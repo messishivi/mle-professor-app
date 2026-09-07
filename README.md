@@ -1,2 +1,65 @@
-# mle-professor-app
-consolidated view of what is going on everyday in the ML/AI field for working MLEs and students 
+# MLE Professor
+
+Consolidated view of what is going on every day in the ML/AI field, for working MLEs.
+
+Local knowledge base: ingest papers, watch an ML/AI pulse, and brief or critique them in chat. Runs on a laptop. Reasoning goes to Groq; papers and read-state stay on disk.
+
+## What you get
+
+- **ML Pulse** — Hugging Face Daily Papers + arXiv (`cs.LG`, `cs.CL`, `cs.AI`), mapped to a paper and a concept
+- **Research Hub** — your SQLite library, read/unread, structured abstracts
+- **Consultant** — layer 1: short plain-English briefing; layer 2: systems critic (KV cache, HBM, FLOPs, parallelism)
+
+Each person runs their own copy. There is no shared server and no shared API key.
+
+## Setup
+
+```bash
+git clone https://github.com/messishivi/mle-professor-app.git
+cd mle-professor-app
+python3 -m venv .venv
+source .venv/bin/activate   # Windows: .venv\Scripts\activate
+pip install -r requirements.txt
+cp .env.example .env
+```
+
+In `.env`, set **your** Groq key (not someone else’s):
+
+```
+GROQ_API_KEY=gsk_...
+GROQ_MODEL=openai/gpt-oss-120b
+```
+
+Create a key at [console.groq.com](https://console.groq.com). Pulse clustering and the consultant need it. Ingest and the library work without it.
+
+```bash
+streamlit run app.py
+```
+
+Open http://127.0.0.1:8501. Click **Refresh ML Pulse** (and **Refresh papers** if you want the library filled from arXiv). Opening the app does not fetch by itself.
+
+Python 3.9+ works. LanceDB needs 3.10+; on 3.9 the app falls back to a numpy index.
+
+## Team rules
+
+- Keep the GitHub repo **private**. Invite teammates; do not make it public.
+- Never commit `.env`, `data/`, or `*.db`. Those are gitignored on purpose.
+- Do not put confidential work documents, customer data, or internal papers into the library or the consultant. Chat text is sent to Groq.
+- Bind Streamlit to localhost only. Do not `--server.address 0.0.0.0` and do not deploy this as a shared cloud app with one key.
+- Rotate a key if it was ever pasted into chat, Slack, or email.
+
+## Architecture
+
+```
+Streamlit (localhost)
+  ├── SQLite          papers, read state, pulse snapshots   (data/mle_knowledge.db)
+  ├── LanceDB/numpy   local semantic index (optional)
+  ├── ArXiv + HF      ingest and ML Pulse (public research only)
+  └── Groq            explain / systems chat
+```
+
+## Tests
+
+```bash
+EMBEDDING_BACKEND=hash MLE_DATA_DIR=/tmp/mle-prof-test pytest -q
+```

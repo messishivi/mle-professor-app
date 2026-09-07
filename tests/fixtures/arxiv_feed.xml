@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom" xmlns:arxiv="http://arxiv.org/schemas/atom">
+  <title>ArXiv Query: cat:cs.LG</title>
+  <entry>
+    <id>http://arxiv.org/abs/1706.03762v1</id>
+    <updated>2017-06-12T17:57:34Z</updated>
+    <published>2017-06-12T17:57:34Z</published>
+    <title>Attention Is All You Need</title>
+    <summary>
+      We propose a new simple network architecture, the Transformer,
+      based solely on attention mechanisms.
+    </summary>
+    <author><name>Ashish Vaswani</name></author>
+    <author><name>Noam Shazeer</name></author>
+    <link href="http://arxiv.org/abs/1706.03762v1" rel="alternate" type="text/html"/>
+    <link title="pdf" href="http://arxiv.org/pdf/1706.03762v1" rel="related" type="application/pdf"/>
+    <arxiv:primary_category term="cs.CL"/>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <arxiv:doi>10.5555/3295222.3295349</arxiv:doi>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/1512.03385v1</id>
+    <published>2015-12-10T00:00:00Z</published>
+    <title>Deep Residual Learning for Image Recognition</title>
+    <summary>Deeper neural networks are more difficult to train.</summary>
+    <author><name>Kaiming He</name></author>
+    <arxiv:primary_category term="cs.CV"/>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <link title="pdf" href="http://arxiv.org/pdf/1512.03385v1.pdf" rel="related" type="application/pdf"/>
+  </entry>
+  <entry>
+    <title></title>
+    <summary>This entry is intentionally broken.</summary>
+  </entry>
+</feed>
