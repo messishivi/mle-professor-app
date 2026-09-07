@@ -298,8 +298,20 @@ def _run_consultant_turn(prompt: str, layer: str) -> None:
             st.session_state[key].append({"role": "assistant", "content": text})
             return
         try:
-            reply = chat_with_consultant(prompt, history, layer=layer)
+            reply = chat_with_consultant(
+                prompt, history, layer=layer, store=get_store()
+            )
             st.markdown(reply.content)
+            if reply.sources:
+                with st.expander("Checked sources (click these — do not trust an unsourced paper name)"):
+                    for src in reply.sources:
+                        kind = src.get("kind") or "source"
+                        title = src.get("title") or "untitled"
+                        url = src.get("url") or ""
+                        if url:
+                            st.markdown(f"- **{kind}** · [{title}]({url})")
+                        else:
+                            st.markdown(f"- **{kind}** · {title}")
             st.session_state[key].append({"role": "assistant", "content": reply.content})
         except Exception as exc:
             st.error(str(exc))
@@ -329,8 +341,8 @@ def render_consultant_terminal() -> None:
     if layer_label == "explain":
         st.markdown(
             "<div class='terminal-hint'>"
-            "First layer · short plain-English briefing · problem, method, why it matters. "
-            "No FLOPs or HBM unless you switch layers."
+            "First layer · short plain-English briefing · cites retrieved links. "
+            "Products (e.g. OpenAI Astra) are not swapped for similarly named papers."
             "</div>",
             unsafe_allow_html=True,
         )

@@ -22,15 +22,21 @@ load_dotenv(ROOT / ".env", override=True)
 
 EXPLAIN_PROMPT = (
     "You are MLE Professor's first-layer explainer. Give a short, plain-English "
-    "briefing of a research paper or ML idea.\n\n"
+    "briefing of a research paper, model, or ML idea.\n\n"
     "The reader is a working ML engineer, not a beginner in a survey course and "
     "not someone asking for a production war-room review.\n\n"
     "Always answer in three tight sections, about 4–6 sentences each:\n"
-    "1. What problem this is solving\n"
-    "2. What they actually did (the method, no jargon dump)\n"
-    "3. Why anyone should care / what changed versus prior work\n\n"
+    "1. What this is (product vs paper — do not mix them up)\n"
+    "2. What it actually does / what they did\n"
+    "3. Why anyone should care\n"
+    "Then a Sources section with markdown links you actually used.\n\n"
     "Rules:\n"
     "- Start with the overall view. Be concrete and short.\n"
+    "- If the user names a product (for example OpenAI Astra / GPT-6 Astra), "
+    "answer that product. Do not swap in a similarly named paper (ASTAR, A*).\n"
+    "- Only cite papers that appear in Retrieved sources, using those exact URLs.\n"
+    "- Never invent an arXiv id, paper title, author, or link. If sources are "
+    "empty or off-topic, say you cannot verify and do not fabricate a paper.\n"
     "- No formulas unless the user asks.\n"
     "- No KV cache, HBM, FLOPs/token, or tensor/pipeline/data-parallelism layouts "
     "unless the user explicitly asks for systems detail.\n"
@@ -89,6 +95,7 @@ class ConsultantReply(BaseModel):
     provider: str
     layer: str = DEFAULT_LAYER
     messages: list[dict[str, str]] = Field(default_factory=list)
+    sources: list[dict[str, Any]] = Field(default_factory=list)
 
 
 def resolve_layer(layer: Optional[str]) -> str:
@@ -136,6 +143,7 @@ def build_messages(
     history: Optional[Sequence[Any]] = None,
     *,
     layer: Optional[str] = None,
+    retrieved: str = "",
 ) -> list[dict[str, str]]:
     text = (user_message or "").strip()
     if not text:
@@ -145,6 +153,8 @@ def build_messages(
     ]
     for turn in _coerce_history(history):
         messages.append({"role": turn.role, "content": turn.content})
+    if retrieved.strip():
+        text = f"{retrieved.strip()}\n\nUser question:\n{text}"
     messages.append({"role": "user", "content": text})
     return messages
 
@@ -173,11 +183,15 @@ class Consultant:
         history: Optional[Sequence[Any]] = None,
         *,
         layer: Optional[str] = None,
+        retrieved: str = "",
+        sources: Optional[list[dict[str, Any]]] = None,
         temperature: float = 0.3,
         max_tokens: int = 1800,
     ) -> ConsultantReply:
         chosen = resolve_layer(layer)
-        messages = build_messages(user_message, history, layer=chosen)
+        messages = build_messages(
+            user_message, history, layer=chosen, retrieved=retrieved
+        )
         response = self.client.chat.completions.create(
             model=self.model,
             messages=messages,
@@ -194,6 +208,7 @@ class Consultant:
             provider=self.provider,
             layer=chosen,
             messages=messages,
+            sources=list(sources or []),
         )
 
 
@@ -205,6 +220,7 @@ def chat_with_consultant(
     history: Optional[Sequence[Any]] = None,
     *,
     layer: Optional[str] = None,
+    store: Any = None,
     temperature: float = 0.3,
     max_tokens: int = 1800,
 ) -> ConsultantReply:
@@ -214,10 +230,17 @@ def chat_with_consultant(
     model = os.getenv("GROQ_MODEL", DEFAULT_MODEL).strip() or DEFAULT_MODEL
     if _default is None or _default.model != model:
         _default = Consultant(model=model)
+    from grounding import format_sources_for_model, gather_sources
+
+    packed = gather_sources(user_message, store)
+    retrieved = format_sources_for_model(packed)
+    source_rows = [s.model_dump(exclude_none=True) for s in packed]
     return _default.chat_with_consultant(
         user_message,
         history,
         layer=layer,
+        retrieved=retrieved,
+        sources=source_rows,
         temperature=temperature,
         max_tokens=max_tokens,
     )
