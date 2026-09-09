@@ -18,7 +18,9 @@ def test_app_sidebar_and_tabs():
     assert [s.value for s in at.subheader] == ["ML Pulse", "Research Hub", "Consultant Terminal"]
     assert [m.label for m in at.metric] == ["Papers", "Unread", "Read"]
     assert any(b.label == "Refresh papers" for b in at.button)
-    assert at.multiselect[0].label == "Categories"
+    labels = [m.label for m in at.multiselect]
+    assert "Categories" in labels
+    assert "I work on" in labels
     assert at.slider[0].label == "Max results"
     assert "plain-English" in at.chat_input[0].placeholder
     tab_labels = [t.label for t in at.tabs]

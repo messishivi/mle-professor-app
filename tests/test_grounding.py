@@ -1,6 +1,10 @@
+from pathlib import Path
+
+from database import PaperDatabase
 from grounding import (
     arxiv_search_query,
     format_sources_for_model,
+    library_sources,
     product_sources,
     query_tokens,
 )
@@ -27,6 +31,18 @@ def test_arxiv_query_is_sanitized():
 def test_stopwords_stripped():
     assert "explain" not in [t.lower() for t in query_tokens("explain the astra model")]
     assert "astra" in [t.lower() for t in query_tokens("explain the astra model")]
+
+
+def test_library_sources_use_summary_raw(tmp_path: Path):
+    db = PaperDatabase(tmp_path / "mle_knowledge.db")
+    db.upsert_paper(
+        id="1706.03762",
+        title="Attention Is All You Need",
+        summary_raw="We propose the Transformer.",
+    )
+    hits = library_sources("Attention Is All You Need", db)
+    assert hits
+    assert "Transformer" in hits[0].snippet
 
 
 def test_format_sources_forbids_invention_when_empty():

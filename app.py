@@ -24,7 +24,16 @@ import pipeline as ingest_pipeline
 from consultant import chat_with_consultant, paper_explain_prompt
 from database import Paper, PaperDatabase, get_db
 from pipeline import DEFAULT_CATEGORIES
-from trends import load_pulse, refresh_pulse
+from trends import (
+    STACK_CHOICES,
+    draft_decision_memo,
+    load_pulse,
+    memo_item_key,
+    refine_decision_memo,
+    refresh_pulse,
+    score_against_stack,
+    stack_key,
+)
 
 load_dotenv(ROOT / ".env", override=False)
 
@@ -210,6 +219,21 @@ def render_sidebar(store: PaperDatabase) -> None:
     st.caption(f"SQLite · `{store.path.name}`")
 
     st.divider()
+    st.markdown("**Your stack**")
+    st.caption("Pulse ranks papers as High fit / Watch / Skip against this.")
+    current_stack = store.get_stack()
+    picked = st.multiselect(
+        "I work on",
+        options=STACK_CHOICES,
+        default=[c for c in current_stack if c in STACK_CHOICES],
+        key="stack_select",
+    )
+    if picked != current_stack:
+        store.set_stack(picked)
+    if picked:
+        st.caption(" · ".join(picked))
+
+    st.divider()
     st.markdown("**ArXiv ingest**")
     categories = st.multiselect(
         "Categories",
@@ -377,35 +401,71 @@ def render_consultant_terminal() -> None:
 def render_ml_pulse(store: PaperDatabase) -> None:
     st.subheader("ML Pulse")
     st.caption(
-        "Not generic X trends (sports, ads). This is the ML/AI feed: Hugging Face Daily Papers "
-        "plus fresh arXiv cs.LG / cs.CL / cs.AI — the same papers the research timeline actually shares. "
-        "Each topic is paired with a paper and a concept."
+        "Morning brief for an MLE: what moved, the paper, the concept, and whether it fits "
+        "your stack. Sources are Hugging Face Daily Papers + arXiv cs.LG / cs.CL / cs.AI."
     )
     snap = load_pulse(store)
     if not snap or not snap.items:
         st.info("No pulse yet. Click **Refresh ML Pulse** in the sidebar.")
         return
-    st.caption(f"Updated {snap.fetched_at}")
-    for i, item in enumerate(snap.items):
+    stack = store.get_stack()
+    view = st.radio(
+        "Show",
+        options=["my_stack", "all"],
+        format_func=lambda v: "For my stack" if v == "my_stack" else "Everything",
+        horizontal=True,
+        key="pulse_view",
+    )
+    ranked = [(score_against_stack(item, stack), i, item) for i, item in enumerate(snap.items)]
+    ranked.sort(key=lambda row: (-row[0].score, row[1]))
+    if view == "my_stack" and stack:
+        ranked = [row for row in ranked if row[0].label != "Skip"]
+        if not ranked:
+            st.info("Nothing on your stack in this pulse. Switch to Everything, or refresh.")
+            return
+    st.caption(f"Updated {snap.fetched_at} · {len(ranked)} items")
+    for fit, i, item in ranked:
         with st.container(border=True):
             st.markdown(f"**{item.topic}**")
-            kind = []
+            kind = [fit.label.lower()]
             if item.paper_id:
                 kind.append("paper")
             if item.concept:
                 kind.append("concept")
+            if item.in_library:
+                kind.append("in library")
             st.markdown(
-                " ".join(f'<span class="tag">{k}</span>' for k in kind)
-                + (
-                    ' <span class="tag">in library</span>'
-                    if item.in_library
-                    else ""
-                ),
+                " ".join(f'<span class="tag">{k}</span>' for k in kind),
                 unsafe_allow_html=True,
             )
+            st.caption(fit.so_what)
             if item.why:
                 st.write(item.why)
-            cols = st.columns((3, 2, 1.2))
+            ikey = memo_item_key(item)
+            skey = stack_key(stack)
+            saved = store.get_memo(ikey, skey)
+            if saved:
+                memo_verdict = saved["verdict"]
+                memo_constraint = saved["constraint_note"]
+                memo_so_what = saved["so_what"]
+                memo_url = saved.get("paper_url") or item.paper_url
+                memo_origin = saved.get("origin") or "heuristic"
+            else:
+                draft = draft_decision_memo(item, fit, stack)
+                memo_verdict = draft.verdict
+                memo_constraint = draft.constraint
+                memo_so_what = draft.so_what
+                memo_url = draft.paper_url
+                memo_origin = draft.origin
+            st.markdown(
+                f"**Decision · {memo_verdict.upper()}**"
+                + (f" · _{memo_origin}_" if memo_origin == "groq" else "")
+            )
+            st.caption(memo_so_what)
+            st.caption(f"Constraint: {memo_constraint}")
+            if memo_url:
+                st.markdown(f"Link: [{memo_url}]({memo_url})")
+            cols = st.columns((3, 2, 1.2, 1.4))
             with cols[0]:
                 if item.paper_id:
                     st.markdown(
@@ -432,6 +492,17 @@ def render_ml_pulse(store: PaperDatabase) -> None:
                     st.session_state.consultant_layer = "explain"
                     st.session_state.pending_user_message = paper_explain_prompt(paper)
                     st.rerun()
+            with cols[3]:
+                if st.button(
+                    "Refine memo",
+                    key=f"pulse-memo-{i}-{ikey}",
+                    use_container_width=True,
+                    disabled=not _api_ready(),
+                ):
+                    draft = draft_decision_memo(item, fit, stack)
+                    refined = refine_decision_memo(item, fit, stack, draft)
+                    store.save_memo(ikey, skey, **refined.as_dict())
+                    st.rerun()
 
 
 def main() -> None:
@@ -452,7 +523,7 @@ def main() -> None:
 <div class="hero">
   <div class="gold">Personal ML knowledge base</div>
   <h1>MLE Professor</h1>
-  <p class="muted">See what ML/AI is moving. Map it to a paper and a concept. Then brief it in plain English.</p>
+  <p class="muted">What moved in ML today, the paper, the concept, and whether it fits your stack — with links you can check.</p>
 </div>
 """,
         unsafe_allow_html=True,

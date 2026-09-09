@@ -55,6 +55,23 @@ CREATE TABLE IF NOT EXISTS pulse_snapshots (
     fetched_at TEXT NOT NULL,
     payload TEXT NOT NULL
 );
+
+CREATE TABLE IF NOT EXISTS settings (
+    key TEXT PRIMARY KEY,
+    value TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS decision_memos (
+    item_key TEXT NOT NULL,
+    stack_key TEXT NOT NULL,
+    verdict TEXT NOT NULL,
+    constraint_note TEXT NOT NULL,
+    so_what TEXT NOT NULL,
+    paper_url TEXT NOT NULL DEFAULT '',
+    origin TEXT NOT NULL DEFAULT 'heuristic',
+    created_at TEXT NOT NULL,
+    PRIMARY KEY (item_key, stack_key)
+);
 """
 
 
@@ -383,6 +400,90 @@ class PaperDatabase:
         if not isinstance(items, list):
             items = []
         return {"fetched_at": str(row["fetched_at"]), "items": items}
+
+    def get_setting(self, key: str, default: str = "") -> str:
+        with self._db() as conn:
+            row = conn.execute("SELECT value FROM settings WHERE key = ?", (key,)).fetchone()
+        return default if row is None else str(row["value"])
+
+    def set_setting(self, key: str, value: str) -> None:
+        with self._db() as conn:
+            conn.execute(
+                """
+                INSERT INTO settings(key, value) VALUES(?, ?)
+                ON CONFLICT(key) DO UPDATE SET value = excluded.value
+                """,
+                (key, value),
+            )
+
+    def get_stack(self) -> list[str]:
+        raw = self.get_setting("stack", "[]")
+        try:
+            value = json.loads(raw)
+        except json.JSONDecodeError:
+            return []
+        if isinstance(value, list):
+            return [str(v) for v in value if str(v).strip()]
+        return []
+
+    def save_memo(
+        self,
+        item_key: str,
+        stack_key: str,
+        *,
+        verdict: str,
+        constraint_note: str,
+        so_what: str,
+        paper_url: str = "",
+        origin: str = "heuristic",
+    ) -> None:
+        with self._db() as conn:
+            conn.execute(
+                """
+                INSERT INTO decision_memos(
+                    item_key, stack_key, verdict, constraint_note, so_what,
+                    paper_url, origin, created_at
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                ON CONFLICT(item_key, stack_key) DO UPDATE SET
+                    verdict = excluded.verdict,
+                    constraint_note = excluded.constraint_note,
+                    so_what = excluded.so_what,
+                    paper_url = excluded.paper_url,
+                    origin = excluded.origin,
+                    created_at = excluded.created_at
+                """,
+                (
+                    item_key,
+                    stack_key,
+                    verdict,
+                    constraint_note,
+                    so_what,
+                    paper_url,
+                    origin,
+                    utcnow(),
+                ),
+            )
+
+    def get_memo(self, item_key: str, stack_key: str) -> Optional[dict[str, Any]]:
+        with self._db() as conn:
+            row = conn.execute(
+                "SELECT * FROM decision_memos WHERE item_key = ? AND stack_key = ?",
+                (item_key, stack_key),
+            ).fetchone()
+        if row is None:
+            return None
+        return {k: row[k] for k in row.keys()}
+
+    def set_stack(self, concepts: list[str]) -> None:
+        cleaned = []
+        seen: set[str] = set()
+        for name in concepts:
+            text = str(name).strip()
+            if not text or text in seen:
+                continue
+            seen.add(text)
+            cleaned.append(text)
+        self.set_setting("stack", json.dumps(cleaned, ensure_ascii=False))
 
     @staticmethod
     def _from_row(row: sqlite3.Row) -> Paper:

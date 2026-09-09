@@ -108,7 +108,11 @@ def library_sources(text: str, store: PaperDatabase, *, limit: int = 4) -> list[
                 kind="library",
                 title=paper.title,
                 url=f"https://arxiv.org/abs/{paper.id}",
-                snippet=(paper.abstract or paper.summary_raw or "")[:280],
+                snippet=(
+                    getattr(paper, "summary_raw", None)
+                    or getattr(paper, "abstract", None)
+                    or ""
+                )[:280],
                 paper_id=paper.id,
             )
         )

@@ -6,7 +6,7 @@ Local knowledge base: ingest papers, watch an ML/AI pulse, and brief or critique
 
 ## What you get
 
-- **ML Pulse** — Hugging Face Daily Papers + arXiv (`cs.LG`, `cs.CL`, `cs.AI`), mapped to a paper and a concept
+- **ML Pulse** — Hugging Face Daily Papers + arXiv (`cs.LG`, `cs.CL`, `cs.AI`), mapped to a paper, a concept, stack fit, and a decision memo (Adopt / Prototype / Watch / Skip + one production constraint)
 - **Research Hub** — your SQLite library, read/unread, structured abstracts
 - **Consultant** — layer 1: short plain-English briefing; layer 2: systems critic (KV cache, HBM, FLOPs, parallelism)
 

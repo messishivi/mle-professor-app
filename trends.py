@@ -10,6 +10,7 @@ from __future__ import annotations
 import json
 import os
 import re
+from dataclasses import dataclass
 from typing import Any, Optional
 import requests
 from pydantic import BaseModel, ConfigDict, Field
@@ -37,7 +38,55 @@ CONCEPTS: list[tuple[str, str, tuple[str, ...]]] = [
     ("Safety / alignment", "Stopping models from causing harm while they pursue a goal.", ("safety", "alignment", "jailbreak", "refusal")),
     ("Multimodal", "One model that takes text plus image, audio, or video.", ("multimodal", "vision-language", "vlm", "audio language")),
     ("Distributed training", "Splitting a big training job across GPUs (data, tensor, pipeline parallel).", ("fsdp", "tensor parallel", "pipeline parallel", "deepspeed")),
+    ("Recommenders", "Ranking, retrieval, and personalization systems.", ("recommend", "two-tower", "ranking", "ctr", "recsys")),
 ]
+
+STACK_CHOICES = [name for name, _blurb, _keys in CONCEPTS]
+
+
+@dataclass(frozen=True)
+class StackFit:
+    label: str
+    score: int
+    so_what: str
+
+
+CONSTRAINTS = {
+    "Transformers": "Watch sequence length and attention memory before you copy the architecture.",
+    "Mixture of Experts": "Serving cost is routing and all-to-all bandwidth, not just train FLOPs.",
+    "RL post-training": "You need preference data and a held-out harm/quality eval, not a vibes demo.",
+    "Long context": "Price the KV cache at your real context; quality often dies before the window does.",
+    "Retrieval-augmented generation": "Measure retrieval recall on YOUR corpus; the generator cannot fix a dead index.",
+    "Speculative decoding": "Gains depend on draft acceptance rate under your latency SLO, not blog speedups.",
+    "Quantization": "Eval the drop on your task and match train/serve dtypes; WikiText is not the test.",
+    "LoRA / adapters": "Decide what stays frozen in prod and how you version adapters per tenant/task.",
+    "Diffusion": "Sample steps vs quality is the product constraint; batch the reverse process if you serve it.",
+    "World models": "Sim-to-real gap and reset cost dominate; do not plan a policy on an uncalibrated latent.",
+    "Agents": "Tool permissions, loop caps, and eval of multi-step tasks — not a single chat score.",
+    "Evaluation / benchmarks": "If it does not match your user task, it is a leaderboard, not a ship gate.",
+    "Safety / alignment": "Define the misuse surface and who owns the refusal policy before a prototype.",
+    "Multimodal": "Modality lag and labeling cost usually beat model choice in the first quarter.",
+    "Distributed training": "Topology (DP/TP/PP) has to match your GPU count and interconnect, or you buy idle time.",
+    "Recommenders": "Offline AUC is not the product; watch position bias, leakage, and training-serving skew.",
+}
+
+
+@dataclass(frozen=True)
+class DecisionMemo:
+    verdict: str
+    constraint: str
+    so_what: str
+    paper_url: str = ""
+    origin: str = "heuristic"
+
+    def as_dict(self) -> dict[str, str]:
+        return {
+            "verdict": self.verdict,
+            "constraint_note": self.constraint,
+            "so_what": self.so_what,
+            "paper_url": self.paper_url,
+            "origin": self.origin,
+        }
 
 
 class PulseItem(BaseModel):
@@ -72,6 +121,159 @@ class RawSignal(BaseModel):
 
 def _clean(text: str) -> str:
     return re.sub(r"\s+", " ", (text or "").strip())
+
+
+def score_against_stack(item: PulseItem, stack: list[str]) -> StackFit:
+    """Rank a pulse item for a working MLE's chosen stack. No extra model call."""
+    if not stack:
+        return StackFit(
+            "Set stack",
+            40,
+            "Pick your stack in the sidebar to rank this as High / Watch / Skip.",
+        )
+    blob = " ".join(
+        [
+            item.topic,
+            item.paper_title,
+            item.concept,
+            item.concept_blurb,
+            item.why,
+            item.abstract,
+        ]
+    ).lower()
+    stacked = {name: keys for name, _blurb, keys in CONCEPTS if name in stack}
+    hits: list[tuple[int, str]] = []
+    for name, keys in stacked.items():
+        n = 0
+        if item.concept == name:
+            n += 4
+        n += sum(1 for k in keys if k in blob)
+        if n:
+            hits.append((n, name))
+    hits.sort(reverse=True)
+    if not hits:
+        focus = ", ".join(stack[:3])
+        return StackFit(
+            "Skip",
+            10,
+            f"Skip unless curious — it does not overlap {focus}.",
+        )
+    best_n, best_name = hits[0]
+    if item.concept in stack or best_n >= 3:
+        return StackFit(
+            "High fit",
+            80 + min(20, best_n),
+            f"On your stack ({best_name}). Worth a 10-minute read if you own this surface.",
+        )
+    return StackFit(
+        "Watch",
+        45 + min(20, best_n),
+        f"Adjacent to {best_name}. Skim the abstract; deep-read only if it names your failure mode.",
+    )
+
+
+def memo_item_key(item: PulseItem) -> str:
+    return (item.paper_id or item.topic)[:120]
+
+
+def stack_key(stack: list[str]) -> str:
+    return json.dumps(sorted({s for s in stack if s}), ensure_ascii=False)
+
+
+def draft_decision_memo(item: PulseItem, fit: StackFit, stack: list[str]) -> DecisionMemo:
+    """Instant Adopt/Prototype/Watch/Skip memo. No model call."""
+    if fit.label == "Skip":
+        verdict = "skip"
+    elif fit.label == "High fit" and item.in_library:
+        verdict = "adopt"
+    elif fit.label == "High fit":
+        verdict = "prototype"
+    else:
+        verdict = "watch"
+    constraint = CONSTRAINTS.get(
+        item.concept,
+        "Name the eval, the latency budget, and the data you would need before a prototype.",
+    )
+    url = item.paper_url or (f"https://arxiv.org/abs/{item.paper_id}" if item.paper_id else "")
+    so_what = fit.so_what
+    if stack and verdict == "prototype":
+        so_what = f"Prototype on {item.concept or 'this idea'} against your stack — one eval, one constraint, then kill or keep."
+    elif verdict == "adopt":
+        so_what = "Already in your library and on-stack. Treat it as a design input, not a new science project."
+    return DecisionMemo(
+        verdict=verdict,
+        constraint=constraint,
+        so_what=so_what,
+        paper_url=url,
+        origin="heuristic",
+    )
+
+
+def refine_decision_memo(
+    item: PulseItem,
+    fit: StackFit,
+    stack: list[str],
+    draft: DecisionMemo,
+) -> DecisionMemo:
+    """Optional Groq pass. Falls back to the heuristic draft on any failure."""
+    api_key = os.getenv("GROQ_API_KEY", "").strip()
+    if not api_key:
+        return draft
+    try:
+        from groq import Groq
+    except ImportError:
+        return draft
+    url = draft.paper_url
+    payload = {
+        "stack": stack,
+        "fit": fit.label,
+        "concept": item.concept,
+        "title": item.paper_title or item.topic,
+        "paper_id": item.paper_id,
+        "paper_url": url,
+        "abstract": (item.abstract or item.why)[:800],
+        "allowed_verdicts": ["adopt", "prototype", "watch", "skip"],
+    }
+    try:
+        client = Groq(api_key=api_key)
+        model = os.getenv("GROQ_MODEL", "openai/gpt-oss-120b").strip() or "openai/gpt-oss-120b"
+        response = client.chat.completions.create(
+            model=model,
+            messages=[
+                {
+                    "role": "system",
+                    "content": (
+                        "You write a 3-line decision memo for a staff MLE. JSON only: "
+                        '{"verdict":"adopt|prototype|watch|skip","constraint":str,"so_what":str}. '
+                        "Adopt = already investing and should use this as design input. "
+                        "Prototype = worth a time-boxed experiment. Watch = skim only. Skip = ignore. "
+                        "constraint = one production constraint (eval, latency, data, serving). "
+                        "Use only the given paper_url; never invent an arXiv id."
+                    ),
+                },
+                {"role": "user", "content": json.dumps(payload, ensure_ascii=False)},
+            ],
+            temperature=0.2,
+            max_tokens=400,
+        )
+        raw = (response.choices[0].message.content or "").strip()
+        body = _parse_json(raw)
+    except Exception:
+        return draft
+    if not isinstance(body, dict):
+        return draft
+    verdict = str(body.get("verdict") or draft.verdict).strip().lower()
+    if verdict not in {"adopt", "prototype", "watch", "skip"}:
+        verdict = draft.verdict
+    constraint = str(body.get("constraint") or draft.constraint).strip() or draft.constraint
+    so_what = str(body.get("so_what") or draft.so_what).strip() or draft.so_what
+    return DecisionMemo(
+        verdict=verdict,
+        constraint=constraint,
+        so_what=so_what,
+        paper_url=url,
+        origin="groq",
+    )
 
 
 def match_concept(title: str, abstract: str) -> tuple[str, str]:
