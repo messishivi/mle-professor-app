@@ -12,6 +12,8 @@ Local knowledge base: ingest papers, watch an ML/AI pulse, and brief or critique
 
 Each person runs their own copy. There is no shared server and no shared API key.
 
+Released under the [MIT License](LICENSE). This is a personal project, not affiliated with any employer.
+
 ## Setup
 
 ```bash
@@ -40,9 +42,8 @@ Open http://127.0.0.1:8501. Click **Refresh ML Pulse** (and **Refresh papers** i
 
 Python 3.9+ works. LanceDB needs 3.10+; on 3.9 the app falls back to a numpy index.
 
-## Team rules
+## Usage notes
 
-- Keep the GitHub repo **private**. Invite teammates; do not make it public.
 - Never commit `.env`, `data/`, or `*.db`. Those are gitignored on purpose.
 - Do not put confidential work documents, customer data, or internal papers into the library or the consultant. Chat text is sent to Groq.
 - Bind Streamlit to localhost only. Do not `--server.address 0.0.0.0` and do not deploy this as a shared cloud app with one key.
@@ -63,3 +64,7 @@ Streamlit (localhost)
 ```bash
 EMBEDDING_BACKEND=hash MLE_DATA_DIR=/tmp/mle-prof-test pytest -q
 ```
+
+## License
+
+[MIT](LICENSE) © 2026 Shivani
