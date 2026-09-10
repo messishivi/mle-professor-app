@@ -11,7 +11,7 @@ import os
 import sys
 from pathlib import Path
 from types import SimpleNamespace
-from typing import Optional
+from typing import Any, Optional
 
 ROOT = Path(__file__).resolve().parent
 if str(ROOT) not in sys.path:
@@ -21,8 +21,9 @@ import streamlit as st
 from dotenv import load_dotenv
 
 import pipeline as ingest_pipeline
-from consultant import chat_with_consultant, paper_explain_prompt
+from consultant import chat_with_consultant, paper_apply_prompt
 from database import Paper, PaperDatabase, get_db
+from repo import fetch_readme, parse_repo
 from pipeline import DEFAULT_CATEGORIES
 from trends import (
     STACK_CHOICES,
@@ -78,6 +79,11 @@ div[data-testid="stMetric"] {
 }
 </style>
 """
+
+MAIN_PULSE = "ML Pulse"
+MAIN_HUB = "Research Hub"
+MAIN_CONSULTANT = "Consultant Terminal"
+MAIN_SECTIONS = (MAIN_PULSE, MAIN_HUB, MAIN_CONSULTANT)
 
 CATEGORY_OPTIONS = [
     "cs.CL",
@@ -183,10 +189,8 @@ def render_paper(store: PaperDatabase, paper: Paper) -> None:
             if st.button(label, key=f"read-{paper.id}", use_container_width=True):
                 store.set_read_status(paper.id, 0 if paper.read_status else 1)
                 st.rerun()
-            if st.button("Explain", key=f"ex-{paper.id}", use_container_width=True):
-                st.session_state.consultant_layer = "explain"
-                st.session_state.pending_user_message = paper_explain_prompt(paper)
-                st.rerun()
+            if st.button("Apply to my system", key=f"ex-{paper.id}", use_container_width=True):
+                queue_apply(store, paper)
         if paper.summary_raw:
             st.write(paper.summary_raw)
         render_structured(paper)
@@ -232,6 +236,66 @@ def render_sidebar(store: PaperDatabase) -> None:
         store.set_stack(picked)
     if picked:
         st.caption(" · ".join(picked))
+    if "application_ctx" not in st.session_state:
+        st.session_state.application_ctx = store.get_application()
+    if "known_papers_ctx" not in st.session_state:
+        st.session_state.known_papers_ctx = store.get_known_papers()
+    st.text_area(
+        "I'm building",
+        placeholder="What you ship — e.g. RL post-training, RAG over a corpus, two-tower rec… train/serve split",
+        key="application_ctx",
+        height=90,
+    )
+    st.text_input(
+        "Papers I already use",
+        placeholder="Methods already in the stack, e.g. PPO, DPO",
+        key="known_papers_ctx",
+    )
+    if "repo_url_ctx" not in st.session_state:
+        st.session_state.repo_url_ctx = store.get_repo_url()
+    st.text_input(
+        "Repo (README)",
+        placeholder="https://github.com/you/your-service",
+        key="repo_url_ctx",
+        help="Public GitHub/GitLab README is used in Apply delta. Sent to Groq. No private/company repos.",
+    )
+    if st.session_state.application_ctx != store.get_application():
+        store.set_application(st.session_state.application_ctx)
+    if st.session_state.known_papers_ctx != store.get_known_papers():
+        store.set_known_papers(st.session_state.known_papers_ctx)
+    repo_url = (st.session_state.repo_url_ctx or "").strip()
+    if repo_url != store.get_repo_url():
+        store.set_repo_url(repo_url)
+        store.set_repo_readme("", source_url="")
+        if parse_repo(repo_url):
+            try:
+                with st.spinner("Fetching README…"):
+                    doc = fetch_readme(repo_url)
+                store.set_repo_readme(doc.content, source_url=doc.readme_url)
+            except Exception as exc:
+                st.warning(str(exc))
+    if store.get_repo_readme():
+        st.caption(
+            f"README loaded · {len(store.get_repo_readme())} chars · used in Apply delta"
+        )
+        with st.expander("README preview"):
+            st.markdown(store.get_repo_readme()[:1500])
+        reload_label = "Reload README"
+    elif parse_repo(repo_url):
+        st.caption("Paste a public repo, then load the README for Apply delta.")
+        reload_label = "Load README"
+    else:
+        reload_label = ""
+        if repo_url:
+            st.caption("Need a GitHub or GitLab repo URL.")
+    if reload_label and st.button(reload_label, use_container_width=True):
+        try:
+            with st.spinner("Fetching README…"):
+                doc = fetch_readme(store.get_repo_url() or repo_url)
+            store.set_repo_readme(doc.content, source_url=doc.readme_url)
+            st.rerun()
+        except Exception as exc:
+            st.warning(str(exc))
 
     st.divider()
     st.markdown("**ArXiv ingest**")
@@ -322,9 +386,10 @@ def _run_consultant_turn(prompt: str, layer: str) -> None:
             st.session_state[key].append({"role": "assistant", "content": text})
             return
         try:
-            reply = chat_with_consultant(
-                prompt, history, layer=layer, store=get_store()
-            )
+            with st.spinner("Mapping onto your system…" if layer == "apply" else "Consulting…"):
+                reply = chat_with_consultant(
+                    prompt, history, layer=layer, store=get_store()
+                )
             st.markdown(reply.content)
             if reply.sources:
                 with st.expander("Checked sources (click these — do not trust an unsourced paper name)"):
@@ -345,27 +410,37 @@ def _run_consultant_turn(prompt: str, layer: str) -> None:
 def render_consultant_terminal() -> None:
     st.subheader("Consultant Terminal")
     if "consultant_layer" not in st.session_state:
-        st.session_state.consultant_layer = "explain"
-    for layer in ("explain", "systems"):
+        st.session_state.consultant_layer = "apply"
+    for layer in ("apply", "explain", "systems"):
         key = _history_key(layer)
         if key not in st.session_state:
             st.session_state[key] = []
 
     layer_label = st.radio(
         "Layer",
-        options=["explain", "systems"],
-        format_func=lambda value: (
-            "1 · Plain English (default)"
-            if value == "explain"
-            else "2 · Systems critic"
-        ),
+        options=["apply", "explain", "systems"],
+        format_func=lambda value: {
+            "apply": "1 · Apply to my system",
+            "explain": "2 · Plain English",
+            "systems": "3 · Systems critic",
+        }[value],
         horizontal=True,
         key="consultant_layer",
     )
-    if layer_label == "explain":
+    if layer_label == "apply":
         st.markdown(
             "<div class='terminal-hint'>"
-            "First layer · short plain-English briefing · cites retrieved links. "
+            "Default · map the paper onto YOUR application (user / item / data / "
+            "train / serve / eval): Use / Adapt / Ignore, delta vs papers + repo README, "
+            "then an implementation path."
+            "</div>",
+            unsafe_allow_html=True,
+        )
+        placeholder = "How do I apply this paper to my system given the papers I already use?"
+    elif layer_label == "explain":
+        st.markdown(
+            "<div class='terminal-hint'>"
+            "Short plain-English briefing · cites retrieved links. "
             "Products (e.g. OpenAI Astra) are not swapped for similarly named papers."
             "</div>",
             unsafe_allow_html=True,
@@ -480,7 +555,7 @@ def render_ml_pulse(store: PaperDatabase) -> None:
                     st.caption(item.concept_blurb)
             with cols[2]:
                 if item.paper_id and st.button(
-                    "Explain", key=f"pulse-ex-{i}-{item.paper_id}", use_container_width=True
+                    "Apply", key=f"pulse-ex-{i}-{item.paper_id}", use_container_width=True
                 ):
                     paper = SimpleNamespace(
                         id=item.paper_id,
@@ -489,9 +564,7 @@ def render_ml_pulse(store: PaperDatabase) -> None:
                         published_date="",
                         summary_raw=item.abstract or item.why,
                     )
-                    st.session_state.consultant_layer = "explain"
-                    st.session_state.pending_user_message = paper_explain_prompt(paper)
-                    st.rerun()
+                    queue_apply(store, paper)
             with cols[3]:
                 if st.button(
                     "Refine memo",
@@ -503,6 +576,34 @@ def render_ml_pulse(store: PaperDatabase) -> None:
                     refined = refine_decision_memo(item, fit, stack, draft)
                     store.save_memo(ikey, skey, **refined.as_dict())
                     st.rerun()
+
+
+def queue_apply(store: PaperDatabase, paper: Any) -> None:
+    """Run Apply on the Consultant pane; Streamlit tabs cannot be selected in code."""
+    st.session_state.consultant_layer = "apply"
+    st.session_state.pending_user_message = paper_apply_prompt(
+        paper,
+        application=store.get_application(),
+        known_papers=store.get_known_papers(),
+        repo_url=store.get_repo_url(),
+    )
+    st.session_state.open_consultant = True
+    st.rerun()
+
+
+def _active_section() -> str:
+    # Flag must be applied before the section widget is instantiated.
+    if st.session_state.pop("open_consultant", False):
+        st.session_state.main_section = MAIN_CONSULTANT
+    if "main_section" not in st.session_state:
+        st.session_state.main_section = MAIN_PULSE
+    return st.radio(
+        "Section",
+        options=list(MAIN_SECTIONS),
+        horizontal=True,
+        key="main_section",
+        label_visibility="collapsed",
+    )
 
 
 def main() -> None:
@@ -529,12 +630,12 @@ def main() -> None:
         unsafe_allow_html=True,
     )
 
-    pulse_tab, hub, terminal = st.tabs(["ML Pulse", "Research Hub", "Consultant Terminal"])
-    with pulse_tab:
+    section = _active_section()
+    if section == MAIN_PULSE:
         render_ml_pulse(store)
-    with hub:
+    elif section == MAIN_HUB:
         render_research_hub(store)
-    with terminal:
+    else:
         render_consultant_terminal()
 
 

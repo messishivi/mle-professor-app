@@ -94,3 +94,15 @@ def test_parameterized_queries_reject_sql_in_title(db: PaperDatabase):
     paper = db.get_paper("2106.09685")
     assert paper is not None
     assert "DROP TABLE" in paper.title
+
+
+def test_repo_readme_settings(db: PaperDatabase):
+    assert db.get_repo_url() == ""
+    db.set_repo_url("https://github.com/you/your-service")
+    db.set_repo_readme("# service\nRanker in /rank", source_url="https://github.com/you/your-service#readme")
+    assert db.get_repo_url() == "https://github.com/you/your-service"
+    assert "Ranker in /rank" in db.get_repo_readme()
+    assert db.get_repo_readme_url().endswith("#readme")
+    db.set_repo_url("")
+    db.set_repo_readme("", source_url="")
+    assert db.get_repo_readme() == ""

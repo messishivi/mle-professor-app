@@ -8,7 +8,9 @@ Local knowledge base: ingest papers, watch an ML/AI pulse, and brief or critique
 
 - **ML Pulse** — Hugging Face Daily Papers + arXiv (`cs.LG`, `cs.CL`, `cs.AI`), mapped to a paper, a concept, stack fit, and a decision memo (Adopt / Prototype / Watch / Skip + one production constraint)
 - **Research Hub** — your SQLite library, read/unread, structured abstracts
-- **Consultant** — layer 1: short plain-English briefing; layer 2: systems critic (KV cache, HBM, FLOPs, parallelism)
+- **Consultant** — default: map a paper onto *your* system (Use / Adapt / Ignore + implementation path). Optional plain-English briefing and systems critic.
+
+Set **I'm building**, **Papers I already use**, and optionally a public **Repo (README)**. **Apply to my system** maps a paper onto your stack (user / item / data / train / serve / eval) and deltas against those papers and the README.
 
 Each person runs their own copy. There is no shared server and no shared API key.
 

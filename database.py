@@ -416,6 +416,34 @@ class PaperDatabase:
                 (key, value),
             )
 
+    def get_application(self) -> str:
+        return self.get_setting("application", "")
+
+    def set_application(self, text: str) -> None:
+        self.set_setting("application", (text or "").strip()[:4000])
+
+    def get_known_papers(self) -> str:
+        return self.get_setting("known_papers", "")
+
+    def set_known_papers(self, text: str) -> None:
+        self.set_setting("known_papers", (text or "").strip()[:1000])
+
+    def get_repo_url(self) -> str:
+        return self.get_setting("repo_url", "")
+
+    def set_repo_url(self, url: str) -> None:
+        self.set_setting("repo_url", (url or "").strip()[:500])
+
+    def get_repo_readme(self) -> str:
+        return self.get_setting("repo_readme", "")
+
+    def get_repo_readme_url(self) -> str:
+        return self.get_setting("repo_readme_url", "")
+
+    def set_repo_readme(self, content: str, *, source_url: str = "") -> None:
+        self.set_setting("repo_readme", (content or "")[:6000])
+        self.set_setting("repo_readme_url", (source_url or "").strip()[:500])
+
     def get_stack(self) -> list[str]:
         raw = self.get_setting("stack", "[]")
         try:

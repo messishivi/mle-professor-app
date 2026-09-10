@@ -4,6 +4,7 @@ from unittest.mock import MagicMock
 import pytest
 
 from consultant import (
+    APPLY_PROMPT,
     EXPLAIN_PROMPT,
     SYSTEMS_PROMPT,
     SYSTEM_PROMPT,
@@ -11,18 +12,29 @@ from consultant import (
     ConsultantReply,
     build_messages,
     chat_with_consultant,
+    format_application_context,
+    paper_apply_prompt,
     paper_explain_prompt,
 )
 
 
-def test_default_layer_is_plain_english():
-    messages = build_messages("Explain Kimi K3.", history=[])
-    assert messages[0] == {"role": "system", "content": EXPLAIN_PROMPT}
+def test_default_layer_is_apply_to_system():
+    messages = build_messages("How do I apply this to my rec stack?", history=[])
+    assert messages[0] == {"role": "system", "content": APPLY_PROMPT}
     assert messages[0]["content"] == SYSTEM_PROMPT
-    assert "plain-English" in SYSTEM_PROMPT
-    assert "three tight sections" in SYSTEM_PROMPT
+    assert "implementation path" in SYSTEM_PROMPT.lower()
+    assert "Use / Adapt / Ignore" in SYSTEM_PROMPT
     assert "Never invent an arXiv id" in SYSTEM_PROMPT
-    assert "Do not swap in a similarly named paper" in SYSTEM_PROMPT
+    assert "repo README" in SYSTEM_PROMPT
+    assert "user / item" in SYSTEM_PROMPT.lower() or "user (who" in SYSTEM_PROMPT.lower()
+    assert "Do not invent a persona tower" in SYSTEM_PROMPT
+    assert "generic rec-stack map" not in SYSTEM_PROMPT
+
+
+def test_explain_layer_still_plain_english():
+    messages = build_messages("Explain Kimi K3.", history=[], layer="explain")
+    assert messages[0]["content"] == EXPLAIN_PROMPT
+    assert "plain-English" in EXPLAIN_PROMPT
 
 
 def test_systems_layer_keeps_original_persona():
@@ -44,7 +56,7 @@ def test_history_keeps_user_assistant_and_drops_system():
     messages = build_messages("Go one level deeper on the method.", history)
     roles = [m["role"] for m in messages]
     assert roles == ["system", "user", "assistant", "user"]
-    assert messages[0]["content"] == EXPLAIN_PROMPT
+    assert messages[0]["content"] == APPLY_PROMPT
     assert "competing prompt" not in str(messages[1:])
 
 
@@ -63,8 +75,8 @@ def test_chat_with_consultant_sends_explain_prompt():
     consultant = Consultant(client=client, model="openai/gpt-oss-120b")
     reply = consultant.chat_with_consultant("Explain Kimi K3.", history=[])
     assert reply.content == "Short briefing."
-    assert reply.layer == "explain"
-    assert captured["messages"][0]["content"] == EXPLAIN_PROMPT
+    assert reply.layer == "apply"
+    assert captured["messages"][0]["content"] == APPLY_PROMPT
     assert captured["messages"][-1]["content"].startswith("Explain Kimi K3") or "Kimi K3" in captured["messages"][-1]["content"]
 
 
@@ -83,6 +95,79 @@ def test_systems_layer_is_opt_in():
     consultant = Consultant(client=client, model="openai/gpt-oss-120b")
     consultant.chat_with_consultant("Cost KV cache.", history=[], layer="systems")
     assert captured["messages"][0]["content"] == SYSTEMS_PROMPT
+
+
+def test_paper_apply_prompt_asks_for_implementation_path():
+    paper = SimpleNamespace(
+        id="2606.12198",
+        title="Audio feedback for RL agents",
+        authors="et al.",
+        published_date="2026-06-10",
+        summary_raw="Distilled audio policy as environment feedback.",
+    )
+    text = paper_apply_prompt(
+        paper,
+        application="RL post-training for a speech policy",
+        known_papers="PPO, DPO",
+        repo_url="https://github.com/you/speech-rl",
+    )
+    assert "RL post-training" in text
+    assert "PPO, DPO" in text
+    assert "github.com/you/speech-rl" in text
+    assert "README" in text
+    assert "implement" in text.lower() or "application" in text.lower()
+    assert "do not assume a rec stack" in text.lower()
+    assert "persona/user model" not in text.lower()
+    assert "retrieval, ranking" not in text.lower()
+
+
+def test_format_application_context_names_known_papers():
+    block = format_application_context(
+        "RL post-training for a speech policy",
+        ["RL post-training"],
+        "PPO, DPO",
+        repo_url="https://github.com/you/speech-rl",
+        repo_readme="# speech-rl\nPolicy in training/, serve via FastAPI.",
+    )
+    assert "RL post-training" in block
+    assert "PPO" in block
+    assert "recommender template" in block.lower()
+    assert "github.com/you/speech-rl" in block
+    assert "Policy in training/" in block
+    assert "delta" in block.lower()
+
+
+def test_chat_with_consultant_injects_repo_readme(monkeypatch):
+    captured = {}
+
+    fake = MagicMock()
+    fake.model = "openai/gpt-oss-120b"
+
+    def capture(user_message, history, **kwargs):
+        captured["retrieved"] = kwargs.get("retrieved")
+        captured["sources"] = kwargs.get("sources")
+        return SimpleNamespace(content="ok", layer="apply", sources=kwargs.get("sources") or [])
+
+    fake.chat_with_consultant.side_effect = capture
+    monkeypatch.setattr("consultant._default", fake)
+    monkeypatch.setenv("GROQ_MODEL", "openai/gpt-oss-120b")
+    monkeypatch.setattr("grounding.gather_sources", lambda *a, **k: [])
+    monkeypatch.setattr(
+        "grounding.format_sources_for_model",
+        lambda sources: "Retrieved sources:\n" + "\n".join(s.url for s in sources if s.url),
+    )
+    store = SimpleNamespace(
+        get_application=lambda: "speech policy",
+        get_stack=lambda: ["RL post-training"],
+        get_known_papers=lambda: "PPO",
+        get_repo_url=lambda: "https://github.com/you/speech-rl",
+        get_repo_readme=lambda: "# speech-rl\nFastAPI serve",
+        get_repo_readme_url=lambda: "https://github.com/you/speech-rl#readme",
+    )
+    chat_with_consultant("apply this", [], store=store)
+    assert "FastAPI serve" in captured["retrieved"]
+    assert "speech-rl" in captured["retrieved"]
+    assert any(s.get("kind") == "repo" for s in captured["sources"])
 
 
 def test_paper_explain_prompt_includes_abstract():
