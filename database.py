@@ -10,6 +10,7 @@ which would delete-and-reinsert and wipe ``read_status`` / ``added_at``.
 from __future__ import annotations
 
 import json
+import os
 import re
 import sqlite3
 from contextlib import contextmanager
@@ -152,7 +153,15 @@ class PaperDatabase:
     """CRUD + conflict-safe upsert over ``mle_knowledge.db``."""
 
     def __init__(self, path: Union[str, Path, None] = None) -> None:
-        self.path = Path(path) if path is not None else DEFAULT_DB_PATH
+        if path is not None:
+            self.path = Path(path)
+        else:
+            override = os.getenv("MLE_DATA_DIR", "").strip()
+            self.path = (
+                Path(override).expanduser() / "mle_knowledge.db"
+                if override
+                else DEFAULT_DB_PATH
+            )
         self.path.parent.mkdir(parents=True, exist_ok=True)
         self._init_schema()
 

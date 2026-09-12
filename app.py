@@ -1,7 +1,7 @@
 """MLE Professor — Streamlit entry point.
 
 Sidebar: ArXiv ingest + SQLite stats.
-Tabs: Research Hub (papers) and Consultant Terminal (Grok/OpenAI).
+Panes: ML Pulse (morning brief + Saved library) and Consultant Terminal.
 """
 
 from __future__ import annotations
@@ -20,6 +20,7 @@ if str(ROOT) not in sys.path:
 import streamlit as st
 from dotenv import load_dotenv
 
+import demo
 import pipeline as ingest_pipeline
 from consultant import chat_with_consultant, paper_apply_prompt
 from database import Paper, PaperDatabase, get_db
@@ -81,9 +82,8 @@ div[data-testid="stMetric"] {
 """
 
 MAIN_PULSE = "ML Pulse"
-MAIN_HUB = "Research Hub"
 MAIN_CONSULTANT = "Consultant Terminal"
-MAIN_SECTIONS = (MAIN_PULSE, MAIN_HUB, MAIN_CONSULTANT)
+MAIN_SECTIONS = (MAIN_PULSE, MAIN_CONSULTANT)
 
 CATEGORY_OPTIONS = [
     "cs.CL",
@@ -104,7 +104,8 @@ def get_store() -> PaperDatabase:
 
 
 def _api_ready() -> bool:
-    return bool(os.getenv("GROQ_API_KEY", "").strip())
+    # Demo mode: a key pasted into the sidebar (session state only) also counts.
+    return bool(demo.effective_groq_key())
 
 
 def _stats(store: PaperDatabase) -> dict[str, int]:
@@ -213,6 +214,8 @@ def run_ingest(store: PaperDatabase, categories: list[str], max_results: int) ->
 
 
 def render_sidebar(store: PaperDatabase) -> None:
+    if demo.demo_enabled():
+        demo.render_demo_banner()
     stats = _stats(store)
     st.markdown("### MLE Professor")
     st.caption("Research hub + staff-level systems consultant")
@@ -343,13 +346,18 @@ def render_sidebar(store: PaperDatabase) -> None:
     if _api_ready():
         model = os.getenv("GROQ_MODEL", "openai/gpt-oss-120b")
         st.success(f"Consultant ready · Groq · {model}")
+    elif demo.demo_enabled():
+        st.warning("Paste a Groq key above to unlock the Consultant (this session only).")
     else:
         st.warning("Set `GROQ_API_KEY` in `.env` for the Consultant Terminal.")
 
 
-def render_research_hub(store: PaperDatabase) -> None:
-    st.subheader("Research Hub")
-    st.caption("Papers in `mle_knowledge.db`. Structured Atom fields stay attached to each row.")
+def render_saved(store: PaperDatabase) -> None:
+    st.subheader("Saved")
+    st.caption(
+        "Your library. Pulse is the morning brief; this is what you kept "
+        "(Refresh papers in the sidebar)."
+    )
     controls = st.columns((2, 1.2, 1))
     query = controls[0].text_input("Filter", placeholder="title, author, abstract…")
     status = controls[1].selectbox("Status", ["All", "Unread", "Read"])
@@ -365,7 +373,7 @@ def render_research_hub(store: PaperDatabase) -> None:
 
     papers = store.list_papers(read_status=read_status, query=query or "")
     if not papers:
-        st.info("No papers yet. Use **Refresh papers** in the sidebar to pull the latest ArXiv Atom feed.")
+        st.info("Nothing saved yet. Use **Refresh papers** in the sidebar to pull ArXiv into this library.")
         return
     st.caption(f"{len(papers)} paper{'s' if len(papers) != 1 else ''}")
     for paper in papers:
@@ -477,24 +485,32 @@ def render_consultant_terminal() -> None:
 
 
 def render_ml_pulse(store: PaperDatabase) -> None:
+    view = st.radio(
+        "Show",
+        options=["my_stack", "all", "saved"],
+        format_func=lambda v: {
+            "my_stack": "For my stack",
+            "all": "Everything",
+            "saved": "Saved",
+        }[v],
+        horizontal=True,
+        key="pulse_view",
+    )
+    if view == "saved":
+        render_saved(store)
+        return
     st.subheader("ML Pulse")
     st.caption(
         "Morning brief: Hugging Face Daily Papers **trending** plus newest arXiv "
         "cs.LG / cs.CL / cs.AI, limited to the last 60 days. "
-        "**For my stack** re-ranks that list. Not the library Max results slider."
+        "**For my stack** re-ranks that list. **Saved** is your library. "
+        "Not the library Max results slider."
     )
     snap = load_pulse(store)
     if not snap or not snap.items:
         st.info("No pulse yet. Click **Refresh ML Pulse** in the sidebar.")
         return
     stack = store.get_stack()
-    view = st.radio(
-        "Show",
-        options=["my_stack", "all"],
-        format_func=lambda v: "For my stack" if v == "my_stack" else "Everything",
-        horizontal=True,
-        key="pulse_view",
-    )
     ranked = [(score_against_stack(item, stack), i, item) for i, item in enumerate(snap.items)]
     if view == "my_stack" and stack:
         ranked.sort(key=lambda row: (-row[0].score, row[1]))
@@ -605,6 +621,9 @@ def _active_section() -> str:
     # Flag must be applied before the section widget is instantiated.
     if st.session_state.pop("open_consultant", False):
         st.session_state.main_section = MAIN_CONSULTANT
+    if st.session_state.get("main_section") == "Research Hub":
+        st.session_state.main_section = MAIN_PULSE
+        st.session_state.pulse_view = "saved"
     if "main_section" not in st.session_state:
         st.session_state.main_section = MAIN_PULSE
     return st.radio(
@@ -625,6 +644,8 @@ def main() -> None:
     )
     st.markdown(CSS, unsafe_allow_html=True)
     store = get_store()
+    if demo.demo_enabled():
+        demo.seed_demo_data(store)
 
     with st.sidebar:
         render_sidebar(store)
@@ -643,8 +664,6 @@ def main() -> None:
     section = _active_section()
     if section == MAIN_PULSE:
         render_ml_pulse(store)
-    elif section == MAIN_HUB:
-        render_research_hub(store)
     else:
         render_consultant_terminal()
 

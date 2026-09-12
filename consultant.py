@@ -146,7 +146,12 @@ def prompt_for(layer: Optional[str] = None) -> str:
 
 
 def _resolve_client() -> tuple[Groq, str]:
-    api_key = os.getenv("GROQ_API_KEY", "").strip()
+    try:
+        from demo import effective_groq_key
+
+        api_key = effective_groq_key()
+    except Exception:
+        api_key = os.getenv("GROQ_API_KEY", "").strip()
     if not api_key:
         raise RuntimeError("Set GROQ_API_KEY in the environment or .env.")
     model = os.getenv("GROQ_MODEL", DEFAULT_MODEL).strip() or DEFAULT_MODEL

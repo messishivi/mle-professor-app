@@ -7,7 +7,6 @@ from streamlit.testing.v1 import AppTest
 from database import get_db
 from pipeline import IngestResult
 
-HUB = "Research Hub"
 CONSULTANT = "Consultant Terminal"
 
 
@@ -20,6 +19,14 @@ def _app() -> AppTest:
 
 def _switch(at: AppTest, section: str) -> AppTest:
     at.session_state.main_section = section
+    at.run()
+    assert not at.exception
+    return at
+
+
+def _open_saved(at: AppTest) -> AppTest:
+    at.session_state.main_section = "ML Pulse"
+    at.session_state.pulse_view = "saved"
     at.run()
     assert not at.exception
     return at
@@ -39,13 +46,18 @@ def test_app_sidebar_and_tabs():
     assert any("repo" in t.label.lower() for t in at.text_input)
     assert not at.tabs
     assert any(b.label == "Refresh ML Pulse" for b in at.button)
+    radios = [r.label for r in at.radio]
+    assert "Section" in radios
+    assert "Show" in radios
+    section = [r for r in at.radio if r.label == "Section"][0]
+    assert list(section.options) == ["ML Pulse", "Consultant Terminal"]
     _switch(at, CONSULTANT)
     assert [s.value for s in at.subheader] == ["Consultant Terminal"]
     ph = at.chat_input[0].placeholder.lower()
     assert "apply" in ph or "system" in ph
 
 
-def test_research_hub_renders_paper_and_toggles_read():
+def test_saved_renders_paper_and_toggles_read():
     store = get_db()
     store.upsert_paper(
         id="1706.03762",
@@ -56,7 +68,8 @@ def test_research_hub_renders_paper_and_toggles_read():
         summary_structured={"primary_category": "cs.CL", "categories": ["cs.CL", "cs.LG"]},
         read_status=0,
     )
-    at = _switch(_app(), HUB)
+    at = _open_saved(_app())
+    assert [s.value for s in at.subheader] == ["Saved"]
     markdown = " ".join(str(m.value) for m in at.markdown)
     assert "Attention Is All You Need" in markdown
     read_buttons = [b for b in at.button if getattr(b, "key", None) == "read-1706.03762"]
@@ -83,7 +96,7 @@ def test_apply_to_my_system_opens_consultant_and_runs():
     with patch.dict(os.environ, {"GROQ_API_KEY": "test-key"}, clear=False), patch(
         "consultant.chat_with_consultant", return_value=fake
     ) as mock_chat:
-        at = _switch(_app(), HUB)
+        at = _open_saved(_app())
         apply_btns = [
             b for b in at.button if getattr(b, "key", None) == "ex-1706.03762"
         ]
