@@ -1,0 +1,42 @@
+# Daily ML Pulse digest -> static site (GitHub Pages).
+#
+# Runs every morning, rebuilds docs/pulse/index.html from the public
+# Hugging Face + arXiv feeds (no LLM key needed; memos are the rule-based
+# drafts), and commits the result. Enable Pages with source = "Deploy from a
+# branch", branch = main, folder = /docs.
+name: pulse-digest
+
+on:
+  schedule:
+    - cron: "0 13 * * *" # 06:00 PT daily
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  digest:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install (no torch needed for the digest)
+        run: |
+          pip install pydantic requests python-dotenv
+
+      - name: Build digest
+        run: |
+          MLE_DATA_DIR=/tmp/pulse-digest python scripts/build_pulse_digest.py \
+            --out docs/pulse/index.html
+
+      - name: Commit digest
+        run: |
+          git config user.name "mle-professor-bot"
+          git config user.email "mle-professor-bot@users.noreply.github.com"
+          git add docs/pulse/index.html
+          git diff --quiet --cached || git commit -m "Daily ML pulse digest $(date -u +%F)"
+          git push
