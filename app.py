@@ -307,7 +307,7 @@ def render_sidebar(store: PaperDatabase) -> None:
     max_results = st.slider("Max results", min_value=5, max_value=50, value=20, step=5)
     if st.button("Refresh ML Pulse", use_container_width=True):
         try:
-            with st.spinner("Pulling Hugging Face Daily Papers + arXiv ML…"):
+            with st.spinner("Pulling Hugging Face trending + newest arXiv (last 60 days)…"):
                 snap = refresh_pulse(store)
             st.session_state.last_pulse = snap.fetched_at
             st.rerun()
@@ -315,7 +315,10 @@ def render_sidebar(store: PaperDatabase) -> None:
             st.error(str(exc))
     pulse = load_pulse(store)
     if pulse:
-        st.caption(f"Pulse · {len(pulse.items)} topics · {pulse.fetched_at[:16]}")
+        st.caption(
+            f"Pulse · {len(pulse.items)} trending + new (last 60 days) · {pulse.fetched_at[:16]}"
+        )
+    st.caption("Max results below is for **Refresh papers** (your library), not Pulse.")
 
     if st.button("Refresh papers", type="primary", use_container_width=True):
         if not categories:
@@ -476,8 +479,9 @@ def render_consultant_terminal() -> None:
 def render_ml_pulse(store: PaperDatabase) -> None:
     st.subheader("ML Pulse")
     st.caption(
-        "Morning brief for an MLE: what moved, the paper, the concept, and whether it fits "
-        "your stack. Sources are Hugging Face Daily Papers + arXiv cs.LG / cs.CL / cs.AI."
+        "Morning brief: Hugging Face Daily Papers **trending** plus newest arXiv "
+        "cs.LG / cs.CL / cs.AI, limited to the last 60 days. "
+        "**For my stack** re-ranks that list. Not the library Max results slider."
     )
     snap = load_pulse(store)
     if not snap or not snap.items:
@@ -492,8 +496,8 @@ def render_ml_pulse(store: PaperDatabase) -> None:
         key="pulse_view",
     )
     ranked = [(score_against_stack(item, stack), i, item) for i, item in enumerate(snap.items)]
-    ranked.sort(key=lambda row: (-row[0].score, row[1]))
     if view == "my_stack" and stack:
+        ranked.sort(key=lambda row: (-row[0].score, row[1]))
         ranked = [row for row in ranked if row[0].label != "Skip"]
         if not ranked:
             st.info("Nothing on your stack in this pulse. Switch to Everything, or refresh.")
@@ -503,6 +507,12 @@ def render_ml_pulse(store: PaperDatabase) -> None:
         with st.container(border=True):
             st.markdown(f"**{item.topic}**")
             kind = [fit.label.lower()]
+            if item.published_date:
+                kind.append(item.published_date[:10])
+            if item.source == "hf_daily":
+                kind.append("trending")
+            elif item.source == "arxiv":
+                kind.append("arxiv new")
             if item.paper_id:
                 kind.append("paper")
             if item.concept:

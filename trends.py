@@ -11,6 +11,7 @@ import json
 import os
 import re
 from dataclasses import dataclass
+from datetime import datetime, timedelta, timezone
 from typing import Any, Optional
 import requests
 from pydantic import BaseModel, ConfigDict, Field
@@ -21,6 +22,9 @@ from pipeline import parse_atom_feed, fetch_atom_xml, build_category_query
 HF_DAILY = "https://huggingface.co/api/daily_papers"
 USER_AGENT = "mle-professor/0.1 (personal ML knowledge base)"
 ML_CATEGORIES = ("cs.LG", "cs.CL", "cs.AI")
+# Trending + newest, but drop papers older than this (HF trending includes 2023 hits).
+PULSE_WINDOW_DAYS = 60
+PULSE_ITEM_LIMIT = 20
 
 CONCEPTS: list[tuple[str, str, tuple[str, ...]]] = [
     ("Transformers", "The backbone architecture behind modern language and vision models.", ("transformer", "attention", "self-attention")),
@@ -102,6 +106,7 @@ class PulseItem(BaseModel):
     in_library: bool = False
     source: str = "hf_daily"
     abstract: str = ""
+    published_date: str = ""
 
 
 class PulseSnapshot(BaseModel):
@@ -117,6 +122,7 @@ class RawSignal(BaseModel):
     authors: str = ""
     source: str
     url: str = ""
+    published: str = ""
 
 
 def _clean(text: str) -> str:
@@ -276,6 +282,44 @@ def refine_decision_memo(
     )
 
 
+def _parse_published(raw: str) -> Optional[datetime]:
+    text = (raw or "").strip()
+    if not text:
+        return None
+    text = text.replace("Z", "+00:00")
+    try:
+        dt = datetime.fromisoformat(text)
+    except ValueError:
+        try:
+            dt = datetime.strptime(text[:10], "%Y-%m-%d")
+        except ValueError:
+            return None
+    if dt.tzinfo is None:
+        dt = dt.replace(tzinfo=timezone.utc)
+    return dt.astimezone(timezone.utc)
+
+
+def published_from_arxiv_id(paper_id: str) -> str:
+    """Best-effort YYYY-MM-01 from a modern arXiv id (YYMM.NNNNN)."""
+    match = re.match(r"^(\d{2})(\d{2})\.", paper_id or "")
+    if not match:
+        return ""
+    year, month = int(match.group(1)), int(match.group(2))
+    if not 1 <= month <= 12:
+        return ""
+    return f"{2000 + year:04d}-{month:02d}-01"
+
+
+def is_recent(published: str = "", paper_id: str = "", *, days: int = PULSE_WINDOW_DAYS) -> bool:
+    """True if the paper is inside the pulse window (default 60 days)."""
+    cutoff = datetime.now(timezone.utc) - timedelta(days=days)
+    for raw in (published, published_from_arxiv_id(paper_id)):
+        dt = _parse_published(raw)
+        if dt is not None:
+            return dt >= cutoff
+    return False
+
+
 def match_concept(title: str, abstract: str) -> tuple[str, str]:
     blob = f"{title} {abstract}".lower()
     best: Optional[tuple[int, str, str]] = None
@@ -288,7 +332,8 @@ def match_concept(title: str, abstract: str) -> tuple[str, str]:
     return best[1], best[2]
 
 
-def fetch_hf_daily(limit: int = 15) -> list[RawSignal]:
+def fetch_hf_daily(limit: int = 20) -> list[RawSignal]:
+    # Hugging Face Daily Papers trending. Recency is enforced after fetch.
     response = requests.get(
         HF_DAILY,
         params={"limit": max(1, min(limit, 50)), "sort": "trending"},
@@ -317,6 +362,9 @@ def fetch_hf_daily(limit: int = 15) -> list[RawSignal]:
             for a in (paper.get("authors") or [])
             if isinstance(a, dict)
         )
+        published = str(
+            paper.get("publishedAt") or row.get("publishedAt") or row.get("date") or ""
+        )
         out.append(
             RawSignal(
                 paper_id=pid,
@@ -325,17 +373,19 @@ def fetch_hf_daily(limit: int = 15) -> list[RawSignal]:
                 authors=authors,
                 source="hf_daily",
                 url=f"https://arxiv.org/abs/{pid}",
+                published=published[:10] if published else published_from_arxiv_id(pid),
             )
         )
     return out
 
 
-def fetch_arxiv_ml(max_results: int = 12) -> list[RawSignal]:
+def fetch_arxiv_ml(max_results: int = 20) -> list[RawSignal]:
     query = build_category_query(ML_CATEGORIES)
     xml_bytes = fetch_atom_xml(query, max_results=max_results, timeout=30)
     entries, _errors = parse_atom_feed(xml_bytes)
     out: list[RawSignal] = []
     for entry in entries:
+        published = (entry.published or "")[:10] or published_from_arxiv_id(entry.id)
         out.append(
             RawSignal(
                 paper_id=entry.id,
@@ -344,6 +394,7 @@ def fetch_arxiv_ml(max_results: int = 12) -> list[RawSignal]:
                 authors=", ".join(entry.authors),
                 source="arxiv",
                 url=entry.abs_url or f"https://arxiv.org/abs/{entry.id}",
+                published=published,
             )
         )
     return out
@@ -377,6 +428,7 @@ def _items_from_signals(signals: list[RawSignal], store: PaperDatabase) -> list[
                 in_library=in_lib,
                 source=sig.source,
                 abstract=sig.abstract,
+                published_date=(sig.published or "")[:10],
             )
         )
     return items
@@ -391,7 +443,7 @@ def _cluster_with_groq(signals: list[RawSignal], store: PaperDatabase) -> Option
     except ImportError:
         return None
     digest = []
-    for sig in signals[:18]:
+    for sig in signals[:PULSE_ITEM_LIMIT]:
         digest.append(
             {
                 "id": sig.paper_id,
@@ -408,7 +460,8 @@ def _cluster_with_groq(signals: list[RawSignal], store: PaperDatabase) -> Option
         "(this is what ML Twitter actually discusses; skip sports, celebrity, crypto).\n"
         "Return JSON: {\"topics\":[{\"topic\":str,\"why\":str,\"paper_id\":str,"
         "\"paper_title\":str,\"concept\":str,\"concept_blurb\":str}]}\n"
-        "Give 6 to 8 topics. Merge papers that are about the same idea. "
+        "Give up to 20 topics, one paper each, only from this list. "
+        "Do not add older or extra papers. "
         "why = 2 short plain-English sentences. concept = a canonical ML idea "
         "(e.g. Mixture of Experts, RAG, speculative decoding).\n"
         f"Papers:\n{json.dumps(digest, ensure_ascii=False)}"
@@ -447,6 +500,10 @@ def _cluster_with_groq(signals: list[RawSignal], store: PaperDatabase) -> Option
         except ValueError:
             pid = None
         sig = by_id.get(pid) if pid else None
+        if pid and sig is None:
+            continue
+        if sig and not is_recent(sig.published, sig.paper_id):
+            continue
         title = _clean(str(row.get("paper_title") or (sig.title if sig else "")))
         concept = _clean(str(row.get("concept") or ""))
         blurb = _clean(str(row.get("concept_blurb") or ""))
@@ -464,6 +521,7 @@ def _cluster_with_groq(signals: list[RawSignal], store: PaperDatabase) -> Option
                 in_library=bool(pid and store.get_paper(pid)),
                 source=sig.source if sig else "cluster",
                 abstract=sig.abstract if sig else "",
+                published_date=(sig.published if sig else "")[:10],
             )
         )
     return items or None
@@ -488,18 +546,23 @@ def refresh_pulse(store: Optional[PaperDatabase] = None) -> PulseSnapshot:
     db = store or get_db()
     errors: list[str] = []
     signals: list[RawSignal] = []
+    hf: list[RawSignal] = []
+    arxiv: list[RawSignal] = []
     try:
-        signals.extend(fetch_hf_daily(15))
+        hf = fetch_hf_daily(30)
     except Exception as exc:
         errors.append(f"Hugging Face Daily Papers: {exc}")
     try:
-        signals.extend(fetch_arxiv_ml(10))
+        arxiv = fetch_arxiv_ml(20)
     except Exception as exc:
         errors.append(f"arXiv ML feed: {exc}")
-    signals = _dedupe(signals)
+    # Keep HF trending order, then fill with newest arXiv. Do not re-sort by date.
+    hf = [s for s in hf if is_recent(s.published, s.paper_id)]
+    arxiv = [s for s in arxiv if is_recent(s.published, s.paper_id)]
+    signals = _dedupe(hf + arxiv)[:PULSE_ITEM_LIMIT]
     items = _cluster_with_groq(signals, db)
     if items is None:
-        items = _items_from_signals(signals[:12], db)
+        items = _items_from_signals(signals, db)
     snapshot = PulseSnapshot(fetched_at=utcnow(), items=items, errors=errors)
     db.save_pulse([item.model_dump() for item in items])
     return snapshot

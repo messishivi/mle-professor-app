@@ -1,3 +1,4 @@
+from datetime import datetime, timezone
 from pathlib import Path
 from unittest.mock import patch
 
@@ -10,6 +11,7 @@ from trends import (
     _items_from_signals,
     draft_decision_memo,
     fetch_hf_daily,
+    is_recent,
     match_concept,
     score_against_stack,
 )
@@ -74,6 +76,21 @@ def test_dedupe_by_arxiv_id():
     c = RawSignal(paper_id="1512.03385", title="B", source="arxiv")
     out = _dedupe([a, b, c])
     assert [x.paper_id for x in out] == ["1706.03762", "1512.03385"]
+    assert out[0].source == "hf_daily"
+
+
+def test_trending_order_is_kept_ahead_of_arxiv_fill():
+    hf = [
+        RawSignal(paper_id="2609.00001", title="Hot", source="hf_daily", published="2026-09-08"),
+        RawSignal(paper_id="2609.00002", title="Also hot", source="hf_daily", published="2026-09-07"),
+    ]
+    arxiv = [
+        RawSignal(paper_id="2609.00003", title="Newest arxiv", source="arxiv", published="2026-09-10"),
+        RawSignal(paper_id="2609.00001", title="Dup", source="arxiv", published="2026-09-10"),
+    ]
+    out = _dedupe(hf + arxiv)
+    assert [x.paper_id for x in out] == ["2609.00001", "2609.00002", "2609.00003"]
+    assert [x.source for x in out] == ["hf_daily", "hf_daily", "arxiv"]
 
 
 def test_items_flag_library(tmp_path: Path):
@@ -112,3 +129,13 @@ def test_fetch_hf_daily_parses_nested_paper():
     assert len(rows) == 1
     assert rows[0].paper_id == "2609.04444"
     assert rows[0].title == "HarvestBench"
+    params = mocked.call_args.kwargs["params"]
+    assert params.get("sort") == "trending"
+
+
+def test_is_recent_drops_two_year_old_papers():
+    today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    assert is_recent(published=today)
+    assert is_recent(published="2023-10-14T17:01:37.000Z") is False
+    assert is_recent(paper_id="2310.10688") is False
+    assert is_recent(paper_id="2407.16741") is False
