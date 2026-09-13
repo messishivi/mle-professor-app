@@ -6,8 +6,10 @@ Increments so far:
 - P2b: ML Pulse (``/pulse``, ``/pulse/refresh``, ``/pulse/memos/refine``) and
   sidebar settings (``/settings``, ``/settings/repo-readme``), mirroring
   ``app.render_ml_pulse`` and the sidebar stack/application/repo state.
-
-Consultant (P2c) extends this same app.
+- P2c: Consultant Terminal (``/consult/status``, ``POST /consult/chat`` as an
+  SSE stream: ``sources`` -> ``delta``* -> ``done``/``error``), mirroring
+  ``consultant.chat_with_consultant`` grounding and the offline behavior of
+  app.py. LLM calls go through the thin provider seam in ``providers.py``.
 
 Run from the repo root:
 
@@ -16,15 +18,27 @@ Run from the repo root:
 
 from __future__ import annotations
 
+import json
 import os
-from typing import Any, Optional
+from typing import Any, Iterator, Optional
 
 import requests
+from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel, Field, field_validator
+from fastapi.responses import StreamingResponse
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 
+import grounding
 import pipeline as ingest_pipeline
+import providers
+from consultant import (
+    ROOT,
+    ChatTurn,
+    build_messages,
+    format_application_context,
+    resolve_layer,
+)
 from database import PaperDatabase, get_db, normalize_arxiv_id
 from demo import demo_enabled, seed_demo_data
 from repo import fetch_readme
@@ -84,6 +98,30 @@ class RepoReadmeRequest(BaseModel):
     """Body for ``POST /settings/repo-readme`` — optional URL override."""
 
     url: Optional[str] = None
+
+
+class ChatTurnIn(BaseModel):
+    """One history turn; validated by consultant.ChatTurn (system role rejected)."""
+
+    model_config = ConfigDict(extra="ignore")
+
+    role: str
+    content: str = ""
+
+
+class ConsultRequest(BaseModel):
+    """Body for ``POST /consult/chat`` (response is an SSE stream)."""
+
+    message: str
+    history: list[ChatTurnIn] = Field(default_factory=list)
+    layer: str = "explain"
+    # BYOK for this request only (demo mode); never persisted.
+    api_key: Optional[str] = None
+
+
+def _sse(event: str, data: dict[str, Any]) -> str:
+    """One Server-Sent Event frame."""
+    return f"event: {event}\ndata: {json.dumps(data, ensure_ascii=False)}\n\n"
 
 
 def _pulse_payload(db: PaperDatabase, snap=None) -> dict[str, Any]:
@@ -282,6 +320,105 @@ def create_app(store: Optional[PaperDatabase] = None) -> FastAPI:
             "readme_url": readme.readme_url,
             "chars": len(readme.content),
         }
+
+    @app.get("/consult/status")
+    def consult_status() -> dict[str, Any]:
+        """Provider readiness — the ``_api_ready()`` check the Terminal does."""
+        return {
+            "ready": bool(os.getenv("GROQ_API_KEY", "").strip()),
+            "provider": providers.PROVIDER,
+            "model": providers.resolve_model(),
+            "demo_mode": demo_enabled(),
+        }
+
+    @app.post("/consult/chat")
+    def consult(payload: ConsultRequest) -> StreamingResponse:
+        """SSE stream: ``sources`` -> ``delta``* -> ``done`` (or ``error``).
+
+        Parity with the Streamlit Consultant Terminal: same layer prompts,
+        same grounding (gather_sources + repo README + application context),
+        same offline behavior — streamed instead of one-shot.
+        """
+        try:
+            layer = resolve_layer(payload.layer)
+        except ValueError as exc:
+            raise HTTPException(status_code=422, detail=str(exc))
+        if not payload.message.strip():
+            raise HTTPException(status_code=422, detail="user_message is empty.")
+        try:
+            turns = [ChatTurn(role=t.role, content=t.content) for t in payload.history]
+        except ValueError as exc:
+            raise HTTPException(status_code=422, detail=str(exc))
+
+        # Parity with chat_with_consultant: refresh keys from .env per request.
+        load_dotenv(ROOT / ".env", override=True)
+
+        def stream() -> Iterator[str]:
+            try:
+                packed = grounding.gather_sources(payload.message, db)
+                repo_url = db.get_repo_url()
+                readme = db.get_repo_readme()
+                readme_url = db.get_repo_readme_url()
+                if repo_url or readme:
+                    packed = list(packed) + [
+                        grounding.Source(
+                            kind="repo",
+                            title="Your repo README",
+                            url=readme_url or repo_url,
+                            snippet=(readme or "")[:280],
+                        )
+                    ]
+                retrieved = grounding.format_sources_for_model(packed)
+                app_block = format_application_context(
+                    db.get_application(),
+                    db.get_stack(),
+                    db.get_known_papers(),
+                    repo_url=repo_url,
+                    repo_readme=readme,
+                )
+                if app_block:
+                    retrieved = f"{app_block}\n\n{retrieved}"
+                messages = build_messages(
+                    payload.message, turns, layer=layer, retrieved=retrieved
+                )
+                source_rows = [s.model_dump(exclude_none=True) for s in packed]
+                yield _sse("sources", {"sources": source_rows})
+
+                parts: list[str] = []
+                try:
+                    for delta in providers.stream_chat(
+                        messages, api_key=payload.api_key
+                    ):
+                        parts.append(delta)
+                        yield _sse("delta", {"text": delta})
+                except providers.ProviderUnavailable:
+                    yield _sse("error", {"message": providers.OFFLINE_MESSAGE})
+                    return
+                content = "".join(parts).strip()
+                if not content:
+                    yield _sse("error", {"message": "The model returned an empty response."})
+                    return
+                yield _sse(
+                    "done",
+                    {
+                        "content": content,
+                        "model": providers.resolve_model(),
+                        "provider": providers.PROVIDER,
+                        "layer": layer,
+                    },
+                )
+            except Exception as exc:  # noqa: BLE001 - the stream must end with an error event
+                yield _sse("error", {"message": f"Consultant request failed: {exc}"})
+
+        return StreamingResponse(
+            stream(),
+            media_type="text/event-stream",
+            headers={
+                "Cache-Control": "no-cache",
+                "Connection": "keep-alive",
+                "X-Accel-Buffering": "no",
+            },
+        )
 
     return app
 
