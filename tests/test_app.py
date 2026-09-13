@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 from types import SimpleNamespace
 from unittest.mock import patch
 
@@ -7,11 +8,14 @@ from streamlit.testing.v1 import AppTest
 from database import get_db
 from pipeline import IngestResult
 
+ROOT = Path(__file__).resolve().parent.parent
 CONSULTANT = "Consultant Terminal"
 
 
 def _app() -> AppTest:
-    at = AppTest.from_file("app.py", default_timeout=30)
+    # Absolute path: streamlit >= 1.63 resolves AppTest.from_file relative
+    # to the calling test file, not the CWD.
+    at = AppTest.from_file(str(ROOT / "app.py"), default_timeout=30)
     at.run()
     assert not at.exception
     return at
