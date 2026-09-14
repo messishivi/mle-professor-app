@@ -12,6 +12,8 @@ import {
   OFFLINE_MESSAGE,
   getDemoKey,
   getHistory,
+  getProviderSelection,
+  resolveEffectiveConsult,
   setDemoKey,
   setHistory,
   streamConsult,
@@ -37,6 +39,9 @@ interface TurnMeta {
  * - offline: no request is made and the exact OFFLINE_MESSAGE is shown
  *   (app.py:394-398); demo mode adds the session-only BYOK key (demo.py)
  * - SSE streaming: sources -> delta* -> done | error (P2c contract)
+ * - P5: the session provider selection (Settings, in memory) overrides the
+ *   server default per request; readiness/offline text follow the selected
+ *   provider's entry from /consult/status.
  */
 export function ConsultantClient() {
   const router = useRouter();
@@ -109,6 +114,11 @@ export function ConsultantClient() {
 
   const history = histories[layer];
 
+  // P5: the effective provider config for this render — server status folded
+  // with the in-memory session selection (Settings) and the demo key.
+  const selection = getProviderSelection();
+  const eff = resolveEffectiveConsult(status, selection, demoKey);
+
   const runTurn = useCallback(
     async (prompt: string, turnLayer: ConsultLayer) => {
       const text = prompt.trim();
@@ -124,19 +134,20 @@ export function ConsultantClient() {
       setLastMeta(null);
       setStreamText("");
 
-      const key = demoKey.trim();
-      const ready = !!status?.ready || (!!status?.demo_mode && key.length > 0);
+      // P5: fold the session provider selection into readiness + request.
+      const sel = getProviderSelection();
+      const eff = resolveEffectiveConsult(status, sel, demoKey);
 
       // app.py parity: when not ready no request goes out; the exact offline
       // message is shown and kept in the layer history.
-      if (!ready) {
+      if (!eff.ready) {
         const withOffline: ConsultTurn[] = [
           ...next,
-          { role: "assistant", content: OFFLINE_MESSAGE },
+          { role: "assistant", content: eff.offlineMessage },
         ];
         setHistories((h) => ({ ...h, [turnLayer]: withOffline }));
         setHistory(turnLayer, withOffline);
-        setTurnError(OFFLINE_MESSAGE);
+        setTurnError(eff.offlineMessage);
         return;
       }
 
@@ -150,7 +161,9 @@ export function ConsultantClient() {
             message: text,
             history: past,
             layer: turnLayer,
-            apiKey: status?.demo_mode ? key : undefined,
+            apiKey: eff.key || undefined,
+            provider: sel.provider || undefined,
+            model: sel.provider ? eff.model || undefined : undefined,
           },
           (ev) => {
             if (ev.type === "sources") {
@@ -235,13 +248,17 @@ export function ConsultantClient() {
         </p>
       ) : status === null ? (
         <p className="font-mono text-xs text-ink-2">checking consultant…</p>
-      ) : status.ready ? (
+      ) : eff.ready ? (
         <p className="rounded-lg border border-ok/40 bg-ok/10 px-3 py-2 text-sm text-ok">
-          Consultant ready · {status.provider} · {status.model}
+          Consultant ready · {eff.displayName} · {eff.model}
         </p>
-      ) : status.demo_mode ? (
+      ) : !selection.provider && status.demo_mode ? (
         <p className="rounded-lg border border-warn/40 bg-warn/10 px-3 py-2 text-sm text-warn">
           Paste a Groq key above to unlock the Consultant (this session only).
+        </p>
+      ) : selection.provider ? (
+        <p className="rounded-lg border border-warn/40 bg-warn/10 px-3 py-2 text-sm text-warn">
+          {eff.offlineMessage}
         </p>
       ) : (
         <p className="rounded-lg border border-warn/40 bg-warn/10 px-3 py-2 text-sm text-warn">

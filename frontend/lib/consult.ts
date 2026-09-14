@@ -11,6 +11,7 @@
  */
 
 import { ApiError, request } from "@/lib/api";
+import type { ConsultStatus } from "@/lib/api";
 
 // ------------------------------------------------------------------ layers
 
@@ -138,6 +139,13 @@ export interface StreamConsultOptions {
   layer: ConsultLayer;
   /** Demo-mode BYOK: sent for this request only, never persisted. */
   apiKey?: string;
+  /**
+   * Per-request provider override (P5): request > LLM_PROVIDER > groq.
+   * Undefined = the backend resolves it from env.
+   */
+  provider?: string;
+  /** Per-request model override (P5): request > <PROVIDER>_MODEL > default. */
+  model?: string;
   signal?: AbortSignal;
 }
 
@@ -160,6 +168,8 @@ export async function streamConsult(
         history: opts.history,
         layer: opts.layer,
         api_key: opts.apiKey || null,
+        provider: opts.provider || null,
+        model: opts.model || null,
       }),
       signal: opts.signal,
     });
@@ -314,4 +324,89 @@ export function getDemoKey(): string {
 
 export function setDemoKey(key: string): void {
   demoKeyStore = key;
+}
+
+/**
+ * P5: the Consultant's provider selection, same session-only semantics as
+ * the demo key (in memory, lost on reload, never persisted — auth DEFERRED).
+ * `provider: ""` = the backend resolves the provider from LLM_PROVIDER/groq.
+ * `models`/`keys` are keyed per provider so switching keeps each one's
+ * overrides; an empty value means "use the provider's env/default".
+ */
+export interface ProviderSelection {
+  provider: string;
+  models: Record<string, string>;
+  keys: Record<string, string>;
+}
+
+const providerSelection: ProviderSelection = {
+  provider: "",
+  models: {},
+  keys: {},
+};
+
+export function getProviderSelection(): ProviderSelection {
+  return {
+    provider: providerSelection.provider,
+    models: { ...providerSelection.models },
+    keys: { ...providerSelection.keys },
+  };
+}
+
+export function setProviderSelection(next: ProviderSelection): void {
+  providerSelection.provider = next.provider;
+  providerSelection.models = { ...next.models };
+  providerSelection.keys = { ...next.keys };
+}
+
+/**
+ * P5: fold the server status + the session selection + the demo key into the
+ * single config the terminal acts on — what the banner shows, whether a turn
+ * is allowed to fire, and what the request carries.
+ */
+export interface EffectiveConsultConfig {
+  /** Whether the current turn may POST /consult/chat at all. */
+  ready: boolean;
+  /** Provider name sent with the request ("" = backend resolves from env). */
+  provider: string;
+  /** Model sent with the request ("" = backend resolves). */
+  model: string;
+  /** BYOK key sent for this request ("" = the env key applies). */
+  key: string;
+  /** Exact offline text for the active provider (providers.py parity). */
+  offlineMessage: string;
+  /** Active provider for the banner ("" if status has not loaded). */
+  displayName: string;
+}
+
+export function resolveEffectiveConsult(
+  status: ConsultStatus | null,
+  selection: ProviderSelection,
+  demoKey: string,
+): EffectiveConsultConfig {
+  if (selection.provider) {
+    const entry = status?.providers?.[selection.provider];
+    const key = (selection.keys[selection.provider] ?? "").trim();
+    return {
+      ready: !!entry?.ready || key.length > 0,
+      provider: selection.provider,
+      model: (selection.models[selection.provider] ?? "").trim() ||
+        (entry?.model ?? ""),
+      key,
+      offlineMessage:
+        entry?.offline_message ??
+        status?.offline_message ??
+        OFFLINE_MESSAGE,
+      displayName: selection.provider,
+    };
+  }
+  const key = status?.demo_mode ? demoKey.trim() : "";
+  return {
+    ready: !!status?.ready || (!!status?.demo_mode && key.length > 0),
+    provider: "",
+    model: status?.model ?? "",
+    key,
+    offlineMessage: status?.offline_message ?? OFFLINE_MESSAGE,
+    displayName: status?.provider ?? "",
+  };
 }

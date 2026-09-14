@@ -4,13 +4,13 @@ import userEvent from "@testing-library/user-event";
 import { ApiError } from "@/lib/api";
 import type { SettingsPayload } from "@/lib/consult";
 
-const { getSettingsMock, updateSettingsMock, loadReadmeMock } = vi.hoisted(
-  () => ({
+const { getSettingsMock, updateSettingsMock, loadReadmeMock, statusMock } =
+  vi.hoisted(() => ({
     getSettingsMock: vi.fn(),
     updateSettingsMock: vi.fn(),
     loadReadmeMock: vi.fn(),
-  }),
-);
+    statusMock: vi.fn(),
+  }));
 
 // Keep the real pure helpers; stub only the network fns.
 vi.mock("@/lib/consult", async (importOriginal) => {
@@ -22,8 +22,22 @@ vi.mock("@/lib/consult", async (importOriginal) => {
     loadRepoReadme: (...a: unknown[]) => loadReadmeMock(...a),
   };
 });
+vi.mock("@/lib/api", () => ({
+  getConsultStatus: (...a: unknown[]) => statusMock(...a),
+  ApiError: class ApiError extends Error {
+    status: number;
+    detail: string;
+    constructor(status: number, detail: string) {
+      super(detail);
+      this.name = "ApiError";
+      this.status = status;
+      this.detail = detail;
+    }
+  },
+}));
 
 import { SettingsPanel } from "@/components/settings-panel";
+import { getProviderSelection, setProviderSelection } from "@/lib/consult";
 
 const basePayload: SettingsPayload = {
   stack: [],
@@ -35,8 +49,42 @@ const basePayload: SettingsPayload = {
   repo_readme_chars: 0,
 };
 
+// /consult/status fixture — mirrors the backend providers registry (P5).
+const LLM_STATUS = {
+  ready: false,
+  provider: "groq",
+  model: "openai/gpt-oss-120b",
+  demo_mode: false,
+  offline_message: "Consultant is offline. Set `GROQ_API_KEY` in `.env`.",
+  providers: {
+    groq: {
+      ready: false,
+      model: "openai/gpt-oss-120b",
+      offline_message: "Consultant is offline. Set `GROQ_API_KEY` in `.env`.",
+    },
+    openai: {
+      ready: false,
+      model: "gpt-4o-mini",
+      offline_message: "Consultant is offline. Set `OPENAI_API_KEY` in `.env`.",
+    },
+    anthropic: {
+      ready: false,
+      model: "claude-sonnet-4-5",
+      offline_message: "Consultant is offline. Set `ANTHROPIC_API_KEY` in `.env`.",
+    },
+    local: {
+      ready: true,
+      model: "local",
+      offline_message:
+        "Consultant is offline. Start a local OpenAI-compatible server (e.g. " +
+        "llama.cpp) and set `LOCAL_BASE_URL` in `.env`.",
+    },
+  },
+};
+
 beforeEach(() => {
   vi.clearAllMocks();
+  setProviderSelection({ provider: "", models: {}, keys: {} });
   getSettingsMock.mockResolvedValue(basePayload);
   updateSettingsMock.mockImplementation(async (patch: Record<string, unknown>) => ({
     ...basePayload,
@@ -47,6 +95,7 @@ beforeEach(() => {
     repo_url: "https://github.com/x/y",
     readme_url: "https://raw.githubusercontent.com/x/y/main/README.md",
   });
+  statusMock.mockResolvedValue(LLM_STATUS);
 });
 
 describe("SettingsPanel", () => {
@@ -228,5 +277,65 @@ describe("SettingsPanel", () => {
     ).toBeInTheDocument();
     await user.click(screen.getByRole("button", { name: "Retry" }));
     expect(getSettingsMock).toHaveBeenCalledTimes(2);
+  });
+
+  // ---------------------------------------------------------------- P5:
+  // the "Consultant LLM provider" section (session-only store).
+
+  it("renders the provider section from the /consult/status map", async () => {
+    render(<SettingsPanel />);
+    expect(
+      await screen.findByRole("heading", { name: "Consultant LLM provider" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("option", { name: "server default (LLM_PROVIDER)" }),
+    ).toBeInTheDocument();
+    // Registry order + readiness suffix, exactly as the backend reports.
+    expect(
+      screen.getByRole("option", { name: "groq · needs key" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("option", { name: "openai · needs key" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("option", { name: "anthropic · needs key" }),
+    ).toBeInTheDocument();
+    expect(screen.getByRole("option", { name: "local · ready" })).toBeInTheDocument();
+    // No provider picked yet → model/key inputs are disabled (password
+    // inputs are not in the role "textbox" set, so match by placeholder).
+    const disabled = screen.getAllByPlaceholderText("pick a provider first");
+    expect(disabled).toHaveLength(2);
+    for (const el of disabled) expect(el).toBeDisabled();
+  });
+
+  it("selecting a provider prefills the model and applies the session store", async () => {
+    const user = userEvent.setup();
+    render(<SettingsPanel />);
+    await screen.findByRole("heading", { name: "Consultant LLM provider" });
+    await user.selectOptions(
+      screen.getByRole("combobox", { name: "Provider" }),
+      "openai",
+    );
+    // First contact with the provider: prefilled from the status map.
+    expect(screen.getByRole("textbox", { name: "Model" })).toHaveValue(
+      "gpt-4o-mini",
+    );
+    // Password input: not in the role "textbox" set — match the BYOK placeholder.
+    await user.type(screen.getByPlaceholderText("sk-…"), "sk-user");
+    // The real in-memory store holds the selection (the terminal reads it).
+    expect(getProviderSelection()).toEqual({
+      provider: "openai",
+      models: { openai: "gpt-4o-mini" },
+      keys: { openai: "sk-user" },
+    });
+  });
+
+  it("a provider status-load failure degrades only the provider section", async () => {
+    statusMock.mockRejectedValue(new ApiError(0, "no backend for llm"));
+    render(<SettingsPanel />);
+    expect(await screen.findByText(/no backend for llm/)).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { name: "Your stack" }),
+    ).toBeInTheDocument();
   });
 });

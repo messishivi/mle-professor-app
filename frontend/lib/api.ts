@@ -123,12 +123,23 @@ export function ingest(req: IngestRequest = {}): Promise<IngestResult> {
 
 // ------------------------------------------------------ consult status (P2c)
 
+/** Per-provider readiness entry (P5: `consult_status` `providers` map). */
+export interface ProviderReadiness {
+  ready: boolean;
+  model: string;
+  offline_message: string;
+}
+
 /** GET /consult/status — provider readiness (_api_ready parity). */
 export interface ConsultStatus {
   ready: boolean;
   provider: string;
   model: string;
   demo_mode: boolean;
+  /** Canonical offline text for the active provider (P5). */
+  offline_message: string;
+  /** Readiness for every provider in the backend registry (P5). */
+  providers: Record<string, ProviderReadiness>;
 }
 
 export function getConsultStatus(): Promise<ConsultStatus> {

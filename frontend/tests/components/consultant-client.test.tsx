@@ -40,10 +40,54 @@ vi.mock("next/navigation", () => ({
 }));
 
 import { ConsultantClient } from "@/components/consultant-client";
-import { OFFLINE_MESSAGE, setHistory, setDemoKey } from "@/lib/consult";
+import {
+  OFFLINE_MESSAGE,
+  setHistory,
+  setDemoKey,
+  setProviderSelection,
+} from "@/lib/consult";
 
-const offline = { ready: false, provider: "groq", model: "openai/gpt-oss-120b", demo_mode: false };
-const ready = { ready: true, provider: "groq", model: "openai/gpt-oss-120b", demo_mode: false };
+// Per-provider offline strings — byte parity with backend providers.py (P5).
+const OPENAI_OFFLINE =
+  "Consultant is offline. Set `OPENAI_API_KEY` in `.env`.";
+const ANTHROPIC_OFFLINE =
+  "Consultant is offline. Set `ANTHROPIC_API_KEY` in `.env`.";
+const LOCAL_OFFLINE =
+  "Consultant is offline. Start a local OpenAI-compatible server (e.g. " +
+  "llama.cpp) and set `LOCAL_BASE_URL` in `.env`.";
+
+const PROVIDERS = {
+  groq: {
+    ready: false,
+    model: "openai/gpt-oss-120b",
+    offline_message: OFFLINE_MESSAGE,
+  },
+  openai: { ready: false, model: "gpt-4o-mini", offline_message: OPENAI_OFFLINE },
+  anthropic: { ready: false, model: "claude-sonnet-4-5", offline_message: ANTHROPIC_OFFLINE },
+  local: { ready: true, model: "local", offline_message: LOCAL_OFFLINE },
+};
+
+const offline = {
+  ready: false,
+  provider: "groq",
+  model: "openai/gpt-oss-120b",
+  demo_mode: false,
+  offline_message: OFFLINE_MESSAGE,
+  providers: PROVIDERS,
+};
+const ready = {
+  ready: true,
+  provider: "groq",
+  model: "openai/gpt-oss-120b",
+  demo_mode: false,
+  offline_message: OFFLINE_MESSAGE,
+  providers: {
+    ...PROVIDERS,
+    groq: { ...PROVIDERS.groq, ready: true },
+  },
+};
+
+const NO_SELECTION = { provider: "", models: {}, keys: {} };
 
 function emitThenDone(events: SseEvent[]) {
   streamMock.mockImplementation(
@@ -60,6 +104,7 @@ beforeEach(() => {
   setHistory("explain", []);
   setHistory("systems", []);
   setDemoKey("");
+  setProviderSelection(NO_SELECTION);
   paramsMock.current = new URLSearchParams();
   statusMock.mockResolvedValue(offline);
 });
@@ -161,11 +206,16 @@ describe("ConsultantClient", () => {
       history: ConsultTurn[];
       layer: string;
       apiKey?: string;
+      provider?: string;
+      model?: string;
     }];
     expect(opts.message).toBe("how do I use this?");
     expect(opts.history).toEqual([]);
     expect(opts.layer).toBe("apply");
     expect(opts.apiKey).toBeUndefined();
+    // No Settings selection → the backend resolves provider/model itself.
+    expect(opts.provider).toBeUndefined();
+    expect(opts.model).toBeUndefined();
     // Sources expander on the last assistant turn (Streamlit parity string).
     const summary = screen.getByText(
       "Checked sources (click these — do not trust an unsourced paper name)",
@@ -313,5 +363,82 @@ describe("ConsultantClient", () => {
     expect(await screen.findByText("boom-status")).toBeInTheDocument();
     await user.click(screen.getByRole("button", { name: "Retry" }));
     expect(statusMock).toHaveBeenCalledTimes(2);
+  });
+
+  // ------------------------------------------------------------------ P5:
+  // the session provider selection (Settings) drives readiness + request.
+
+  it("selected provider + BYOK key: the request carries provider/model/key", async () => {
+    setProviderSelection({
+      provider: "openai",
+      models: { openai: "gpt-4o" },
+      keys: { openai: "sk-user" },
+    });
+    // The server says openai is NOT ready — the BYOK key unlocks it.
+    statusMock.mockResolvedValue(offline);
+    const user = userEvent.setup();
+    render(<ConsultantClient />);
+    expect(
+      await screen.findByText("Consultant ready · openai · gpt-4o"),
+    ).toBeInTheDocument();
+    await user.type(
+      screen.getByRole("textbox", { name: "Consultant message" }),
+      "hello openai",
+    );
+    await user.click(screen.getByRole("button", { name: "Send" }));
+    await waitFor(() => expect(streamMock).toHaveBeenCalledTimes(1));
+    const [opts] = streamMock.mock.calls[0] as [{
+      provider?: string;
+      model?: string;
+      apiKey?: string;
+    }];
+    expect(opts.provider).toBe("openai");
+    expect(opts.model).toBe("gpt-4o");
+    expect(opts.apiKey).toBe("sk-user");
+  });
+
+  it("selected provider not ready and no key: the exact per-provider offline text", async () => {
+    setProviderSelection({ provider: "anthropic", models: {}, keys: {} });
+    statusMock.mockResolvedValue(offline);
+    const user = userEvent.setup();
+    render(<ConsultantClient />);
+    // The banner shows the anthropic offline message, not the Groq one.
+    expect(await screen.findByText(ANTHROPIC_OFFLINE)).toBeInTheDocument();
+    expect(screen.queryByText(OFFLINE_MESSAGE)).not.toBeInTheDocument();
+    await user.type(
+      screen.getByRole("textbox", { name: "Consultant message" }),
+      "hello anthropic",
+    );
+    await user.click(screen.getByRole("button", { name: "Send" }));
+    expect(streamMock).not.toHaveBeenCalled();
+    expect(
+      (await screen.findAllByText(ANTHROPIC_OFFLINE)).length,
+    ).toBeGreaterThanOrEqual(2);
+  });
+
+  it("selected provider falls back to the server's resolved model", async () => {
+    setProviderSelection({ provider: "openai", models: {}, keys: {} });
+    statusMock.mockResolvedValue({
+      ...offline,
+      providers: {
+        ...PROVIDERS,
+        openai: { ready: true, model: "gpt-4o-mini", offline_message: OPENAI_OFFLINE },
+      },
+    });
+    const user = userEvent.setup();
+    render(<ConsultantClient />);
+    expect(
+      await screen.findByText("Consultant ready · openai · gpt-4o-mini"),
+    ).toBeInTheDocument();
+    await user.type(
+      screen.getByRole("textbox", { name: "Consultant message" }),
+      "fallback model",
+    );
+    await user.click(screen.getByRole("button", { name: "Send" }));
+    await waitFor(() => expect(streamMock).toHaveBeenCalledTimes(1));
+    const [opts] = streamMock.mock.calls[0] as [{ provider?: string; model?: string; apiKey?: string }];
+    expect(opts.provider).toBe("openai");
+    expect(opts.model).toBe("gpt-4o-mini");
+    expect(opts.apiKey).toBeUndefined();
   });
 });

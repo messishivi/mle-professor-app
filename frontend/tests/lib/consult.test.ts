@@ -15,9 +15,13 @@ import {
   setHistory,
   getDemoKey,
   setDemoKey,
+  getProviderSelection,
+  setProviderSelection,
+  resolveEffectiveConsult,
   type ConsultTurn,
   type SseEvent,
 } from "@/lib/consult";
+import type { ConsultStatus } from "@/lib/api";
 import { ApiError } from "@/lib/api";
 
 // ------------------------------------------------------------- constants
@@ -252,6 +256,8 @@ describe("streamConsult", () => {
       history,
       layer: "explain",
       api_key: "sk-test",
+      provider: null,
+      model: null,
     });
     expect(events).toEqual([
       { type: "sources", sources: [{ kind: "arxiv", title: "T1", url: "u1" }] },
@@ -274,6 +280,47 @@ describe("streamConsult", () => {
       (fetchMock.mock.calls[0][1] as RequestInit).body as string,
     );
     expect(body.api_key).toBeNull();
+  });
+
+  it("sends provider/model null when no session selection is set (P5)", async () => {
+    const fetchMock = vi.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      statusText: "OK",
+      body: sseFrames(['event: done\ndata: {"content": "", "model": "m", "provider": "p", "layer": "apply"}\n\n']),
+    });
+    vi.stubGlobal("fetch", fetchMock);
+    await streamConsult({ message: "m", history: [], layer: "apply" }, () => {});
+    const body = JSON.parse(
+      (fetchMock.mock.calls[0][1] as RequestInit).body as string,
+    );
+    expect(body.provider).toBeNull();
+    expect(body.model).toBeNull();
+  });
+
+  it("carries the session provider selection in the request body (P5)", async () => {
+    const fetchMock = vi.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      statusText: "OK",
+      body: sseFrames(['event: done\ndata: {"content": "", "model": "m", "provider": "p", "layer": "apply"}\n\n']),
+    });
+    vi.stubGlobal("fetch", fetchMock);
+    await streamConsult(
+      {
+        message: "m",
+        history: [],
+        layer: "apply",
+        provider: "openai",
+        model: "gpt-4o",
+      },
+      () => {},
+    );
+    const body = JSON.parse(
+      (fetchMock.mock.calls[0][1] as RequestInit).body as string,
+    );
+    expect(body.provider).toBe("openai");
+    expect(body.model).toBe("gpt-4o");
   });
 
   it("throws ApiError with the server detail on HTTP errors", async () => {
@@ -447,5 +494,162 @@ describe("in-memory session storage (st.session_state parity)", () => {
     expect(getDemoKey()).toBe("gsk_123");
     setDemoKey("");
     expect(getDemoKey()).toBe("");
+  });
+
+  it("stores the provider selection for the session only (P5)", () => {
+    setProviderSelection({
+      provider: "anthropic",
+      models: { anthropic: "claude-opus-4-1" },
+      keys: { anthropic: "sk-ant-user" },
+    });
+    expect(getProviderSelection()).toEqual({
+      provider: "anthropic",
+      models: { anthropic: "claude-opus-4-1" },
+      keys: { anthropic: "sk-ant-user" },
+    });
+    setProviderSelection({ provider: "", models: {}, keys: {} });
+    expect(getProviderSelection()).toEqual({
+      provider: "",
+      models: {},
+      keys: {},
+    });
+  });
+});
+
+// -------------------------------------------------------- resolveEffectiveConsult
+
+// A full /consult/status fixture (all P5 fields required by the type).
+const STATUS: ConsultStatus = {
+  ready: false,
+  provider: "groq",
+  model: "openai/gpt-oss-120b",
+  demo_mode: false,
+  offline_message: "Consultant is offline. Set `GROQ_API_KEY` in `.env`.",
+  providers: {
+    groq: {
+      ready: false,
+      model: "openai/gpt-oss-120b",
+      offline_message: "Consultant is offline. Set `GROQ_API_KEY` in `.env`.",
+    },
+    openai: {
+      ready: false,
+      model: "gpt-4o-mini",
+      offline_message:
+        "Consultant is offline. Set `OPENAI_API_KEY` in `.env`.",
+    },
+    anthropic: {
+      ready: false,
+      model: "claude-sonnet-4-5",
+      offline_message:
+        "Consultant is offline. Set `ANTHROPIC_API_KEY` in `.env`.",
+    },
+    local: {
+      ready: true,
+      model: "local",
+      offline_message:
+        "Consultant is offline. Start a local OpenAI-compatible server (e.g. " +
+        "llama.cpp) and set `LOCAL_BASE_URL` in `.env`.",
+    },
+  },
+};
+
+describe("resolveEffectiveConsult (P5)", () => {
+  it("default path offline → not ready, the Groq offline message", () => {
+    const eff = resolveEffectiveConsult(
+      STATUS,
+      { provider: "", models: {}, keys: {} },
+      "",
+    );
+    expect(eff.ready).toBe(false);
+    expect(eff.offlineMessage).toBe(
+      "Consultant is offline. Set `GROQ_API_KEY` in `.env`.",
+    );
+    expect(eff.key).toBe("");
+    expect(eff.provider).toBe("");
+    expect(eff.displayName).toBe("groq");
+  });
+
+  it("default path in demo mode → the key unlocks readiness", () => {
+    const eff = resolveEffectiveConsult(
+      { ...STATUS, demo_mode: true },
+      { provider: "", models: {}, keys: {} },
+      "demo-key",
+    );
+    expect(eff.ready).toBe(true);
+    expect(eff.key).toBe("demo-key");
+  });
+
+  it("selected provider not ready but BYOK key present → ready with the key", () => {
+    const eff = resolveEffectiveConsult(
+      STATUS,
+      {
+        provider: "openai",
+        models: { openai: "gpt-4o" },
+        keys: { openai: "sk-user" },
+      },
+      "",
+    );
+    expect(eff.ready).toBe(true);
+    expect(eff.provider).toBe("openai");
+    expect(eff.model).toBe("gpt-4o");
+    expect(eff.key).toBe("sk-user");
+    expect(eff.displayName).toBe("openai");
+  });
+
+  it("selected provider ready from env → no key needed, model from the map", () => {
+    const eff = resolveEffectiveConsult(
+      {
+        ...STATUS,
+        providers: {
+          ...STATUS.providers,
+          openai: { ...STATUS.providers.openai, ready: true },
+        },
+      },
+      { provider: "openai", models: {}, keys: {} },
+      "",
+    );
+    expect(eff.ready).toBe(true);
+    expect(eff.model).toBe("gpt-4o-mini");
+    expect(eff.key).toBe("");
+  });
+
+  it("selected provider offline, no key → the per-provider offline message", () => {
+    const eff = resolveEffectiveConsult(
+      STATUS,
+      { provider: "anthropic", models: {}, keys: {} },
+      "",
+    );
+    expect(eff.ready).toBe(false);
+    expect(eff.offlineMessage).toBe(
+      "Consultant is offline. Set `ANTHROPIC_API_KEY` in `.env`.",
+    );
+  });
+
+  it("a provider not in the map falls back to the top-level offline message", () => {
+    const eff = resolveEffectiveConsult(
+      STATUS,
+      { provider: "mystery", models: {}, keys: {} },
+      "",
+    );
+    expect(eff.ready).toBe(false);
+    expect(eff.offlineMessage).toBe(
+      "Consultant is offline. Set `GROQ_API_KEY` in `.env`.",
+    );
+  });
+
+  it("status null → the static OFFLINE_MESSAGE constant", () => {
+    const eff = resolveEffectiveConsult(
+      null,
+      { provider: "", models: {}, keys: {} },
+      "",
+    );
+    expect(eff.ready).toBe(false);
+    expect(eff.offlineMessage).toBe(OFFLINE_MESSAGE);
+    const selected = resolveEffectiveConsult(
+      null,
+      { provider: "openai", models: {}, keys: {} },
+      "",
+    );
+    expect(selected.offlineMessage).toBe(OFFLINE_MESSAGE);
   });
 });
