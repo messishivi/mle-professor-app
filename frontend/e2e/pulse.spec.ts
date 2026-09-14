@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-test("pulse page loads with nav and paper cards, no page errors", async ({
+test("pulse page loads the live snapshot with nav, no page errors", async ({
   page,
 }) => {
   const errors: string[] = [];
@@ -12,10 +12,36 @@ test("pulse page loads with nav and paper cards, no page errors", async ({
     page.getByRole("navigation", { name: "Sections" }),
   ).toBeVisible();
   await expect(page.getByRole("heading", { name: "Pulse" })).toBeVisible();
-  await expect(page.locator("article")).toHaveCount(8);
-  // mock-pulse.ts contract: exactly two "adopt" verdicts
-  await expect(page.getByText("ADOPT", { exact: true })).toHaveCount(2);
-  await expect(page.getByText("✓ read")).toBeVisible();
+
+  // Live snapshot from the API (GET /pulse), not the P1 mock data.
+  await expect(
+    page.getByText(/updated \d{4}-\d{2}-\d{2} \d{2}:\d{2} UTC · \d+ items/),
+  ).toBeVisible();
+  // A live-feed topic (stable while the stored snapshot is unchanged —
+  // e2e never clicks Refresh, so the DB snapshot is never mutated). The
+  // topic string also appears in the card's "Paper ·" line, so scope the
+  // assertion to the card heading.
+  await expect(
+    page.getByRole("heading", {
+      name: "AutoResearch: Insight In, Hallucination Out",
+    }),
+  ).toBeVisible();
+  await expect(page.locator("article")).not.toHaveCount(0);
+  // Empty settings → empty stack → every item ranks "Set stack" and the
+  // stack chip row says so.
+  await expect(page.getByText("SET STACK", { exact: true }).first()).toBeVisible();
+  await expect(
+    page.getByText("not set — items rank as “Set stack”"),
+  ).toBeVisible();
+  // Live memos carry a verdict badge (heuristic origin, uppercased).
+  await expect(page.getByText("Decision").first()).toBeVisible();
+  await expect(page.getByText("WATCH", { exact: true }).first()).toBeVisible();
+  // hf_daily items tag themselves "trending" (Streamlit parity).
+  await expect(page.getByText("trending", { exact: true }).first()).toBeVisible();
+  // No GROQ_API_KEY in this environment → Refine is disabled (app.py parity).
+  const refineButtons = page.getByRole("button", { name: "Refine memo" });
+  expect(await refineButtons.count()).toBeGreaterThan(0);
+  await expect(refineButtons.first()).toBeDisabled();
 
   // regression: the nav must stay a non-scrolling container. The active
   // tab underline protrudes 1px below its link; any overflow-* value on

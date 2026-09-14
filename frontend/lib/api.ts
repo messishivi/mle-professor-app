@@ -56,7 +56,7 @@ export interface IngestResult {
 
 // ---------------------------------------------------------------- helpers
 
-async function request<T>(
+export async function request<T>(
   path: string,
   init?: RequestInit,
 ): Promise<T> {
@@ -119,4 +119,18 @@ export function ingest(req: IngestRequest = {}): Promise<IngestResult> {
     method: "POST",
     body: JSON.stringify(req),
   });
+}
+
+// ------------------------------------------------------ consult status (P2c)
+
+/** GET /consult/status — provider readiness (_api_ready parity). */
+export interface ConsultStatus {
+  ready: boolean;
+  provider: string;
+  model: string;
+  demo_mode: boolean;
+}
+
+export function getConsultStatus(): Promise<ConsultStatus> {
+  return request<ConsultStatus>("/consult/status");
 }

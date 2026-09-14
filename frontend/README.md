@@ -14,11 +14,15 @@ fonts, no UI kit).
 | `pnpm test` | Unit + component tests (Vitest + Testing Library) |
 | `pnpm test:e2e` | Playwright smoke tests (starts the dev server itself) |
 
-## Status — P1 (design prototype)
+## Status — P3 (live wiring, in progress)
 
 - Shell: sticky top nav + dark/light theming (dark default, persisted in
   `localStorage`, applied before first paint)
-- Pulse screen wired to **mock data** (`lib/mock-pulse.ts`, fictional papers)
-  — replaced by real API data in P2a/P3a
-- Saved / Consultant pages are empty-state placeholders until their
-  increments land
+- **Pulse** (`app/page.tsx`): live ML Pulse from the API (`lib/pulse.ts`) —
+  snapshot + refresh, "For my stack" / "Everything" re-rank, per-item memos
+  with verdict badges + stack-fit meters, "Refine memo" (needs an online
+  Consultant)
+- **Papers / Saved** (`app/papers`, `app/saved`): live library with search,
+  read/unread filter + optimistic toggle, category ingest (`lib/api.ts`)
+- **Consultant** (`app/consultant`): empty-state placeholder until P3c
+- The P1 mock prototype (`mock-pulse.ts`, `paper-card.tsx`) has been removed
