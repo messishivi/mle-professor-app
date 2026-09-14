@@ -62,7 +62,8 @@ Create a key at [console.groq.com](https://console.groq.com). The Consultant nee
 
 ### Run it (two processes for local dev)
 
-Terminal 1 — backend (API + static hosting, port 8000):
+Terminal 1 — backend (API + static hosting, port 8000), from the repo root with
+the venv active:
 
 ```bash
 uvicorn api:app --reload --port 8000
@@ -72,12 +73,42 @@ Terminal 2 — frontend dev server (port 3000, talks to the API at 127.0.0.1:800
 
 ```bash
 cd frontend
-corepack enable          # once, per machine (enables pnpm)
+corepack enable          # once, per machine (enables pnpm; or `npm i -g pnpm`)
 pnpm install
 pnpm dev
 ```
 
-Open http://127.0.0.1:3000. Click **Refresh ML Pulse** (and **Refresh papers** if you want the library filled from arXiv). Opening the app does not fetch by itself.
+Open http://127.0.0.1:3000. Click **Refresh ML Pulse** (and **Refresh papers**
+if you want the library filled from arXiv). Opening the app does not fetch by
+itself. A healthy backend answers `curl http://127.0.0.1:8000/api/healthz`.
+
+**No keys yet? That's fine.** Pulse, papers, saved, and settings all work
+keyless; only the Consultant needs a model. Until you give it one, the
+Consultant banner shows the active provider's offline note (e.g.
+``Set `GROQ_API_KEY` in `.env`.``).
+
+### Get the Consultant online (local testing)
+
+Pick one — the Consultant banner flips to `Consultant ready · <provider> ·
+<model>` when it works:
+
+1. **Env (persists across restarts).** Put the provider's key in `.env` —
+   the backend reads it at startup: `GROQ_API_KEY` / `OPENAI_API_KEY` /
+   `ANTHROPIC_API_KEY` (see [Providers](#providers-consultant-llm)). `local`
+   needs no key.
+2. **Settings page (session only).** Settings → *Consultant LLM provider*:
+   pick a provider in the dropdown (each entry carries a live readiness label,
+   e.g. `openai · needs key`, and the model field prefills the provider's
+   default), then paste a key into **API key (this session only)**. The key
+   lives in browser memory — never written to disk — and is gone on reload.
+3. **Local model (no cloud, no key).** Run `llama-server -m model.gguf
+   --port 8080`, pick `local` in the dropdown, and set `LOCAL_MODEL` in `.env`
+   to the model name (`LOCAL_BASE_URL` already defaults to
+   `http://127.0.0.1:8080/v1`).
+
+The provider selection itself is session-only (sent per request, never
+persisted); with no selection, the server default `LLM_PROVIDER` (default
+`groq`) applies.
 
 For production you never run these separately: the Docker image builds the frontend as a static export and serves it from the API process (one port).
 
@@ -101,7 +132,7 @@ The Consultant Terminal streams through `providers.py`, a small registry of four
 
 - Never commit `.env`, `data/`, or `*.db`. Those are gitignored on purpose.
 - `MLE_DATA_DIR` overrides where SQLite lives (used by Docker at `/data`).
-- `MLE_DEMO_MODE=1` seeds sample papers when the library is empty. Bring-your-own-key happens on the Consultant page and is sent per request — never written to disk or the database.
+- `MLE_DEMO_MODE=1` seeds sample papers when the library is empty. Bring-your-own-key happens on the Settings page (Consultant LLM provider) and is sent per request — never written to disk or the database, and lost on reload.
 - Do not put confidential work documents, customer data, or internal papers into the library or the consultant. Chat text goes to the provider you configure (Groq by default; see [Providers](#providers-consultant-llm)).
 - **Auth is deferred by design.** The app ships open (single-user, personal use). If you expose it on a public host, put it behind a reverse proxy with basic auth or a VPN — see [README-DEPLOY.md](README-DEPLOY.md). Sensitive ops (chat/ingest) can go behind a toggle later; the API already has a single mount point (`/api`) for that.
 - Rotate a key if it was ever pasted into chat, Slack, or email.

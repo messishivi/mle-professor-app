@@ -14,7 +14,7 @@ fonts, no UI kit).
 | `pnpm test` | Unit + component tests (Vitest + Testing Library) |
 | `pnpm test:e2e` | Playwright smoke tests (starts the dev server itself) |
 
-## Status — P3 (live wiring, complete)
+## Status — P5 (multi-provider wiring, complete)
 
 - Shell: sticky top nav + dark/light theming (dark default, persisted in
   `localStorage`, applied before first paint)
@@ -29,14 +29,19 @@ fonts, no UI kit).
 - **Consultant** (`app/consultant`): SSE terminal (`lib/consult.ts` +
   `components/consultant-client.tsx`) — three layers (Apply to my system /
   Plain English / Systems critic) with per-layer history, streamed deltas,
-  "Checked sources" disclosure on the final turn, session-only demo-key BYOK
-  and session clear. Offline (no `GROQ_API_KEY`) the send path is handled
-  locally with the exact Streamlit offline note and never POSTs
+  "Checked sources" disclosure on the final turn, and session clear. Provider
+  and model ride each request from the Settings selection (session-only store
+  in `lib/consult.ts`); in demo mode a session-only key can also be pasted
+  here. Offline, the send path is handled locally with the selected
+  provider's canonical offline note (`providers.py`) and never POSTs
 - **Settings** (`app/settings`): live stack chips ("Your stack"),
   "I'm building" / "Papers I already use" / "Repo (README)" fields with the
   Streamlit sidebar strings, README load/reload against the backend
   (`POST /settings/repo-readme`) with a `{chars}`-only status caption
-  (intentional deviations: no `parse_repo` gate, no preview body)
+  (intentional deviations: no `parse_repo` gate, no preview body), and the
+  "Consultant LLM provider" section (P5): provider dropdown with live
+  readiness labels from `/consult/status`, per-provider model prefill, and a
+  session-only BYOK key (in memory only — lost on reload, never persisted)
 - The P1 mock prototype (`mock-pulse.ts`, `paper-card.tsx`) has been removed
 
 ### Parity notes

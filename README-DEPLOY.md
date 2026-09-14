@@ -58,17 +58,21 @@ beyond the platform's default.
   `MLE_DEMO_MODE=1`). Spaces gives you free hosting and discovery.
 - **Railway / Render / Fly.io / Fly Machines / Fly.io**: build context = repo
   root, add a persistent volume mounted at `/data` (required for data to
-  survive restarts), set `GROQ_API_KEY`.
+  survive restarts), set the provider key for your `LLM_PROVIDER`
+  (e.g. `GROQ_API_KEY`).
 - **Railway/Render** set their own port — the container honors `PORT`, so no
   change needed.
 
 ## Secrets strategy
 
-- **One secret: `GROQ_API_KEY`.** It is read from the environment only. The
-  frontend's bring-your-own-key (Consultant page) is sent per request and is
+- **Set the secret for the provider you run.** `LLM_PROVIDER` decides which
+  env key the backend needs — `GROQ_API_KEY` / `OPENAI_API_KEY` /
+  `ANTHROPIC_API_KEY` (`local` needs none). Keys are read from the environment
+  only.
+- The frontend's bring-your-own-key (Settings page) is sent per request and is
   never persisted — so demo/keyless hosting needs *no* secret at all.
-- Never bake the key into the image or a committed `.env`.
-- Rotate on any exposure; the key is only ever sent to Groq.
+- Never bake a key into the image or a committed `.env`.
+- Rotate on any exposure; a key is only ever sent to its own provider.
 
 ## Auth (deferred — ship open first)
 
