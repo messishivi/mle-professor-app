@@ -1,11 +1,9 @@
 """Demo mode: try the app without forking, cloning, or a ``.env`` file.
 
-Enable with ``MLE_DEMO_MODE=1``. The app then:
-
-- seeds a few sample papers the first time the library is empty,
-- shows a demo banner,
-- accepts a bring-your-own Groq key from a sidebar field that lives in
-  ``st.session_state`` only — it is never written to disk or the database.
+Enable with ``MLE_DEMO_MODE=1``. The backend then seeds a few sample papers
+the first time the library is empty (``seed_demo_data``). In the web UI,
+bring-your-own-key is per-request: the Consultant page sends the key in the
+chat payload and it is never persisted (see ``api.py`` /consult/chat).
 
 When the flag is off, everything behaves exactly as before.
 """
@@ -13,7 +11,6 @@ When the flag is off, everything behaves exactly as before.
 from __future__ import annotations
 
 import os
-from typing import Optional
 
 _TRUE = {"1", "true", "yes", "on"}
 
@@ -23,26 +20,8 @@ def demo_enabled() -> bool:
     return os.getenv("MLE_DEMO_MODE", "").strip().lower() in _TRUE
 
 
-def _session_state() -> Optional[dict]:
-    """Return Streamlit session state, or None outside a Streamlit run."""
-    try:
-        import streamlit as st
-
-        return st.session_state
-    except Exception:
-        return None
-
-
 def effective_groq_key() -> str:
-    """Session key first (demo BYOK), then the ``GROQ_API_KEY`` environment."""
-    state = _session_state()
-    if state is not None:
-        try:
-            key = str(state.get("demo_groq_key") or "").strip()
-        except Exception:
-            key = ""
-        if key:
-            return key
+    """The ``GROQ_API_KEY`` environment variable, stripped ("" if unset)."""
     return os.getenv("GROQ_API_KEY", "").strip()
 
 
@@ -103,19 +82,3 @@ def seed_demo_data(store) -> int:
         except Exception:
             continue
     return added
-
-
-def render_demo_banner() -> None:
-    """Demo banner + session-only key field. Call once inside the sidebar."""
-    import streamlit as st
-
-    st.info(
-        "Demo mode — explore freely. Data is ephemeral and nothing is saved. "
-        "Add your own Groq key below to unlock the Consultant Terminal."
-    )
-    st.text_input(
-        "Groq API key (this session only)",
-        type="password",
-        key="demo_groq_key",
-        help="Kept in memory for this browser session. Never written to disk.",
-    )

@@ -10,23 +10,35 @@ Increments so far:
   SSE stream: ``sources`` -> ``delta``* -> ``done``/``error``), mirroring
   ``consultant.chat_with_consultant`` grounding and the offline behavior of
   app.py. LLM calls go through the thin provider seam in ``providers.py``.
+- P4: single-image production mode. ``create_app(prefix, web_root)`` mounts
+  every API route under a prefix (``/api`` in the prod image) and serves the
+  Next.js static export (``frontend/out``) at ``/`` — one process, one port,
+  no Node runtime in the container. Both knobs are env-driven at import time
+  (``API_PREFIX``, ``MLE_WEB_ROOT``) so dev/tests keep the historical
+  root-mounted layout when they are unset.
 
 Run from the repo root:
 
     uvicorn api:app --port 8000
+
+Production (inside the Docker image; env already set by the Dockerfile):
+
+    uvicorn api:app --host 0.0.0.0 --port 8000
+    # -> API at /api/*, frontend at /*
 """
 
 from __future__ import annotations
 
 import json
 import os
+from pathlib import Path
 from typing import Any, Iterator, Optional
 
 import requests
 from dotenv import load_dotenv
-from fastapi import FastAPI, HTTPException
+from fastapi import APIRouter, FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import StreamingResponse
+from fastapi.responses import FileResponse, PlainTextResponse, StreamingResponse
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 import grounding
@@ -180,8 +192,54 @@ def _settings_payload(db: PaperDatabase) -> dict[str, Any]:
     }
 
 
-def create_app(store: Optional[PaperDatabase] = None) -> FastAPI:
-    """Build the API. ``store`` is injectable so tests use a temp database."""
+def _resolve_static_file(web_root: Path, full_path: str) -> Optional[Path]:
+    """Map a request path onto a file in the Next.js static export.
+
+    Mirrors the nginx config from Next's static-exports guide
+    (``try_files $uri $uri.html $uri/ =404``) — required because this Next
+    version exports clean routes as flat files (``/papers`` ->
+    ``out/papers.html``), which ``StaticFiles(html=True)`` would not find.
+    Resolves to a file strictly inside ``web_root`` (traversal-safe) or None.
+    """
+    root = web_root
+    # Strip both ends so the directory form ("/papers/") maps to the same
+    # flat file as the clean route ("/papers") in trailingSlash=false exports.
+    rel = full_path.strip("/")
+    if not rel:
+        candidates = [root / "index.html"]
+    else:
+        candidates = [
+            root / rel,  # literal file: /_next/..., /favicon.ico, /papers.txt
+            root / (rel + ".html"),  # clean route: /papers -> /papers.html
+            root / rel / "index.html",  # directory form (trailingSlash exports)
+        ]
+    for candidate in candidates:
+        resolved = candidate.resolve()
+        try:
+            resolved.relative_to(root)
+        except ValueError:
+            continue  # escaped the export root — skip
+        if resolved.is_file():
+            return resolved
+    return None
+
+
+def create_app(
+    store: Optional[PaperDatabase] = None,
+    prefix: str = "",
+    web_root: Optional[str] = None,
+) -> FastAPI:
+    """Build the API.
+
+    - ``store``: injectable PaperDatabase (tests use a temp database).
+    - ``prefix`` (P4): mount every API route under this prefix. The prod
+      single image runs the API under ``/api`` so the frontend can own ``/``;
+      dev and tests pass nothing and keep the historical root layout.
+    - ``web_root`` (P4): directory holding the Next.js static export
+      (``frontend/out``). When set, the app also serves the frontend at
+      ``/`` — one process, one port, no Node runtime in the container.
+    """
+    prefix = (prefix or "").strip().strip("/")
     app = FastAPI(title="MLE Professor API", version=API_VERSION)
     db = store or get_db()
 
@@ -202,11 +260,13 @@ def create_app(store: Optional[PaperDatabase] = None) -> FastAPI:
         allow_headers=["*"],
     )
 
-    @app.get("/healthz")
+    router = APIRouter()
+
+    @router.get("/healthz")
     def healthz() -> dict[str, Any]:
         return {"status": "ok", "service": "mle-professor-api", "papers": db.count()}
 
-    @app.get("/papers")
+    @router.get("/papers")
     def list_papers(
         q: str = "",
         read: Optional[int] = None,
@@ -218,7 +278,7 @@ def create_app(store: Optional[PaperDatabase] = None) -> FastAPI:
         papers = db.list_papers(read_status=read, query=q, limit=limit)
         return {"count": len(papers), "papers": [p.model_dump() for p in papers]}
 
-    @app.get("/papers/{paper_id}")
+    @router.get("/papers/{paper_id}")
     def get_paper(paper_id: str) -> dict[str, Any]:
         try:
             canonical = normalize_arxiv_id(paper_id)
@@ -229,7 +289,7 @@ def create_app(store: Optional[PaperDatabase] = None) -> FastAPI:
             raise HTTPException(status_code=404, detail=f"No paper with id {canonical!r}")
         return paper.model_dump()
 
-    @app.patch("/papers/{paper_id}")
+    @router.patch("/papers/{paper_id}")
     def patch_paper(paper_id: str, payload: PaperPatch) -> dict[str, Any]:
         try:
             paper = db.update_paper(paper_id, read_status=payload.read_status)
@@ -239,7 +299,7 @@ def create_app(store: Optional[PaperDatabase] = None) -> FastAPI:
             raise HTTPException(status_code=400, detail=str(exc))
         return paper.model_dump()
 
-    @app.post("/papers/ingest")
+    @router.post("/papers/ingest")
     def ingest(payload: IngestRequest = IngestRequest()) -> dict[str, Any]:
         """ArXiv Atom ingest (pipeline.fetch_latest_papers), same as the sidebar button."""
         try:
@@ -252,19 +312,19 @@ def create_app(store: Optional[PaperDatabase] = None) -> FastAPI:
             raise HTTPException(status_code=502, detail=f"ArXiv API request failed: {exc}")
         return result.model_dump()
 
-    @app.get("/pulse")
+    @router.get("/pulse")
     def pulse() -> dict[str, Any]:
         """Latest saved ML Pulse snapshot with stack fit + memos (render_ml_pulse parity)."""
         return _pulse_payload(db)
 
-    @app.post("/pulse/refresh")
+    @router.post("/pulse/refresh")
     def pulse_refresh() -> dict[str, Any]:
         """Refresh HF Daily + arXiv ML feeds and save a new snapshot
         (the 'Refresh ML Pulse' button in app.py)."""
         snap = refresh_pulse(db)
         return _pulse_payload(db, snap=snap)
 
-    @app.post("/pulse/memos/refine")
+    @router.post("/pulse/memos/refine")
     def memo_refine(payload: MemoRefineRequest) -> dict[str, Any]:
         """Refine the decision memo for one pulse item (Groq pass with a
         heuristic fallback), then persist it — the 'Refine' button parity."""
@@ -278,12 +338,12 @@ def create_app(store: Optional[PaperDatabase] = None) -> FastAPI:
         db.save_memo(item_key, skey, **memo.as_dict())
         return {"item_key": item_key, "stack_key": skey, "memo": memo.as_dict()}
 
-    @app.get("/settings")
+    @router.get("/settings")
     def get_settings() -> dict[str, Any]:
         """Sidebar state: stack, application, known papers, repo grounding."""
         return _settings_payload(db)
 
-    @app.put("/settings")
+    @router.put("/settings")
     def put_settings(payload: SettingsUpdate) -> dict[str, Any]:
         """Partial update of sidebar state. Changing the repo URL invalidates
         the cached README (same rule as the Streamlit sidebar)."""
@@ -300,7 +360,7 @@ def create_app(store: Optional[PaperDatabase] = None) -> FastAPI:
                 db.set_repo_readme("", source_url="")
         return _settings_payload(db)
 
-    @app.post("/settings/repo-readme")
+    @router.post("/settings/repo-readme")
     def load_repo_readme(
         payload: RepoReadmeRequest = RepoReadmeRequest(),
     ) -> dict[str, Any]:
@@ -321,7 +381,7 @@ def create_app(store: Optional[PaperDatabase] = None) -> FastAPI:
             "chars": len(readme.content),
         }
 
-    @app.get("/consult/status")
+    @router.get("/consult/status")
     def consult_status() -> dict[str, Any]:
         """Provider readiness — the ``_api_ready()`` check the Terminal does."""
         return {
@@ -331,7 +391,7 @@ def create_app(store: Optional[PaperDatabase] = None) -> FastAPI:
             "demo_mode": demo_enabled(),
         }
 
-    @app.post("/consult/chat")
+    @router.post("/consult/chat")
     def consult(payload: ConsultRequest) -> StreamingResponse:
         """SSE stream: ``sources`` -> ``delta``* -> ``done`` (or ``error``).
 
@@ -420,7 +480,42 @@ def create_app(store: Optional[PaperDatabase] = None) -> FastAPI:
             },
         )
 
+    # P4: mount the API (under the prefix) first so it wins over the static
+    # catch-all registered below.
+    if prefix:
+        app.include_router(router, prefix=f"/{prefix}")
+    else:
+        app.include_router(router)
+
+    if web_root:
+        root = Path(web_root).resolve()
+
+        @app.get("/{full_path:path}", include_in_schema=False)
+        def _static_catchall(full_path: str):  # noqa: ANN202
+            """Serve the Next.js static export (P4 single-image mode)."""
+            resolved = _resolve_static_file(root, full_path)
+            if resolved is not None:
+                return FileResponse(resolved)
+            if prefix and (
+                full_path == prefix or full_path.startswith(f"{prefix}/")
+            ):
+                # An unknown API path must 404 like the API, not fall through
+                # to the frontend.
+                from fastapi.responses import JSONResponse
+
+                return JSONResponse({"detail": "Not Found"}, status_code=404)
+            fallback = root / "404.html"
+            if fallback.is_file():
+                return FileResponse(fallback, status_code=404)
+            return PlainTextResponse("Not Found", status_code=404)
+
     return app
 
 
-app = create_app()
+# P4: the prod image sets API_PREFIX=/api + MLE_WEB_ROOT=<export dir> so the
+# same `uvicorn api:app` entrypoint serves API + frontend on one port.
+# Dev and tests leave both unset and get the historical root-mounted API.
+app = create_app(
+    prefix=os.getenv("API_PREFIX", "").strip(),
+    web_root=(os.getenv("MLE_WEB_ROOT", "").strip() or None),
+)

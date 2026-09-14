@@ -33,8 +33,7 @@ def test_demo_enabled_flag(monkeypatch):
     assert demo.demo_enabled() is False
 
 
-def test_effective_key_falls_back_to_env(monkeypatch):
-    # No streamlit installed here -> session state unavailable -> env fallback.
+def test_effective_key_reads_env(monkeypatch):
     monkeypatch.setenv("GROQ_API_KEY", "gsk_test")
     assert demo.effective_groq_key() == "gsk_test"
 

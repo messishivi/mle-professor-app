@@ -1,7 +1,10 @@
 import { Suspense } from "react";
 import { ConsultantClient } from "@/components/consultant-client";
 
-export const dynamic = "force-dynamic";
+// No `dynamic = "force-dynamic"`: this page is fully client-rendered (the
+// ConsultantClient does all fetching in the browser), so the P4 static export
+// only prerenders this Suspense fallback shell. In Next 16 pages are dynamic
+// by default, so the old flag was redundant.
 
 function ConsultantFallback() {
   return (

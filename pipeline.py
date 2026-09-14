@@ -2,9 +2,11 @@
 
 from __future__ import annotations
 
+import random
 import re
+import time
 import xml.etree.ElementTree as ET
-from typing import Optional, Sequence, Union
+from typing import Callable, Optional, Sequence, Union
 from xml.etree.ElementTree import ParseError
 
 import requests
@@ -21,6 +23,30 @@ CATEGORY_RE = re.compile(r"^[a-z][a-z\-]+(\.[A-Za-z0-9\-]+)?$")
 MAX_FEED_BYTES = 8 * 1024 * 1024
 DEFAULT_CATEGORIES = ("cs.CL", "cs.LG")
 USER_AGENT = "mle-professor/0.1 (personal knowledge base; +https://arxiv.org/help/api)"
+
+# P4 (hosting): a public instance gets rate-limited harder than a laptop, so
+# a single burst of 429s used to fail the whole ingest / pulse refresh. Retry
+# transient failures with bounded exponential backoff + jitter.
+ARXIV_RETRYABLE_STATUS = frozenset({429, 500, 502, 503, 504})
+ARXIV_MAX_ATTEMPTS = 3
+ARXIV_BACKOFF_BASE = 2.0  # seconds; attempt n waits ~base * 2**(n-1) + jitter
+ARXIV_BACKOFF_CAP = 30.0  # never sleep longer than this per retry
+
+
+def arxiv_backoff_delay(attempt: int, retry_after: object = None) -> float:
+    """Seconds to wait before retry number ``attempt`` (1-based).
+
+    Honors a numeric ``Retry-After`` header (capped at ``ARXIV_BACKOFF_CAP``);
+    otherwise exponential backoff (base * 2**(attempt-1)) with a little jitter
+    so concurrent hosts do not re-hit the API in lockstep.
+    """
+    if retry_after is not None:
+        try:
+            return min(float(retry_after), ARXIV_BACKOFF_CAP)
+        except (TypeError, ValueError):
+            pass  # HTTP-date or garbage -> fall back to exponential
+    delay = min(ARXIV_BACKOFF_BASE * (2 ** (attempt - 1)), ARXIV_BACKOFF_CAP)
+    return delay + random.uniform(0.0, 0.25 * delay)
 
 
 class ArxivEntry(BaseModel):
@@ -192,7 +218,22 @@ def fetch_atom_xml(
     max_results: int = 20,
     start: int = 0,
     timeout: float = 30.0,
+    max_attempts: int = ARXIV_MAX_ATTEMPTS,
+    get: Optional[Callable[..., requests.Response]] = None,
+    sleep: Callable[[float], None] = time.sleep,
 ) -> bytes:
+    """Fetch the ArXiv Atom XML for a query.
+
+    Retries transient failures — HTTP 429/5xx responses and network errors
+    (timeouts, connection resets) — with exponential backoff + jitter,
+    honoring a numeric ``Retry-After`` header (P4). Non-retryable 4xx
+    responses (e.g. a malformed query -> 400) fail immediately. ``get`` and
+    ``sleep`` are injectable so tests run without real network or waiting.
+    """
+    if max_attempts < 1:
+        raise ValueError("max_attempts must be >= 1")
+    if get is None:
+        get = requests.get
     params = {
         "search_query": query,
         "start": max(0, int(start)),
@@ -200,14 +241,39 @@ def fetch_atom_xml(
         "sortBy": "submittedDate",
         "sortOrder": "descending",
     }
-    response = requests.get(
-        ARXIV_API,
-        params=params,
-        headers={"User-Agent": USER_AGENT, "Accept": "application/atom+xml, application/xml"},
-        timeout=timeout,
-    )
-    response.raise_for_status()
-    return response.content
+    headers = {"User-Agent": USER_AGENT, "Accept": "application/atom+xml, application/xml"}
+
+    last_error: Optional[Exception] = None
+    for attempt in range(1, max_attempts + 1):
+        try:
+            response = get(
+                ARXIV_API,
+                params=params,
+                headers=headers,
+                timeout=timeout,
+            )
+        except requests.RequestException as exc:
+            # Network-level failure (DNS/timeout/reset) — retryable.
+            last_error = exc
+            if attempt >= max_attempts:
+                raise
+            sleep(arxiv_backoff_delay(attempt))
+            continue
+
+        if response.status_code in ARXIV_RETRYABLE_STATUS:
+            last_error = requests.HTTPError(
+                f"ArXiv API returned HTTP {response.status_code}", response=response
+            )
+            if attempt >= max_attempts:
+                raise last_error
+            sleep(arxiv_backoff_delay(attempt, response.headers.get("Retry-After")))
+            continue
+
+        # Non-retryable 4xx raises here; 2xx is a no-op.
+        response.raise_for_status()
+        return response.content
+
+    raise last_error  # pragma: no cover - loop always returns or raises
 
 
 def fetch_latest_papers(

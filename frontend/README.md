@@ -48,5 +48,6 @@ fonts, no UI kit).
   Streamlit request shape.
 - Parity probes (read-only, not part of the suite):
   `scripts/parity-probe-pulse.cjs`, `scripts/parity-probe-saved.cjs`,
-  `scripts/parity-probe-consultant.cjs` (need the Streamlit reference on
-  127.0.0.1:8501).
+  `scripts/parity-probe-consultant.cjs`. These compare against the old
+  Streamlit reference app, which now lives on the `legacy/streamlit` branch
+  (run it there on 127.0.0.1:8501 if you need them).

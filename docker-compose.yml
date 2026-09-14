@@ -1,0 +1,29 @@
+# MLE Professor — single-image deployment (VPS or PaaS).
+#
+# One container, one port (8000): the API under /api and the static
+# Next.js frontend on the same origin.
+#
+#   docker compose up -d --build      # build + start
+#   docker compose logs -f app        # watch
+#
+# Secrets: put GROQ_API_KEY (and optionally GROQ_MODEL, MLE_DEMO_MODE) in a
+# .env file next to this file — compose loads it automatically. Without a
+# key the app runs keyless: ingest/pulse work, the Consultant reports
+# offline until you set the key.
+
+services:
+  app:
+    build: .
+    image: mle-professor
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      GROQ_API_KEY: ${GROQ_API_KEY:-}
+      GROQ_MODEL: ${GROQ_MODEL:-openai/gpt-oss-120b}
+      MLE_DEMO_MODE: ${MLE_DEMO_MODE:-}
+    volumes:
+      - mle-data:/data
+
+volumes:
+  mle-data:

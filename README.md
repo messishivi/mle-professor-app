@@ -2,7 +2,7 @@
 
 Consolidated view of what is going on every day in the ML/AI field, for working MLEs.
 
-Local knowledge base: ingest papers, watch an ML/AI pulse, and brief or critique them in chat. Runs on a laptop. Reasoning goes to Groq; papers and read-state stay on disk.
+Local knowledge base: ingest papers, watch an ML/AI pulse, and brief or critique them in chat. Runs on a laptop or a single container. Reasoning goes to Groq; papers and read-state stay on disk.
 
 ## What you get
 
@@ -20,22 +20,25 @@ Released under the [MIT License](LICENSE). This is a personal project, not affil
 
 ## Try it now
 
-**Docker (demo mode — no `.env`):**
+**Docker (demo mode — no key needed):**
 
 ```bash
-docker run --rm -p 8501:8501 -e MLE_DEMO_MODE=1 \
+docker run --rm -p 8000:8000 -e MLE_DEMO_MODE=1 \
   ghcr.io/messishivi/mle-professor-app:latest
 ```
 
-**Local demo mode** (seeds sample papers; paste a Groq key in the sidebar for this session only):
+Open http://127.0.0.1:8000 — the web UI, API, and static pages all come from
+this one port.
+
+**Or with compose** (persistent volume):
 
 ```bash
-MLE_DEMO_MODE=1 streamlit run app.py
+MLE_DEMO_MODE=1 docker compose up -d --build
 ```
 
 **Daily digest** (GitHub Pages, after the `pulse-digest` workflow has run): https://messishivi.github.io/mle-professor-app/pulse/
 
-Deploy notes (Streamlit Cloud, HF Spaces, GHCR, Pages): [README-DEPLOY.md](README-DEPLOY.md).
+Deploy notes (VPS, PaaS, GHCR, secrets, auth-deferred): [README-DEPLOY.md](README-DEPLOY.md).
 
 ## Setup
 
@@ -44,7 +47,7 @@ git clone https://github.com/messishivi/mle-professor-app.git
 cd mle-professor-app
 python3 -m venv .venv
 source .venv/bin/activate   # Windows: .venv\Scripts\activate
-pip install -r requirements.txt
+pip install -r requirements-dev.txt
 cp .env.example .env
 ```
 
@@ -57,37 +60,68 @@ GROQ_MODEL=openai/gpt-oss-120b
 
 Create a key at [console.groq.com](https://console.groq.com). Pulse clustering and the consultant need it. Ingest and the library work without it.
 
+### Run it (two processes for local dev)
+
+Terminal 1 — backend (API + static hosting, port 8000):
+
 ```bash
-streamlit run app.py
+uvicorn api:app --reload --port 8000
 ```
 
-Open http://127.0.0.1:8501. Click **Refresh ML Pulse** (and **Refresh papers** if you want the library filled from arXiv). Opening the app does not fetch by itself.
+Terminal 2 — frontend dev server (port 3000, talks to the API at 127.0.0.1:8000):
 
-Python 3.9+ works. LanceDB needs 3.10+; on 3.9 the app falls back to a numpy index.
+```bash
+cd frontend
+corepack enable          # once, per machine (enables pnpm)
+pnpm install
+pnpm dev
+```
+
+Open http://127.0.0.1:3000. Click **Refresh ML Pulse** (and **Refresh papers** if you want the library filled from arXiv). Opening the app does not fetch by itself.
+
+For production you never run these separately: the Docker image builds the frontend as a static export and serves it from the API process (one port).
+
+Python 3.10+ works (LanceDB, if you use the dev extras, needs 3.10+; on older interpreters the app falls back to a numpy index).
 
 ## Usage notes
 
 - Never commit `.env`, `data/`, or `*.db`. Those are gitignored on purpose.
 - `MLE_DATA_DIR` overrides where SQLite lives (used by Docker at `/data`).
-- `MLE_DEMO_MODE=1` seeds sample papers and accepts a visitor Groq key in session state only.
+- `MLE_DEMO_MODE=1` seeds sample papers when the library is empty. Bring-your-own-key happens on the Consultant page and is sent per request — never written to disk or the database.
 - Do not put confidential work documents, customer data, or internal papers into the library or the consultant. Chat text is sent to Groq.
-- Bind Streamlit to localhost only. Do not `--server.address 0.0.0.0` and do not deploy this as a shared cloud app with one key.
+- **Auth is deferred by design.** The app ships open (single-user, personal use). If you expose it on a public host, put it behind a reverse proxy with basic auth or a VPN — see [README-DEPLOY.md](README-DEPLOY.md). Sensitive ops (chat/ingest) can go behind a toggle later; the API already has a single mount point (`/api`) for that.
 - Rotate a key if it was ever pasted into chat, Slack, or email.
 
 ## Architecture
 
 ```
-Streamlit (localhost)
-  ├── SQLite          papers, read state, pulse snapshots   (data/mle_knowledge.db)
-  ├── LanceDB/numpy   local semantic index (optional)
-  ├── ArXiv + HF      ingest and ML Pulse (public research only)
-  └── Groq            explain / systems chat
+Browser
+  └── Next.js (static export)          pages: /, /papers, /saved, /consultant, /settings
+        └── FastAPI (uvicorn, :8000)
+              ├── /api/*                papers, pulse, consultant (SSE), settings, healthz
+              ├── /                     static frontend (out/)
+              ├── SQLite                papers, read state, pulse snapshots  (data/mle_knowledge.db or /data)
+              ├── ArXiv + HF            ingest and ML Pulse (public research only; 429-aware retry)
+              └── Groq                  consultant streaming (key from env or per-request)
 ```
+
+- `frontend/` — Next.js (App Router, React, Tailwind). 100% client-side fetching; builds to a flat static export.
+- root `*.py` — FastAPI app (`api.py` is the entry point; `create_app(prefix=..., web_root=...)` is what the container wires up).
+- `mle_professor/` — dev/test-only package (chunker, encoders, RAG experiments); not imported by the runtime API and not in the container.
 
 ## Tests
 
+Backend (run from the repo root):
+
 ```bash
 EMBEDDING_BACKEND=hash MLE_DATA_DIR=/tmp/mle-prof-test pytest -q
+```
+
+Frontend (run from `frontend/`):
+
+```bash
+pnpm test            # vitest + React Testing Library
+pnpm test:e2e        # Playwright smoke tests (needs the backend on :8000)
 ```
 
 ## License
