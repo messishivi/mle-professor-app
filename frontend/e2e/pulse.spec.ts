@@ -47,9 +47,10 @@ test("theme toggle switches to light and back", async ({ page }) => {
   await expect(html).not.toHaveAttribute("data-theme", "light");
 });
 
-test("saved and consultant show empty states", async ({ page }) => {
+test("saved and consultant pages load", async ({ page }) => {
+  // /saved is now a live view (P3a): empty state when nothing is marked read.
   await page.goto("/saved");
-  await expect(page.getByText("Nothing saved yet")).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Saved" })).toBeVisible();
 
   await page.goto("/consultant");
   await expect(page.getByText("consultant terminal")).toBeVisible();

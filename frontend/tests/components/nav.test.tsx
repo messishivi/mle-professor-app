@@ -1,5 +1,5 @@
 import { render, screen } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { Nav } from "@/components/nav";
 
 const { mockPath } = vi.hoisted(() => ({ mockPath: { current: "/" } }));
@@ -14,7 +14,7 @@ describe("Nav", () => {
     expect(
       screen.getByRole("link", { name: /MLE Professor/i }),
     ).toBeInTheDocument();
-    for (const label of ["Pulse", "Saved", "Consultant"]) {
+    for (const label of ["Pulse", "Papers", "Saved", "Consultant"]) {
       expect(screen.getByRole("link", { name: label })).toBeInTheDocument();
     }
   });
