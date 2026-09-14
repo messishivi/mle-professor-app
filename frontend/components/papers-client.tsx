@@ -1,8 +1,11 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import type { ApiPaper } from "@/lib/api";
 import { listPapers, patchPaper } from "@/lib/api";
+import { buildApplyPrompt, getSettings } from "@/lib/consult";
+import type { ApplyContext } from "@/lib/consult";
 import { LibraryRow } from "@/components/library-row";
 import { IngestForm } from "@/components/ingest-form";
 
@@ -36,6 +39,7 @@ export function PapersClient({ mode = "all" }: PapersClientProps) {
   const [busyId, setBusyId] = useState<string | null>(null);
 
   const seq = useRef(0);
+  const router = useRouter();
 
   const load = useCallback(async () => {
     const id = ++seq.current;
@@ -94,6 +98,34 @@ export function PapersClient({ mode = "all" }: PapersClientProps) {
       setBusyId(null);
     }
   }
+
+  // Streamlit parity (app.py:193-195): "Apply to my system" on every row.
+  // The full paper (title/authors/date/abstract) is passed to
+  // buildApplyPrompt with the user's saved settings as context.
+  const apply = useCallback(async (paper: ApiPaper) => {
+    let ctx: ApplyContext = { application: "", known_papers: "", repo_url: "" };
+    try {
+      const s = await getSettings();
+      ctx = {
+        application: s.application,
+        known_papers: s.known_papers,
+        repo_url: s.repo_url,
+      };
+    } catch {
+      // dead settings endpoint -> empty context; the paper fields remain
+    }
+    const prompt = buildApplyPrompt(
+      {
+        id: paper.id,
+        title: paper.title,
+        authors: paper.authors,
+        published_date: paper.published_date ?? "",
+        summary_raw: paper.summary_raw,
+      },
+      ctx,
+    );
+    router.push(`/consultant?layer=apply&q=${encodeURIComponent(prompt)}`);
+  }, [router]);
 
   const heading = savedOnly ? "Saved" : "Papers";
   const caption = savedOnly
@@ -187,6 +219,7 @@ export function PapersClient({ mode = "all" }: PapersClientProps) {
               paper={paper}
               busy={busyId === paper.id}
               onToggleRead={toggleRead}
+              onApply={(p) => void apply(p)}
             />
           ))}
         </div>

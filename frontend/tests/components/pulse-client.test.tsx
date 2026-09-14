@@ -43,6 +43,21 @@ vi.mock("@/lib/api", () => ({
   },
 }));
 
+const { consultLibMock, routerMock } = vi.hoisted(() => ({
+  consultLibMock: { getSettings: vi.fn() },
+  routerMock: { push: vi.fn(), replace: vi.fn() },
+}));
+
+// Keep the REAL pure buildApplyPrompt (byte-parity is what we assert); only
+// stub the network-backed getSettings.
+vi.mock("@/lib/consult", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@/lib/consult")>();
+  return { ...actual, getSettings: (...a: unknown[]) => consultLibMock.getSettings(...a) };
+});
+vi.mock("next/navigation", () => ({
+  useRouter: () => routerMock,
+}));
+
 import { PulseClient } from "@/components/pulse-client";
 
 const item = (
@@ -107,6 +122,15 @@ beforeEach(() => {
     provider: "groq",
     model: "openai/gpt-oss-120b",
     demo_mode: false,
+  });
+  consultLibMock.getSettings.mockResolvedValue({
+    stack: ["pytorch"],
+    stack_choices: ["pytorch"],
+    application: "RL post-training loop",
+    known_papers: "PPO, DPO",
+    repo_url: "https://github.com/you/your-service",
+    repo_readme_url: "https://raw.githubusercontent.com/you/your-service/main/README.md",
+    repo_readme_chars: 0,
   });
 });
 
@@ -276,5 +300,48 @@ describe("PulseClient", () => {
     ).toBeInTheDocument();
     await user.click(screen.getByRole("button", { name: "Retry" }));
     expect(pulseMock.getPulse).toHaveBeenCalledTimes(2);
+  });
+
+  it("Apply queues the paper into the Consultant's Apply layer", async () => {
+    const user = userEvent.setup();
+    render(<PulseClient />);
+    await screen.findByText("Alpha");
+    // Only the "Alpha" item carries a paper_id (app.py:583-593 parity).
+    expect(
+      screen.queryAllByRole("button", { name: /Apply/ }),
+    ).toHaveLength(1);
+    await user.click(screen.getByRole("button", { name: "Apply" }));
+    expect(consultLibMock.getSettings).toHaveBeenCalledTimes(1);
+    await waitFor(() => {
+      expect(routerMock.push).toHaveBeenCalledTimes(1);
+    });
+    const [url] = routerMock.push.mock.calls[0];
+    expect(url).toMatch(/^\/consultant\?layer=apply&q=.+$/);
+    const prompt = decodeURIComponent(
+      new URL(url, "http://localhost").searchParams.get("q") as string,
+    );
+    // buildApplyPrompt byte-parity (consultant.py paper_apply_prompt):
+    expect(prompt).toContain(
+      "Map this paper onto my current application. What is relevant, what to ignore, and how I implement it.",
+    );
+    expect(prompt).toContain("Title: Alpha paper");
+    expect(prompt).toContain("My system: RL post-training loop");
+    expect(prompt).toContain("I already use: PPO, DPO");
+    expect(prompt).toContain("My repo: https://github.com/you/your-service");
+    // No snapshot writes from the Apply click.
+    expect(pulseMock.refreshPulse).not.toHaveBeenCalled();
+  });
+
+  it("Apply survives a dead settings endpoint with empty context", async () => {
+    consultLibMock.getSettings.mockRejectedValueOnce(new Error("boom"));
+    const user = userEvent.setup();
+    render(<PulseClient />);
+    await screen.findByText("Alpha");
+    await user.click(screen.getByRole("button", { name: "Apply" }));
+    await waitFor(() => {
+      expect(routerMock.push).toHaveBeenCalledTimes(1);
+    });
+    const [url] = routerMock.push.mock.calls[0];
+    expect(url).toMatch(/^\/consultant\?layer=apply&q=.+$/);
   });
 });

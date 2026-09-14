@@ -1,12 +1,23 @@
+import { Suspense } from "react";
+import { ConsultantClient } from "@/components/consultant-client";
+
+export const dynamic = "force-dynamic";
+
+function ConsultantFallback() {
+  return (
+    <div className="mx-auto flex w-full max-w-[860px] flex-col gap-4">
+      <h1 className="text-2xl font-semibold tracking-tight text-ink-0">
+        Consultant Terminal
+      </h1>
+      <p className="font-mono text-xs text-ink-2">loading…</p>
+    </div>
+  );
+}
+
 export default function ConsultantPage() {
   return (
-    <div className="flex min-h-[50vh] flex-col items-center justify-center gap-3 text-center">
-      <p className="font-mono text-xs uppercase tracking-[0.04em] text-ink-2">
-        consultant terminal
-      </p>
-      <p className="text-sm text-ink-1">
-        The grounded consultant arrives with the provider layer (Plan 01, P2c).
-      </p>
-    </div>
+    <Suspense fallback={<ConsultantFallback />}>
+      <ConsultantClient />
+    </Suspense>
   );
 }

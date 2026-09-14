@@ -4,16 +4,33 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { PapersClient } from "@/components/papers-client";
 import type { ApiPaper } from "@/lib/api";
 
-const { listPapersMock, patchPaperMock, ingestMock } = vi.hoisted(() => ({
-  listPapersMock: vi.fn(),
-  patchPaperMock: vi.fn(),
-  ingestMock: vi.fn(),
-}));
+const { listPapersMock, patchPaperMock, ingestMock, getSettingsMock, routerMock } =
+  vi.hoisted(() => ({
+    listPapersMock: vi.fn(),
+    patchPaperMock: vi.fn(),
+    ingestMock: vi.fn(),
+    getSettingsMock: vi.fn(),
+    routerMock: { push: vi.fn(), replace: vi.fn() },
+  }));
 
 vi.mock("@/lib/api", () => ({
   listPapers: listPapersMock,
   patchPaper: patchPaperMock,
   ingest: ingestMock,
+}));
+
+// Keep the REAL buildApplyPrompt (byte parity is what we assert); stub the
+// settings fetch.
+vi.mock("@/lib/consult", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@/lib/consult")>();
+  return {
+    ...actual,
+    getSettings: (...a: unknown[]) => getSettingsMock(...a),
+  };
+});
+
+vi.mock("next/navigation", () => ({
+  useRouter: () => routerMock,
 }));
 
 const paperA: ApiPaper = {
@@ -41,6 +58,15 @@ function listResponse(papers: ApiPaper[]) {
 beforeEach(() => {
   vi.clearAllMocks();
   listResponse([paperA, paperB]);
+  getSettingsMock.mockResolvedValue({
+    stack: [],
+    stack_choices: ["RL", "RAG", "Rec"],
+    application: "RL post-training loop",
+    known_papers: "PPO, DPO",
+    repo_url: "https://github.com/you/your-service",
+    repo_readme_url: "",
+    repo_readme_chars: 0,
+  });
   patchPaperMock.mockImplementation(async (id: string, rs: 0 | 1) => ({
     ...paperA,
     id,
@@ -181,6 +207,41 @@ describe("PapersClient (all mode)", () => {
     expect(
       await screen.findByRole("alert"),
     ).toHaveTextContent(/cannot reach the api/i);
+  });
+
+  it("Apply queues the paper into the Consultant's Apply layer (byte-parity prompt)", async () => {
+    const user = userEvent.setup();
+    render(<PapersClient />);
+    await screen.findByText("Attention Is All You Need");
+    await user.click(
+      screen.getByRole("button", {
+        name: "Apply Attention Is All You Need to my system",
+      }),
+    );
+    await waitFor(() =>
+      expect(routerMock.push).toHaveBeenCalledTimes(1),
+    );
+    const url = routerMock.push.mock.calls[0][0] as string;
+    expect(url.startsWith("/consultant?layer=apply&q=")).toBe(true);
+    const prompt = decodeURIComponent(
+      url.slice("/consultant?layer=apply&q=".length),
+    );
+    // Exact P2c/Streamlit parity template for a library paper.
+    expect(prompt).toBe(
+      "Map this paper onto my current application. What is relevant, what to ignore, " +
+        "and how I implement it. Use user / item (or target) / data / training / serving / eval; " +
+        "rename those to my modules. Do not assume a rec stack.\n" +
+        "\nMy system: RL post-training loop\n" +
+        "I already use: PPO, DPO\n" +
+        "My repo: https://github.com/you/your-service\n" +
+        "Delta against the repo README in retrieved sources — what is already shipped.\n" +
+        "\n" +
+        "Title: Attention Is All You Need\n" +
+        "Authors: Vaswani et al.\n" +
+        "arXiv: 1706.03762\n" +
+        "Date: 2017-06-12\n\n" +
+        "Abstract:\nWe propose the Transformer.",
+    );
   });
 });
 

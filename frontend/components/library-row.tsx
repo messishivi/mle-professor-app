@@ -24,13 +24,15 @@ interface LibraryRowProps {
   paper: ApiPaper;
   busy?: boolean;
   onToggleRead?: (paper: ApiPaper) => void;
+  /** Queues the paper into the Consultant's Apply layer (app.py:193-195 parity). */
+  onApply?: (paper: ApiPaper) => void;
 }
 
 /**
  * One row of the library (Streamlit "Saved" pane parity): title, authors,
  * date, arXiv link, abstract, and the read toggle.
  */
-export function LibraryRow({ paper, busy, onToggleRead }: LibraryRowProps) {
+export function LibraryRow({ paper, busy, onToggleRead, onApply }: LibraryRowProps) {
   const read = paper.read_status === 1;
   return (
     <article className="rounded-[10px] border border-line-0 bg-bg-1 p-4 transition-colors duration-120 hover:border-line-1">
@@ -87,22 +89,34 @@ export function LibraryRow({ paper, busy, onToggleRead }: LibraryRowProps) {
           })()}
         </div>
 
-        {onToggleRead && (
-          <div className="flex shrink-0 items-start">
-            <button
-              type="button"
-              onClick={() => onToggleRead(paper)}
-              disabled={busy}
-              aria-pressed={read}
-              aria-label={
-                read
-                  ? `Mark ${paper.title || paper.id} as unread`
-                  : `Mark ${paper.title || paper.id} as read`
-              }
-              className="rounded-lg border border-line-0 bg-bg-2 px-3 py-1 font-mono text-xs text-ink-1 transition-colors duration-120 hover:border-line-1 hover:text-ink-0 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent disabled:opacity-50"
-            >
-              {read ? "✓ read" : "mark read"}
-            </button>
+        {(onToggleRead || onApply) && (
+          <div className="flex shrink-0 flex-col items-end gap-2">
+            {onToggleRead && (
+              <button
+                type="button"
+                onClick={() => onToggleRead(paper)}
+                disabled={busy}
+                aria-pressed={read}
+                aria-label={
+                  read
+                    ? `Mark ${paper.title || paper.id} as unread`
+                    : `Mark ${paper.title || paper.id} as read`
+                }
+                className="rounded-lg border border-line-0 bg-bg-2 px-3 py-1 font-mono text-xs text-ink-1 transition-colors duration-120 hover:border-line-1 hover:text-ink-0 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent disabled:opacity-50"
+              >
+                {read ? "✓ read" : "mark read"}
+              </button>
+            )}
+            {onApply && (
+              <button
+                type="button"
+                onClick={() => onApply(paper)}
+                aria-label={`Apply ${paper.title || paper.id} to my system`}
+                className="rounded-lg border border-line-0 bg-bg-2 px-3 py-1 font-mono text-xs text-ink-1 transition-colors duration-120 hover:border-line-1 hover:text-ink-0 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent disabled:opacity-50"
+              >
+                Apply to my system
+              </button>
+            )}
           </div>
         )}
       </div>

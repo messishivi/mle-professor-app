@@ -8,6 +8,10 @@ interface PulseItemCardProps {
   apiReady: boolean;
   refining: boolean;
   onRefine: (item: PulseItem) => void;
+  /** Queues the paper into the Consultant's Apply layer (app.py:583-593 parity). */
+  onApply?: (item: PulseItem) => void;
+  /** True while the Apply prompt is being prepared. */
+  applying?: boolean;
 }
 
 /** Tag row parity (app.py:526-535): fit label, date, trending/arxiv new, paper, concept, in library. */
@@ -27,6 +31,8 @@ export function PulseItemCard({
   apiReady,
   refining,
   onRefine,
+  onApply,
+  applying,
 }: PulseItemCardProps) {
   const memoUrl = item.memo.paper_url || item.paper_url;
   return (
@@ -151,19 +157,31 @@ export function PulseItemCard({
                 )}
               </span>
             )}
-            <button
-              type="button"
-              onClick={() => onRefine(item)}
-              disabled={!apiReady || refining}
-              title={
-                apiReady
-                  ? undefined
-                  : "Consultant is offline — set GROQ_API_KEY in the API .env"
-              }
-              className="ml-auto rounded-lg border border-line-0 bg-bg-2 px-3 py-1 text-xs text-ink-1 transition-colors duration-120 hover:border-line-1 hover:text-ink-0 disabled:cursor-not-allowed disabled:opacity-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
-            >
-              {refining ? "Refining…" : "Refine memo"}
-            </button>
+            <span className="ml-auto flex items-center gap-2">
+              {onApply && item.paper_id && (
+                <button
+                  type="button"
+                  onClick={() => onApply(item)}
+                  disabled={applying}
+                  className="rounded-lg border border-line-0 bg-bg-2 px-3 py-1 text-xs text-ink-1 transition-colors duration-120 hover:border-line-1 hover:text-ink-0 disabled:cursor-not-allowed disabled:opacity-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+                >
+                  {applying ? "Queuing…" : "Apply"}
+                </button>
+              )}
+              <button
+                type="button"
+                onClick={() => onRefine(item)}
+                disabled={!apiReady || refining}
+                title={
+                  apiReady
+                    ? undefined
+                    : "Consultant is offline — set GROQ_API_KEY in the API .env"
+                }
+                className="rounded-lg border border-line-0 bg-bg-2 px-3 py-1 text-xs text-ink-1 transition-colors duration-120 hover:border-line-1 hover:text-ink-0 disabled:cursor-not-allowed disabled:opacity-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+              >
+                {refining ? "Refining…" : "Refine memo"}
+              </button>
+            </span>
           </div>
         </div>
       </div>

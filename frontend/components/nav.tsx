@@ -9,6 +9,7 @@ const tabs = [
   { href: "/papers", label: "Papers" },
   { href: "/saved", label: "Saved" },
   { href: "/consultant", label: "Consultant" },
+  { href: "/settings", label: "Settings" },
 ];
 
 export function Nav() {

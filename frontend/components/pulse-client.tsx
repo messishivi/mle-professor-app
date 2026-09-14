@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import type { ApiError } from "@/lib/api";
 import { getConsultStatus } from "@/lib/api";
 import type { PulseItem, PulsePayload, PulseView } from "@/lib/pulse";
@@ -13,6 +14,8 @@ import {
   refreshPulse,
   refineMemo,
 } from "@/lib/pulse";
+import { buildApplyPrompt, getSettings } from "@/lib/consult";
+import type { ApplyContext } from "@/lib/consult";
 import { PulseItemCard } from "./pulse-item-card";
 
 /**
@@ -31,8 +34,10 @@ export function PulseClient() {
   const [actionError, setActionError] = useState<string | null>(null);
   const [view, setView] = useState<PulseView>("stack");
   const [refiningKey, setRefiningKey] = useState<string | null>(null);
+  const [applyingKey, setApplyingKey] = useState<string | null>(null);
   const [apiReady, setApiReady] = useState(false);
   const seq = useRef(0);
+  const router = useRouter();
 
   const load = useCallback(async () => {
     const id = ++seq.current;
@@ -103,6 +108,43 @@ export function PulseClient() {
     },
     [payload],
   );
+
+  // Streamlit parity (app.py:583-593): queue the paper into the Consultant's
+  // Apply layer with the byte-identical paper_apply_prompt. The prompt is
+  // built client-side from the settings the user has saved, then handed off
+  // via ?q= (the Consultant runs it once and strips the param).
+  const apply = useCallback(async (item: PulseItem) => {
+    if (!item.paper_id) return;
+    const key = memoItemKey(item);
+    setApplyingKey(key);
+    try {
+      let ctx: ApplyContext = { application: "", known_papers: "", repo_url: "" };
+      try {
+        const s = await getSettings();
+        ctx = {
+          application: s.application,
+          known_papers: s.known_papers,
+          repo_url: s.repo_url,
+        };
+      } catch {
+        // A dead settings endpoint degrades to an empty context; the
+        // Consultant still gets the paper's own fields.
+      }
+      const prompt = buildApplyPrompt(
+        {
+          id: item.paper_id,
+          title: item.paper_title || item.topic,
+          authors: "",
+          published_date: "",
+          summary_raw: item.abstract || item.why || "",
+        },
+        ctx,
+      );
+      router.push(`/consultant?layer=apply&q=${encodeURIComponent(prompt)}`);
+    } finally {
+      setApplyingKey(null);
+    }
+  }, [router]);
 
   const stack = payload?.stack ?? [];
   const items = payload
@@ -254,6 +296,8 @@ export function PulseClient() {
               apiReady={apiReady}
               refining={refiningKey === memoItemKey(item)}
               onRefine={(i) => void refine(i)}
+              onApply={(i) => void apply(i)}
+              applying={applyingKey === memoItemKey(item)}
             />
           ))}
         </div>
