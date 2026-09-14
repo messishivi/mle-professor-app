@@ -383,11 +383,19 @@ def create_app(
 
     @router.get("/consult/status")
     def consult_status() -> dict[str, Any]:
-        """Provider readiness — the ``_api_ready()`` check the Terminal does."""
+        """Provider readiness — the ``_api_ready()`` check the Terminal does.
+
+        ``local`` is always ready (no key required); the others are ready
+        once their key env is set. The active provider is ``LLM_PROVIDER``
+        (default groq) — P5b adds the per-request override + per-provider
+        readiness map."""
+        provider = providers.resolve_provider()
+        spec = providers.PROVIDERS[provider]
         return {
-            "ready": bool(os.getenv("GROQ_API_KEY", "").strip()),
-            "provider": providers.PROVIDER,
-            "model": providers.resolve_model(),
+            "ready": not spec.requires_key
+            or bool(os.getenv(spec.key_env, "").strip()),
+            "provider": provider,
+            "model": providers.resolve_model(provider),
             "demo_mode": demo_enabled(),
         }
 
@@ -412,6 +420,14 @@ def create_app(
 
         # Parity with chat_with_consultant: refresh keys from .env per request.
         load_dotenv(ROOT / ".env", override=True)
+
+        # Resolve the provider up front (P5) so a misconfigured
+        # LLM_PROVIDER is a 422, not a half-streamed error event.
+        try:
+            provider = providers.resolve_provider()
+        except providers.UnknownProvider as exc:
+            raise HTTPException(status_code=422, detail=str(exc))
+        model = providers.resolve_model(provider)
 
         def stream() -> Iterator[str]:
             try:
@@ -447,12 +463,19 @@ def create_app(
                 parts: list[str] = []
                 try:
                     for delta in providers.stream_chat(
-                        messages, api_key=payload.api_key
+                        messages,
+                        provider=provider,
+                        api_key=payload.api_key,
+                        model=model,
                     ):
                         parts.append(delta)
                         yield _sse("delta", {"text": delta})
                 except providers.ProviderUnavailable:
-                    yield _sse("error", {"message": providers.OFFLINE_MESSAGE})
+                    # Per-provider canonical message (P5); groq stays the
+                    # exact P2c/Streamlit text the UI asserts on.
+                    yield _sse(
+                        "error", {"message": providers.offline_message(provider)}
+                    )
                     return
                 content = "".join(parts).strip()
                 if not content:
@@ -462,8 +485,8 @@ def create_app(
                     "done",
                     {
                         "content": content,
-                        "model": providers.resolve_model(),
-                        "provider": providers.PROVIDER,
+                        "model": model,
+                        "provider": provider,
                         "layer": layer,
                     },
                 )
