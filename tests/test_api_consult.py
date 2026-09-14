@@ -53,10 +53,23 @@ def client(db) -> TestClient:
 
 @pytest.fixture(autouse=True)
 def _clean_env(monkeypatch):
-    """Hermetic: no LLM key, no demo mode (consultant.py loads .env at import)."""
+    """Hermetic: no LLM key, no provider override, no demo mode
+    (consultant.py loads .env at import)."""
     monkeypatch.delenv("GROQ_API_KEY", raising=False)
     monkeypatch.delenv("MLE_DEMO_MODE", raising=False)
     monkeypatch.delenv("GROQ_MODEL", raising=False)
+    for var in (
+        "LLM_PROVIDER",
+        "OPENAI_API_KEY",
+        "OPENAI_MODEL",
+        "OPENAI_BASE_URL",
+        "ANTHROPIC_API_KEY",
+        "ANTHROPIC_MODEL",
+        "LOCAL_API_KEY",
+        "LOCAL_MODEL",
+        "LOCAL_BASE_URL",
+    ):
+        monkeypatch.delenv(var, raising=False)
 
 
 def _no_arxiv():
@@ -75,6 +88,19 @@ def test_consult_status_keyless(client):
     assert body["provider"] == "groq"
     assert body["model"] == "openai/gpt-oss-120b"
     assert body["demo_mode"] is False
+    # P5: the active provider's canonical offline text + the per-provider map
+    assert body["offline_message"] == (
+        "Consultant is offline. Set `GROQ_API_KEY` in `.env`."
+    )
+    assert set(body["providers"]) == {"groq", "openai", "anthropic", "local"}
+    assert body["providers"]["groq"]["ready"] is False
+    assert body["providers"]["openai"]["ready"] is False
+    assert body["providers"]["anthropic"]["ready"] is False
+    assert body["providers"]["local"]["ready"] is True  # keyless by design
+    assert body["providers"]["local"]["model"] == "local"
+    assert body["providers"]["openai"]["offline_message"] == (
+        "Consultant is offline. Set `OPENAI_API_KEY` in `.env`."
+    )
 
 
 def test_consult_status_with_key(client, monkeypatch):
@@ -83,6 +109,35 @@ def test_consult_status_with_key(client, monkeypatch):
     body = client.get("/consult/status").json()
     assert body["ready"] is True
     assert body["model"] == "llama-3.3-70b-versatile"
+
+
+def test_consult_status_env_provider_flips_active_entry(client, monkeypatch):
+    """LLM_PROVIDER=openai with a key: top-level follows the env provider,
+    the map still reports every provider independently."""
+    monkeypatch.setenv("LLM_PROVIDER", "openai")
+    monkeypatch.setenv("OPENAI_API_KEY", "sk-test")
+    body = client.get("/consult/status").json()
+    assert body["ready"] is True
+    assert body["provider"] == "openai"
+    assert body["model"] == "gpt-4o-mini"
+    assert body["offline_message"] == (
+        "Consultant is offline. Set `OPENAI_API_KEY` in `.env`."
+    )
+    assert body["providers"]["groq"]["ready"] is False
+    assert body["providers"]["openai"]["ready"] is True
+    assert body["providers"]["local"]["ready"] is True
+
+
+def test_consult_status_bad_llm_provider_degrades_not_500(client, monkeypatch):
+    """A misconfigured LLM_PROVIDER reports ready:false with the raw value."""
+    monkeypatch.setenv("LLM_PROVIDER", "together")
+    res = client.get("/consult/status")
+    assert res.status_code == 200
+    body = res.json()
+    assert body["ready"] is False
+    assert body["provider"] == "together"
+    assert "Unknown provider" in body["offline_message"]
+    assert set(body["providers"]) == {"groq", "openai", "anthropic", "local"}
 
 
 # ------------------------------------------------------- /consult/chat
@@ -154,6 +209,79 @@ def test_consult_chat_offline_without_key_emits_exact_ui_message(client):
     assert "done" not in kinds
     err = next(d for k, d in events if k == "error")
     assert err["message"] == "Consultant is offline. Set `GROQ_API_KEY` in `.env`."
+
+
+def test_consult_chat_anthropic_offline_error_is_per_provider(client, monkeypatch):
+    """LLM_PROVIDER=anthropic without a key: the error event carries
+    anthropic's canonical text, not groq's (P5). Real seam, no patch."""
+    monkeypatch.setenv("LLM_PROVIDER", "anthropic")
+    with _no_arxiv():
+        res = client.post("/consult/chat", json={"message": "Explain LoRA"})
+    assert res.status_code == 200
+    events = parse_sse(res.text)
+    err = next(d for k, d in events if k == "error")
+    assert err["message"] == (
+        "Consultant is offline. Set `ANTHROPIC_API_KEY` in `.env`."
+    )
+
+
+def test_consult_chat_request_provider_override(client):
+    """Per-request provider/model override wins over env (P5b); the seam
+    receives the resolved provider and the done event echoes it."""
+    seen: dict = {}
+
+    def fake_stream(messages, **kwargs):
+        seen["provider"] = kwargs.get("provider")
+        seen["model"] = kwargs.get("model")
+        yield "ok"
+
+    with patch("api.providers.stream_chat", fake_stream), _no_arxiv():
+        res = client.post(
+            "/consult/chat",
+            json={
+                "message": "Explain LoRA",
+                "provider": "openai",
+                "model": "gpt-4o",
+            },
+        )
+    assert res.status_code == 200
+    events = parse_sse(res.text)
+    done = events[-1][1]
+    assert done["provider"] == "openai"
+    assert done["model"] == "gpt-4o"
+    assert seen["provider"] == "openai"
+    assert seen["model"] == "gpt-4o"
+
+
+def test_consult_chat_request_provider_override_without_model_env_default(client):
+    """provider override + no model: the provider's env/default model applies."""
+    seen: dict = {}
+
+    def fake_stream(messages, **kwargs):
+        seen["model"] = kwargs.get("model")
+        yield "ok"
+
+    with patch("api.providers.stream_chat", fake_stream), _no_arxiv():
+        res = client.post(
+            "/consult/chat",
+            json={"message": "Explain LoRA", "provider": "anthropic"},
+        )
+    assert res.status_code == 200
+    events = parse_sse(res.text)
+    done = events[-1][1]
+    assert done["provider"] == "anthropic"
+    assert done["model"] == "claude-sonnet-4-5"
+    assert seen["model"] == "claude-sonnet-4-5"
+
+
+def test_consult_chat_unknown_request_provider_is_422(client):
+    """A bad per-request provider name is a 422 before any stream opens."""
+    res = client.post(
+        "/consult/chat",
+        json={"message": "Explain LoRA", "provider": "together"},
+    )
+    assert res.status_code == 422
+    assert "Unknown provider" in res.json()["detail"]
 
 
 def test_consult_chat_byok_key_is_used_not_persisted(client, db, monkeypatch):

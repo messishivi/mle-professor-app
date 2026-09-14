@@ -18,8 +18,12 @@ Docker and set a few environment variables can run the whole app.
 
 | Var | Default | Meaning |
 | --- | --- | --- |
+| `LLM_PROVIDER` | `groq` | Active Consultant provider: `groq` \| `openai` \| `anthropic` \| `local`. |
 | `GROQ_API_KEY` | *(empty)* | Groq key for the Consultant. Empty = keyless; ingest/pulse still work, Consultant reports offline. |
 | `GROQ_MODEL` | `openai/gpt-oss-120b` | Model name sent to Groq. |
+| `OPENAI_API_KEY` / `OPENAI_MODEL` / `OPENAI_BASE_URL` | *(empty)* / `gpt-4o-mini` / `https://api.openai.com/v1` | OpenAI provider. `BASE_URL` may point at any OpenAI-compatible endpoint. |
+| `ANTHROPIC_API_KEY` / `ANTHROPIC_MODEL` | *(empty)* / `claude-sonnet-4-5` | Anthropic provider (native Messages API). |
+| `LOCAL_BASE_URL` / `LOCAL_MODEL` / `LOCAL_API_KEY` | `http://127.0.0.1:8080/v1` / `local` / *(empty)* | Any OpenAI-compatible local server (e.g. llama.cpp). Key optional — a keyless local server is the intended setup. |
 | `MLE_DEMO_MODE` | *(empty)* | `1` = seed sample papers when the library is empty. |
 | `MLE_DATA_DIR` | `/data` | Where `mle_knowledge.db` lives. |
 | `API_PREFIX` | `/api` | API mount path. |

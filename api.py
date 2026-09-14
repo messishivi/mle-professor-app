@@ -16,6 +16,12 @@ Increments so far:
   no Node runtime in the container. Both knobs are env-driven at import time
   (``API_PREFIX``, ``MLE_WEB_ROOT``) so dev/tests keep the historical
   root-mounted layout when they are unset.
+- P5 (Plan 03): multi-provider support. ``providers.py`` owns the registry
+  (groq / openai / anthropic / local) and the ``stream_chat`` dispatch seam;
+  the active provider is ``LLM_PROVIDER`` (default groq),
+  ``POST /consult/chat`` accepts per-request ``provider``/``model`` overrides
+  (422 on unknown provider), and ``GET /consult/status`` reports a
+  per-provider readiness map on top of the active provider's state.
 
 Run from the repo root:
 
@@ -129,6 +135,11 @@ class ConsultRequest(BaseModel):
     layer: str = "explain"
     # BYOK for this request only (demo mode); never persisted.
     api_key: Optional[str] = None
+    # Per-request provider override (P5): request > LLM_PROVIDER > groq.
+    # One of: groq | openai | anthropic | local (providers.PROVIDERS).
+    provider: Optional[str] = None
+    # Per-request model override (P5): request > <PROVIDER>_MODEL > default.
+    model: Optional[str] = None
 
 
 def _sse(event: str, data: dict[str, Any]) -> str:
@@ -385,18 +396,42 @@ def create_app(
     def consult_status() -> dict[str, Any]:
         """Provider readiness — the ``_api_ready()`` check the Terminal does.
 
+        Top-level fields describe the active provider (``LLM_PROVIDER``,
+        default groq). ``providers`` is the per-provider readiness map the
+        Settings dropdown renders (P5): each entry carries ``ready``, the
+        resolved ``model``, and the canonical ``offline_message``.
         ``local`` is always ready (no key required); the others are ready
-        once their key env is set. The active provider is ``LLM_PROVIDER``
-        (default groq) — P5b adds the per-request override + per-provider
-        readiness map."""
-        provider = providers.resolve_provider()
-        spec = providers.PROVIDERS[provider]
+        once their key env is set. A misconfigured ``LLM_PROVIDER`` reports
+        ``ready: false`` with the raw value — never a 500."""
+        providers_map: dict[str, dict[str, Any]] = {
+            name: {
+                "ready": not spec.requires_key
+                or bool(os.getenv(spec.key_env, "").strip()),
+                "model": providers.resolve_model(name),
+                "offline_message": providers.offline_message(name),
+            }
+            for name, spec in providers.PROVIDERS.items()
+        }
+        try:
+            provider = providers.resolve_provider()
+        except providers.UnknownProvider:
+            raw = (os.getenv("LLM_PROVIDER") or "").strip().lower()
+            return {
+                "ready": False,
+                "provider": raw,
+                "model": "",
+                "demo_mode": demo_enabled(),
+                "offline_message": providers.offline_message(raw),
+                "providers": providers_map,
+            }
+        entry = providers_map[provider]
         return {
-            "ready": not spec.requires_key
-            or bool(os.getenv(spec.key_env, "").strip()),
+            "ready": entry["ready"],
             "provider": provider,
-            "model": providers.resolve_model(provider),
+            "model": entry["model"],
             "demo_mode": demo_enabled(),
+            "offline_message": entry["offline_message"],
+            "providers": providers_map,
         }
 
     @router.post("/consult/chat")
@@ -422,12 +457,13 @@ def create_app(
         load_dotenv(ROOT / ".env", override=True)
 
         # Resolve the provider up front (P5) so a misconfigured
-        # LLM_PROVIDER is a 422, not a half-streamed error event.
+        # LLM_PROVIDER or a bad per-request override is a 422, not a
+        # half-streamed error event. Precedence: request > env > default.
         try:
-            provider = providers.resolve_provider()
+            provider = providers.resolve_provider(payload.provider)
         except providers.UnknownProvider as exc:
             raise HTTPException(status_code=422, detail=str(exc))
-        model = providers.resolve_model(provider)
+        model = providers.resolve_model(provider, payload.model)
 
         def stream() -> Iterator[str]:
             try:

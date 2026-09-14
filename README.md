@@ -2,7 +2,7 @@
 
 Consolidated view of what is going on every day in the ML/AI field, for working MLEs.
 
-Local knowledge base: ingest papers, watch an ML/AI pulse, and brief or critique them in chat. Runs on a laptop or a single container. Reasoning goes to Groq; papers and read-state stay on disk.
+Local knowledge base: ingest papers, watch an ML/AI pulse, and brief or critique them in chat. Runs on a laptop or a single container. Reasoning goes to your LLM provider (Groq by default); papers and read-state stay on disk.
 
 ## What you get
 
@@ -58,7 +58,7 @@ GROQ_API_KEY=gsk_...
 GROQ_MODEL=openai/gpt-oss-120b
 ```
 
-Create a key at [console.groq.com](https://console.groq.com). Pulse clustering and the consultant need it. Ingest and the library work without it.
+Create a key at [console.groq.com](https://console.groq.com). The Consultant needs it (or pick another provider — see [Providers](#providers-consultant-llm)). Ingest and the library work without it.
 
 ### Run it (two processes for local dev)
 
@@ -83,12 +83,26 @@ For production you never run these separately: the Docker image builds the front
 
 Python 3.10+ works (LanceDB, if you use the dev extras, needs 3.10+; on older interpreters the app falls back to a numpy index).
 
+### Providers (Consultant LLM)
+
+The Consultant Terminal streams through `providers.py`, a small registry of four providers:
+
+| Provider | Key env | Model env | Default model | Notes |
+| --- | --- | --- | --- | --- |
+| `groq` (default) | `GROQ_API_KEY` | `GROQ_MODEL` | `openai/gpt-oss-120b` | Original provider; behavior unchanged. |
+| `openai` | `OPENAI_API_KEY` | `OPENAI_MODEL` | `gpt-4o-mini` | `OPENAI_BASE_URL` can point at any OpenAI-compatible endpoint. |
+| `anthropic` | `ANTHROPIC_API_KEY` | `ANTHROPIC_MODEL` | `claude-sonnet-4-5` | Native Anthropic Messages API. |
+| `local` | *(none)* | `LOCAL_MODEL` | `local` | Any OpenAI-compatible local server — e.g. llama.cpp: `llama-server -m model.gguf --port 8080`, then `LOCAL_BASE_URL=http://127.0.0.1:8080/v1` and `LOCAL_MODEL=<model name>`. No key needed. |
+
+- Active provider: `LLM_PROVIDER` (default `groq`). The Consultant page can also override the provider and model per request (in-memory only, same rule as the BYOK key — never persisted).
+- If the active provider has no key, the Consultant reports offline with that provider's own message (e.g. ``Set `OPENAI_API_KEY` in `.env`.``); ingest, the library, and pulse keep working.
+
 ## Usage notes
 
 - Never commit `.env`, `data/`, or `*.db`. Those are gitignored on purpose.
 - `MLE_DATA_DIR` overrides where SQLite lives (used by Docker at `/data`).
 - `MLE_DEMO_MODE=1` seeds sample papers when the library is empty. Bring-your-own-key happens on the Consultant page and is sent per request — never written to disk or the database.
-- Do not put confidential work documents, customer data, or internal papers into the library or the consultant. Chat text is sent to Groq.
+- Do not put confidential work documents, customer data, or internal papers into the library or the consultant. Chat text goes to the provider you configure (Groq by default; see [Providers](#providers-consultant-llm)).
 - **Auth is deferred by design.** The app ships open (single-user, personal use). If you expose it on a public host, put it behind a reverse proxy with basic auth or a VPN — see [README-DEPLOY.md](README-DEPLOY.md). Sensitive ops (chat/ingest) can go behind a toggle later; the API already has a single mount point (`/api`) for that.
 - Rotate a key if it was ever pasted into chat, Slack, or email.
 
@@ -102,7 +116,8 @@ Browser
               ├── /                     static frontend (out/)
               ├── SQLite                papers, read state, pulse snapshots  (data/mle_knowledge.db or /data)
               ├── ArXiv + HF            ingest and ML Pulse (public research only; 429-aware retry)
-              └── Groq                  consultant streaming (key from env or per-request)
+              └── LLM provider          consultant streaming: groq | openai | anthropic | local
+                                         (key from env or per request; LLM_PROVIDER selects)
 ```
 
 - `frontend/` — Next.js (App Router, React, Tailwind). 100% client-side fetching; builds to a flat static export.
