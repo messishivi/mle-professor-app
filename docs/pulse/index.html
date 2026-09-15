@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>ML Pulse — 2026-09-14</title>
+<title>ML Pulse — 2026-09-15</title>
 <style>
 body{font-family:system-ui,-apple-system,sans-serif;max-width:900px;margin:0 auto;padding:24px;color:#e6edf3;background:#0d1117}
 a{color:#79c0ff} h1{letter-spacing:-0.02em} .muted{color:#8b949e}
@@ -14,10 +14,36 @@ a{color:#79c0ff} h1{letter-spacing:-0.02em} .muted{color:#8b949e}
 footer{margin-top:32px;color:#8b949e;font-size:13px}
 </style></head><body>
 <h1>ML Pulse</h1>
-<p class="muted">What moved in ML/AI on 2026-09-14 — trending papers mapped to concepts,
+<p class="muted">What moved in ML/AI on 2026-09-15 — trending papers mapped to concepts,
 ranked for a generalist MLE stack, with a decision memo each. Updated daily.
-Fetched 2026-09-14T18:24:17+00:00.</p>
+Fetched 2026-09-15T17:31:17+00:00.</p>
 <details class='errors'><summary>Feed notes (1)</summary><ul><li>arXiv ML feed: HTTPSConnectionPool(host=&#x27;export.arxiv.org&#x27;, port=443): Read timed out. (read timeout=30)</li></ul></details>
+
+    <article class="card">
+      <div class="card-top"><span class="verdict" style="border-color:#d4a574;color:#d4a574">Prototype</span>
+      <span class="fit">High fit · 86</span></div>
+      <h3>Atria Dawn: The Dawn of Agentic Superintelligence</h3>
+      
+      <p class="concept"><strong>Evaluation / benchmarks</strong> — Measuring what models can actually do, and where they fail.</p>
+      <p class="why">As AI agents become participants in the development of their successors, they reshape both the production of intelligence and the role of human researchers. We introduce Atria Dawn Preview, a foundation agentic language model designed for scientific research and engineering workflows, with the goal of expanding the frontier of agent productivity in the real world. This model is trained via a Verifiable Experience Pip</p>
+      <p class="abstract">As AI agents become participants in the development of their successors, they reshape both the production of intelligence and the role of human researchers. We introduce Atria Dawn Preview, a foundation agentic language model designed for scientific research and engineering workflows, with the goal of expanding the frontier of agent productivity in the real world. This model is trained via a Verifiable Experience Pipeline that connects tool-mediated interactions to executable environments and externally verified outcomes. Across 16 benchmarks spanning real-world research, engineering, and digi…</p>
+      <p class="constraint">⚠ If it does not match your user task, it is a leaderboard, not a ship gate.</p>
+      <p class="sowhat">Prototype on Evaluation / benchmarks against your stack — one eval, one constraint, then kill or keep.</p>
+      <div class="links"><a href="https://arxiv.org/abs/2609.15818">Paper &rarr;</a></div>
+    </article>
+
+    <article class="card">
+      <div class="card-top"><span class="verdict" style="border-color:#d4a574;color:#d4a574">Prototype</span>
+      <span class="fit">High fit · 86</span></div>
+      <h3>ZGCM-1: A Fully Open and Extremely Efficient Foundation Model for Math and Agentic Search</h3>
+      
+      <p class="concept"><strong>Agents</strong> — Models that use tools, memory, and loops to complete tasks.</p>
+      <p class="why">In this work, we present ZGCM-1, a fully open 7B dense foundation model trained from scratch with extreme data, system, and algorithmic efficiency. ZGCM-1 is founded on a core premise: compact models cannot passively memorize the open web, but can overcome parametric capacity limits by coupling deliberate internal thinking with active external tool use. To support this paradigm across a 256K context, we develop an en</p>
+      <p class="abstract">In this work, we present ZGCM-1, a fully open 7B dense foundation model trained from scratch with extreme data, system, and algorithmic efficiency. ZGCM-1 is founded on a core premise: compact models cannot passively memorize the open web, but can overcome parametric capacity limits by coupling deliberate internal thinking with active external tool use. To support this paradigm across a 256K context, we develop an end-to-end, high-efficiency open training recipe: Architecture &amp; System Co-design: interleaved gated sliding-window and full attention, and a stable FP8 Muon optimizer; Progressive C…</p>
+      <p class="constraint">⚠ Tool permissions, loop caps, and eval of multi-step tasks — not a single chat score.</p>
+      <p class="sowhat">Prototype on Agents against your stack — one eval, one constraint, then kill or keep.</p>
+      <div class="links"><a href="https://arxiv.org/abs/2609.13356">Paper &rarr;</a></div>
+    </article>
 
     <article class="card">
       <div class="card-top"><span class="verdict" style="border-color:#d4a574;color:#d4a574">Prototype</span>
@@ -34,6 +60,19 @@ Fetched 2026-09-14T18:24:17+00:00.</p>
 
     <article class="card">
       <div class="card-top"><span class="verdict" style="border-color:#d4a574;color:#d4a574">Prototype</span>
+      <span class="fit">High fit · 86</span></div>
+      <h3>RSIAgent: Autonomous Exploration for Recursive Self-improvement in New Environments</h3>
+      
+      <p class="concept"><strong>LoRA / adapters</strong> — Training a thin low-rank update instead of the full network.</p>
+      <p class="why">Digital agents must often adapt to new environments whose interfaces, tools, and failure modes are not fully captured by pretrained models. We introduce RSIAgent, a training-free multi-agent framework for recursive self-improvement through autonomous memory construction. RSIAgent coordinates curriculum, actor, and verifier agents to continually explore the environment, validate outcomes, and retain environment-specif</p>
+      <p class="abstract">Digital agents must often adapt to new environments whose interfaces, tools, and failure modes are not fully captured by pretrained models. We introduce RSIAgent, a training-free multi-agent framework for recursive self-improvement through autonomous memory construction. RSIAgent coordinates curriculum, actor, and verifier agents to continually explore the environment, validate outcomes, and retain environment-specific knowledge, including reusable causal relationships between actions, conditions, and consequences. It further adopts a broad-then-deep exploration strategy, combining parallel br…</p>
+      <p class="constraint">⚠ Decide what stays frozen in prod and how you version adapters per tenant/task.</p>
+      <p class="sowhat">Prototype on LoRA / adapters against your stack — one eval, one constraint, then kill or keep.</p>
+      <div class="links"><a href="https://arxiv.org/abs/2609.15364">Paper &rarr;</a></div>
+    </article>
+
+    <article class="card">
+      <div class="card-top"><span class="verdict" style="border-color:#d4a574;color:#d4a574">Prototype</span>
       <span class="fit">High fit · 89</span></div>
       <h3>AuK Technical Report: An Open-Source Foundational Model for Speech Generation and Editing</h3>
       
@@ -43,6 +82,19 @@ Fetched 2026-09-14T18:24:17+00:00.</p>
       <p class="constraint">⚠ You need preference data and a held-out harm/quality eval, not a vibes demo.</p>
       <p class="sowhat">Prototype on RL post-training against your stack — one eval, one constraint, then kill or keep.</p>
       <div class="links"><a href="https://arxiv.org/abs/2609.08936">Paper &rarr;</a></div>
+    </article>
+
+    <article class="card">
+      <div class="card-top"><span class="verdict" style="border-color:#d4a574;color:#d4a574">Prototype</span>
+      <span class="fit">High fit · 85</span></div>
+      <h3>Apodex 1.1: Scaling Agentic Intelligence for Complex Work</h3>
+      
+      <p class="concept"><strong>Agents</strong> — Models that use tools, memory, and loops to complete tasks.</p>
+      <p class="why">General-purpose language models can reason and synthesize knowledge, but complex work also requires sustained interaction with files, information sources, and executable code, together with state maintenance, failure recovery, and verifiable delivery. We call this working capability: sustained, verifiable progress toward a real-world objective. Apodex 1.1 develops this capability along two complementary dimensions. E</p>
+      <p class="abstract">General-purpose language models can reason and synthesize knowledge, but complex work also requires sustained interaction with files, information sources, and executable code, together with state maintenance, failure recovery, and verifiable delivery. We call this working capability: sustained, verifiable progress toward a real-world objective. Apodex 1.1 develops this capability along two complementary dimensions. Environment Scaling expands the diversity and verifiability of executable file, search, and code environments, while Agentic Coordination Scaling trains agents to decompose long-hor…</p>
+      <p class="constraint">⚠ Tool permissions, loop caps, and eval of multi-step tasks — not a single chat score.</p>
+      <p class="sowhat">Prototype on Agents against your stack — one eval, one constraint, then kill or keep.</p>
+      <div class="links"><a href="https://arxiv.org/abs/2608.23283">Paper &rarr;</a></div>
     </article>
 
     <article class="card">
@@ -60,19 +112,6 @@ Fetched 2026-09-14T18:24:17+00:00.</p>
 
     <article class="card">
       <div class="card-top"><span class="verdict" style="border-color:#d4a574;color:#d4a574">Prototype</span>
-      <span class="fit">High fit · 85</span></div>
-      <h3>Apodex 1.1: Scaling Agentic Intelligence for Complex Work</h3>
-      
-      <p class="concept"><strong>Agents</strong> — Models that use tools, memory, and loops to complete tasks.</p>
-      <p class="why">General-purpose language models can reason and synthesize knowledge, but complex work also requires sustained interaction with files, information sources, and executable code, together with state maintenance, failure recovery, and verifiable delivery. We call this working capability: sustained, verifiable progress toward a real-world objective. Apodex 1.1 develops this capability along two complementary dimensions. E</p>
-      <p class="abstract">General-purpose language models can reason and synthesize knowledge, but complex work also requires sustained interaction with files, information sources, and executable code, together with state maintenance, failure recovery, and verifiable delivery. We call this working capability: sustained, verifiable progress toward a real-world objective. Apodex 1.1 develops this capability along two complementary dimensions. Environment Scaling expands the diversity and verifiability of executable file, search, and code environments, while Agentic Coordination Scaling trains agents to decompose long-hor…</p>
-      <p class="constraint">⚠ Tool permissions, loop caps, and eval of multi-step tasks — not a single chat score.</p>
-      <p class="sowhat">Prototype on Agents against your stack — one eval, one constraint, then kill or keep.</p>
-      <div class="links"><a href="https://arxiv.org/abs/2608.23283">Paper &rarr;</a></div>
-    </article>
-
-    <article class="card">
-      <div class="card-top"><span class="verdict" style="border-color:#d4a574;color:#d4a574">Prototype</span>
       <span class="fit">High fit · 86</span></div>
       <h3>VoiceMem: Streaming Dual-Brain Memory for Real-Time Interaction</h3>
       
@@ -82,6 +121,19 @@ Fetched 2026-09-14T18:24:17+00:00.</p>
       <p class="constraint">⚠ If it does not match your user task, it is a leaderboard, not a ship gate.</p>
       <p class="sowhat">Prototype on Evaluation / benchmarks against your stack — one eval, one constraint, then kill or keep.</p>
       <div class="links"><a href="https://arxiv.org/abs/2608.26005">Paper &rarr;</a></div>
+    </article>
+
+    <article class="card">
+      <div class="card-top"><span class="verdict" style="border-color:#d4a574;color:#d4a574">Prototype</span>
+      <span class="fit">High fit · 85</span></div>
+      <h3>Marigold V2: Revisiting Diffusion Transformers for Monocular Depth Estimation</h3>
+      
+      <p class="concept"><strong>Transformers</strong> — The backbone architecture behind modern language and vision models.</p>
+      <p class="why">Monocular depth estimation is a ubiquitous yet highly ill-posed computer vision task, with downstream applications in scene reconstruction, computational photography, and robotics, among others. Despite the field&#x27;s maturity, recent models still struggle to generalize to out-of-distribution inputs and to produce sharp and detailed depth maps. In this paper, we revisit Marigold, a set of techniques for repurposing mode</p>
+      <p class="abstract">Monocular depth estimation is a ubiquitous yet highly ill-posed computer vision task, with downstream applications in scene reconstruction, computational photography, and robotics, among others. Despite the field&#x27;s maturity, recent models still struggle to generalize to out-of-distribution inputs and to produce sharp and detailed depth maps. In this paper, we revisit Marigold, a set of techniques for repurposing modern image generation and editing models, powered by the diffusion transformer (DiT) architecture, into state-of-the-art monocular depth estimators. Our recipes target single-step in…</p>
+      <p class="constraint">⚠ Watch sequence length and attention memory before you copy the architecture.</p>
+      <p class="sowhat">Prototype on Transformers against your stack — one eval, one constraint, then kill or keep.</p>
+      <div class="links"><a href="https://arxiv.org/abs/2609.08084">Paper &rarr;</a></div>
     </article>
 
     <article class="card">
@@ -99,15 +151,28 @@ Fetched 2026-09-14T18:24:17+00:00.</p>
 
     <article class="card">
       <div class="card-top"><span class="verdict" style="border-color:#d4a574;color:#d4a574">Prototype</span>
-      <span class="fit">High fit · 85</span></div>
-      <h3>Marigold V2: Revisiting Diffusion Transformers for Monocular Depth Estimation</h3>
+      <span class="fit">High fit · 87</span></div>
+      <h3>Prime Agent: A Self-Improving RLM Harness</h3>
       
-      <p class="concept"><strong>Transformers</strong> — The backbone architecture behind modern language and vision models.</p>
-      <p class="why">Monocular depth estimation is a ubiquitous yet highly ill-posed computer vision task, with downstream applications in scene reconstruction, computational photography, and robotics, among others. Despite the field&#x27;s maturity, recent models still struggle to generalize to out-of-distribution inputs and to produce sharp and detailed depth maps. In this paper, we revisit Marigold, a set of techniques for repurposing mode</p>
-      <p class="abstract">Monocular depth estimation is a ubiquitous yet highly ill-posed computer vision task, with downstream applications in scene reconstruction, computational photography, and robotics, among others. Despite the field&#x27;s maturity, recent models still struggle to generalize to out-of-distribution inputs and to produce sharp and detailed depth maps. In this paper, we revisit Marigold, a set of techniques for repurposing modern image generation and editing models, powered by the diffusion transformer (DiT) architecture, into state-of-the-art monocular depth estimators. Our recipes target single-step in…</p>
-      <p class="constraint">⚠ Watch sequence length and attention memory before you copy the architecture.</p>
-      <p class="sowhat">Prototype on Transformers against your stack — one eval, one constraint, then kill or keep.</p>
-      <div class="links"><a href="https://arxiv.org/abs/2609.08084">Paper &rarr;</a></div>
+      <p class="concept"><strong>Evaluation / benchmarks</strong> — Measuring what models can actually do, and where they fail.</p>
+      <p class="why">Language models are sequential processors, but long-horizon agency requires external information and computation beyond model weights and active context. Prime Agent is an open-source harness for long-horizon evaluation and coding-agent workflows. A persistent IPython REPL follows the Recursive Language Model abstraction for programmatic context processing and test-time compute, while Continual Harness preserves hist</p>
+      <p class="abstract">Language models are sequential processors, but long-horizon agency requires external information and computation beyond model weights and active context. Prime Agent is an open-source harness for long-horizon evaluation and coding-agent workflows. A persistent IPython REPL follows the Recursive Language Model abstraction for programmatic context processing and test-time compute, while Continual Harness preserves histories, memories, skills, prompts, and subagent specifications across trajectories. Recursive subagents coordinate through direct agent-to-agent communication, and the Agents View l…</p>
+      <p class="constraint">⚠ If it does not match your user task, it is a leaderboard, not a ship gate.</p>
+      <p class="sowhat">Prototype on Evaluation / benchmarks against your stack — one eval, one constraint, then kill or keep.</p>
+      <div class="links"><a href="https://arxiv.org/abs/2608.23552">Paper &rarr;</a></div>
+    </article>
+
+    <article class="card">
+      <div class="card-top"><span class="verdict" style="border-color:#d4a574;color:#d4a574">Prototype</span>
+      <span class="fit">High fit · 87</span></div>
+      <h3>NeoHorse-1: Towards Recursive Self-Improvement via Agentic Post-Training with Routing Harness</h3>
+      
+      <p class="concept"><strong>Evaluation / benchmarks</strong> — Measuring what models can actually do, and where they fail.</p>
+      <p class="why">Recursive self-improvement (RSI) requires a concrete mechanism through which an AI system observes its capabilities and converts that evidence into the next round of learning. We present NeoHorse-1, a family of agent-native models developed to explore this path through agentic post-training. Our system combines a heterogeneous model pool with intelligent routing, recording the predicted capability demand, selected se</p>
+      <p class="abstract">Recursive self-improvement (RSI) requires a concrete mechanism through which an AI system observes its capabilities and converts that evidence into the next round of learning. We present NeoHorse-1, a family of agent-native models developed to explore this path through agentic post-training. Our system combines a heterogeneous model pool with intelligent routing, recording the predicted capability demand, selected service tier, and subsequent interaction for each user turn. These records are converted into training examples that preserve interleaved reasoning, tool calls, and harness context, …</p>
+      <p class="constraint">⚠ If it does not match your user task, it is a leaderboard, not a ship gate.</p>
+      <p class="sowhat">Prototype on Evaluation / benchmarks against your stack — one eval, one constraint, then kill or keep.</p>
+      <div class="links"><a href="https://arxiv.org/abs/2609.08183">Paper &rarr;</a></div>
     </article>
 
     <article class="card">
@@ -125,15 +190,15 @@ Fetched 2026-09-14T18:24:17+00:00.</p>
 
     <article class="card">
       <div class="card-top"><span class="verdict" style="border-color:#d4a574;color:#d4a574">Prototype</span>
-      <span class="fit">High fit · 87</span></div>
-      <h3>Prime Agent: A Self-Improving RLM Harness</h3>
+      <span class="fit">High fit · 86</span></div>
+      <h3>Dream-RSI: Recursive Self-Improvement through Evolving Worlds</h3>
       
-      <p class="concept"><strong>Evaluation / benchmarks</strong> — Measuring what models can actually do, and where they fail.</p>
-      <p class="why">Language models are sequential processors, but long-horizon agency requires external information and computation beyond model weights and active context. Prime Agent is an open-source harness for long-horizon evaluation and coding-agent workflows. A persistent IPython REPL follows the Recursive Language Model abstraction for programmatic context processing and test-time compute, while Continual Harness preserves hist</p>
-      <p class="abstract">Language models are sequential processors, but long-horizon agency requires external information and computation beyond model weights and active context. Prime Agent is an open-source harness for long-horizon evaluation and coding-agent workflows. A persistent IPython REPL follows the Recursive Language Model abstraction for programmatic context processing and test-time compute, while Continual Harness preserves histories, memories, skills, prompts, and subagent specifications across trajectories. Recursive subagents coordinate through direct agent-to-agent communication, and the Agents View l…</p>
-      <p class="constraint">⚠ If it does not match your user task, it is a leaderboard, not a ship gate.</p>
-      <p class="sowhat">Prototype on Evaluation / benchmarks against your stack — one eval, one constraint, then kill or keep.</p>
-      <div class="links"><a href="https://arxiv.org/abs/2608.23552">Paper &rarr;</a></div>
+      <p class="concept"><strong>LoRA / adapters</strong> — Training a thin low-rank update instead of the full network.</p>
+      <p class="why">Recursive self-improvement is becoming increasingly vital for autonomous AI agents, where progress hinges on discovering high-value solutions across complex domains. The driver of this process is effective exploration, however, managing and improving exploration strategies remains a major bottleneck. Current systems face a fundamental dilemma: fixed strategies fail to adapt as search spaces scale, while online policy</p>
+      <p class="abstract">Recursive self-improvement is becoming increasingly vital for autonomous AI agents, where progress hinges on discovering high-value solutions across complex domains. The driver of this process is effective exploration, however, managing and improving exploration strategies remains a major bottleneck. Current systems face a fundamental dilemma: fixed strategies fail to adapt as search spaces scale, while online policy optimization requires navigating vast meta-search spaces under delayed and expensive feedback over long-horizon rollouts. We introduce Dream-RSI, a framework for scalable and recu…</p>
+      <p class="constraint">⚠ Decide what stays frozen in prod and how you version adapters per tenant/task.</p>
+      <p class="sowhat">Prototype on LoRA / adapters against your stack — one eval, one constraint, then kill or keep.</p>
+      <div class="links"><a href="https://arxiv.org/abs/2609.14858">Paper &rarr;</a></div>
     </article>
 
     <article class="card">
@@ -160,32 +225,6 @@ Fetched 2026-09-14T18:24:17+00:00.</p>
       <p class="constraint">⚠ You need preference data and a held-out harm/quality eval, not a vibes demo.</p>
       <p class="sowhat">Prototype on RL post-training against your stack — one eval, one constraint, then kill or keep.</p>
       <div class="links"><a href="https://arxiv.org/abs/2609.08977">Paper &rarr;</a></div>
-    </article>
-
-    <article class="card">
-      <div class="card-top"><span class="verdict" style="border-color:#d4a574;color:#d4a574">Prototype</span>
-      <span class="fit">High fit · 87</span></div>
-      <h3>NeoHorse-1: Towards Recursive Self-Improvement via Agentic Post-Training with Routing Harness</h3>
-      
-      <p class="concept"><strong>Evaluation / benchmarks</strong> — Measuring what models can actually do, and where they fail.</p>
-      <p class="why">Recursive self-improvement (RSI) requires a concrete mechanism through which an AI system observes its capabilities and converts that evidence into the next round of learning. We present NeoHorse-1, a family of agent-native models developed to explore this path through agentic post-training. Our system combines a heterogeneous model pool with intelligent routing, recording the predicted capability demand, selected se</p>
-      <p class="abstract">Recursive self-improvement (RSI) requires a concrete mechanism through which an AI system observes its capabilities and converts that evidence into the next round of learning. We present NeoHorse-1, a family of agent-native models developed to explore this path through agentic post-training. Our system combines a heterogeneous model pool with intelligent routing, recording the predicted capability demand, selected service tier, and subsequent interaction for each user turn. These records are converted into training examples that preserve interleaved reasoning, tool calls, and harness context, …</p>
-      <p class="constraint">⚠ If it does not match your user task, it is a leaderboard, not a ship gate.</p>
-      <p class="sowhat">Prototype on Evaluation / benchmarks against your stack — one eval, one constraint, then kill or keep.</p>
-      <div class="links"><a href="https://arxiv.org/abs/2609.08183">Paper &rarr;</a></div>
-    </article>
-
-    <article class="card">
-      <div class="card-top"><span class="verdict" style="border-color:#d4a574;color:#d4a574">Prototype</span>
-      <span class="fit">High fit · 87</span></div>
-      <h3>What LLM Trading Agents Actually Do in Production: A Six-Month, Population-Scale Record from Two Fleets</h3>
-      
-      <p class="concept"><strong>Evaluation / benchmarks</strong> — Measuring what models can actually do, and where they fail.</p>
-      <p class="why">We present a continuous, population-scale measurement record of autonomous language-model trading agents operating in production across two systems with one design lineage: DX Terminal Pro (3,505 user-funded vaults trading real ETH in Base memecoin markets for 21 days, February to March 2026) and the DXAP live alpha fleet (500 to 599 user-created agents all-history, 91 to 117 concurrently active, trading Hyperliquid </p>
-      <p class="abstract">We present a continuous, population-scale measurement record of autonomous language-model trading agents operating in production across two systems with one design lineage: DX Terminal Pro (3,505 user-funded vaults trading real ETH in Base memecoin markets for 21 days, February to March 2026) and the DXAP live alpha fleet (500 to 599 user-created agents all-history, 91 to 117 concurrently active, trading Hyperliquid perpetuals, June to August 2026). The record spans roughly six months, 7.5M single-model invocations with about 300K onchain actions, and a further 231,638 multi-tool turns produci…</p>
-      <p class="constraint">⚠ If it does not match your user task, it is a leaderboard, not a ship gate.</p>
-      <p class="sowhat">Prototype on Evaluation / benchmarks against your stack — one eval, one constraint, then kill or keep.</p>
-      <div class="links"><a href="https://arxiv.org/abs/2609.05663">Paper &rarr;</a></div>
     </article>
 <footer>Generated by <a href="https://github.com/messishivi/mle-professor-app">MLE Professor</a>
 · verdicts are rule-based drafts, not financial/production advice.</footer>
