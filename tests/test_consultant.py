@@ -1,15 +1,15 @@
 from types import SimpleNamespace
-from unittest.mock import MagicMock
 
 import pytest
 
+import providers
 from consultant import (
     APPLY_PROMPT,
     EXPLAIN_PROMPT,
     SYSTEMS_PROMPT,
     SYSTEM_PROMPT,
-    Consultant,
     ConsultantReply,
+    assemble_consult_context,
     build_messages,
     chat_with_consultant,
     format_application_context,
@@ -60,41 +60,61 @@ def test_history_keeps_user_assistant_and_drops_system():
     assert "competing prompt" not in str(messages[1:])
 
 
-def test_chat_with_consultant_sends_explain_prompt():
+def test_chat_with_consultant_sends_apply_prompt(monkeypatch):
     captured = {}
 
-    def fake_create(**kwargs):
+    def fake_stream(messages, **kwargs):
+        captured["messages"] = messages
         captured.update(kwargs)
-        return SimpleNamespace(
-            model="openai/gpt-oss-120b",
-            choices=[SimpleNamespace(message=SimpleNamespace(content="  Short briefing.  "))],
-        )
+        yield "  Short briefing.  "
 
-    client = MagicMock()
-    client.chat.completions.create.side_effect = fake_create
-    consultant = Consultant(client=client, model="openai/gpt-oss-120b")
-    reply = consultant.chat_with_consultant("Explain Kimi K3.", history=[])
+    monkeypatch.setattr(providers, "stream_chat", fake_stream)
+    monkeypatch.setattr("grounding.gather_sources", lambda *a, **k: [])
+    monkeypatch.setattr("grounding.format_sources_for_model", lambda sources: "")
+    reply = chat_with_consultant("Explain Kimi K3.", history=[])
     assert reply.content == "Short briefing."
     assert reply.layer == "apply"
     assert captured["messages"][0]["content"] == APPLY_PROMPT
-    assert captured["messages"][-1]["content"].startswith("Explain Kimi K3") or "Kimi K3" in captured["messages"][-1]["content"]
+    assert captured["messages"][-1]["content"].startswith(
+        "Explain Kimi K3"
+    ) or "Kimi K3" in captured["messages"][-1]["content"]
+    # Default provider is groq when no LLM_PROVIDER env is set (hermetic conftest).
+    assert captured["provider"] == "groq"
+    assert reply.provider == "groq"
 
 
-def test_systems_layer_is_opt_in():
+def test_systems_layer_is_opt_in(monkeypatch):
     captured = {}
 
-    def fake_create(**kwargs):
-        captured.update(kwargs)
-        return SimpleNamespace(
-            model="openai/gpt-oss-120b",
-            choices=[SimpleNamespace(message=SimpleNamespace(content="HBM bound."))],
-        )
+    def fake_stream(messages, **kwargs):
+        captured["messages"] = messages
+        yield "HBM bound."
 
-    client = MagicMock()
-    client.chat.completions.create.side_effect = fake_create
-    consultant = Consultant(client=client, model="openai/gpt-oss-120b")
-    consultant.chat_with_consultant("Cost KV cache.", history=[], layer="systems")
+    monkeypatch.setattr(providers, "stream_chat", fake_stream)
+    monkeypatch.setattr("grounding.gather_sources", lambda *a, **k: [])
+    monkeypatch.setattr("grounding.format_sources_for_model", lambda sources: "")
+    chat_with_consultant("Cost KV cache.", history=[], layer="systems")
     assert captured["messages"][0]["content"] == SYSTEMS_PROMPT
+
+
+def test_chat_with_consultant_honors_llm_provider_env(monkeypatch):
+    """Plan 03: the one-shot path must honor LLM_PROVIDER, not just Groq."""
+    captured = {}
+
+    def fake_stream(messages, **kwargs):
+        captured.update(kwargs)
+        yield "ok"
+
+    monkeypatch.setattr(providers, "stream_chat", fake_stream)
+    monkeypatch.setattr("grounding.gather_sources", lambda *a, **k: [])
+    monkeypatch.setattr("grounding.format_sources_for_model", lambda sources: "")
+    monkeypatch.setenv("LLM_PROVIDER", "openai")
+    monkeypatch.setenv("OPENAI_API_KEY", "sk-test")
+    monkeypatch.setenv("OPENAI_MODEL", "gpt-4o-mini")
+    reply = chat_with_consultant("hello", [])
+    assert reply.provider == "openai"
+    assert captured["provider"] == "openai"
+    assert captured["model"] == "gpt-4o-mini"
 
 
 def test_paper_apply_prompt_asks_for_implementation_path():
@@ -140,17 +160,11 @@ def test_format_application_context_names_known_papers():
 def test_chat_with_consultant_injects_repo_readme(monkeypatch):
     captured = {}
 
-    fake = MagicMock()
-    fake.model = "openai/gpt-oss-120b"
+    def fake_stream(messages, **kwargs):
+        captured["messages"] = messages
+        yield "ok"
 
-    def capture(user_message, history, **kwargs):
-        captured["retrieved"] = kwargs.get("retrieved")
-        captured["sources"] = kwargs.get("sources")
-        return SimpleNamespace(content="ok", layer="apply", sources=kwargs.get("sources") or [])
-
-    fake.chat_with_consultant.side_effect = capture
-    monkeypatch.setattr("consultant._default", fake)
-    monkeypatch.setenv("GROQ_MODEL", "openai/gpt-oss-120b")
+    monkeypatch.setattr(providers, "stream_chat", fake_stream)
     monkeypatch.setattr("grounding.gather_sources", lambda *a, **k: [])
     monkeypatch.setattr(
         "grounding.format_sources_for_model",
@@ -164,10 +178,29 @@ def test_chat_with_consultant_injects_repo_readme(monkeypatch):
         get_repo_readme=lambda: "# speech-rl\nFastAPI serve",
         get_repo_readme_url=lambda: "https://github.com/you/speech-rl#readme",
     )
-    chat_with_consultant("apply this", [], store=store)
-    assert "FastAPI serve" in captured["retrieved"]
-    assert "speech-rl" in captured["retrieved"]
-    assert any(s.get("kind") == "repo" for s in captured["sources"])
+    reply = chat_with_consultant("apply this", [], store=store)
+    user_msg = captured["messages"][-1]["content"]
+    assert "FastAPI serve" in user_msg
+    assert "speech-rl" in user_msg
+    assert any(s.get("kind") == "repo" for s in reply.sources)
+
+
+def test_assemble_consult_context_returns_messages_and_packed(monkeypatch):
+    monkeypatch.setattr("grounding.gather_sources", lambda *a, **k: [])
+    monkeypatch.setattr("grounding.format_sources_for_model", lambda sources: "")
+    store = SimpleNamespace(
+        get_application=lambda: "speech policy",
+        get_stack=lambda: ["RL post-training"],
+        get_known_papers=lambda: "PPO",
+        get_repo_url=lambda: "https://github.com/you/speech-rl",
+        get_repo_readme=lambda: "# speech-rl\nFastAPI serve",
+        get_repo_readme_url=lambda: "https://github.com/you/speech-rl#readme",
+    )
+    messages, packed = assemble_consult_context(store, "apply this")
+    assert messages[0]["role"] == "system"
+    assert messages[-1]["content"].endswith("apply this")
+    assert len(packed) == 1
+    assert packed[0].kind == "repo"
 
 
 def test_paper_explain_prompt_includes_abstract():
@@ -184,18 +217,30 @@ def test_paper_explain_prompt_includes_abstract():
     assert "plain English" in text
 
 
-def test_module_function_uses_injected_client(monkeypatch):
-    fake = MagicMock()
-    fake.model = "openai/gpt-oss-120b"
-    fake.chat_with_consultant.return_value = SimpleNamespace(content="ok")
-    monkeypatch.setattr("consultant._default", fake)
-    monkeypatch.setenv("GROQ_MODEL", "openai/gpt-oss-120b")
+def test_module_function_routes_through_provider_seam(monkeypatch):
+    """The one-shot entry point must go through providers.stream_chat."""
+    captured = {}
+
+    def fake_stream(messages, **kwargs):
+        captured["messages"] = messages
+        captured.update(kwargs)
+        yield "ok"
+
+    monkeypatch.setattr(providers, "stream_chat", fake_stream)
     monkeypatch.setattr("grounding.gather_sources", lambda *a, **k: [])
     monkeypatch.setattr("grounding.format_sources_for_model", lambda sources: "")
     chat_with_consultant("hello", [])
-    fake.chat_with_consultant.assert_called_once()
-    args, kwargs = fake.chat_with_consultant.call_args
-    assert args[0] == "hello"
+    assert captured["messages"][-1]["content"] == "hello"
+    assert captured["api_key"] is None
+
+
+def test_missing_key_raises_provider_unavailable(monkeypatch):
+    monkeypatch.delenv("GROQ_API_KEY", raising=False)
+    monkeypatch.delenv("LLM_PROVIDER", raising=False)
+    monkeypatch.setattr("grounding.gather_sources", lambda *a, **k: [])
+    monkeypatch.setattr("grounding.format_sources_for_model", lambda sources: "")
+    with pytest.raises(providers.ProviderUnavailable, match="GROQ_API_KEY"):
+        chat_with_consultant("hello", [])
 
 
 def test_consultant_reply_allows_source_without_paper_id():
@@ -225,10 +270,9 @@ def test_build_messages_injects_retrieved_context():
     assert messages[-1]["content"].endswith("What is Astra?")
 
 
-def test_missing_keys_raise(monkeypatch):
-    monkeypatch.delenv("GROQ_API_KEY", raising=False)
-    import consultant as mod
-
-    monkeypatch.setattr(mod, "_default", None)
-    with pytest.raises(RuntimeError, match="GROQ_API_KEY"):
-        Consultant()
+def test_unknown_layer_message_names_apply(monkeypatch):
+    """Nit fix: the error must name all three layers, including apply."""
+    monkeypatch.setattr("grounding.gather_sources", lambda *a, **k: [])
+    monkeypatch.setattr("grounding.format_sources_for_model", lambda sources: "")
+    with pytest.raises(ValueError, match="apply, explain, or systems"):
+        chat_with_consultant("hello", [], layer="bogus")

@@ -7,12 +7,14 @@ from trends import (
     PulseItem,
     RawSignal,
     StackFit,
+    _cluster_with_llm,
     _dedupe,
     _items_from_signals,
     draft_decision_memo,
     fetch_hf_daily,
     is_recent,
     match_concept,
+    refine_decision_memo,
     score_against_stack,
 )
 
@@ -139,3 +141,122 @@ def test_is_recent_drops_two_year_old_papers():
     assert is_recent(published="2023-10-14T17:01:37.000Z") is False
     assert is_recent(paper_id="2310.10688") is False
     assert is_recent(paper_id="2407.16741") is False
+
+
+def _sample_item():
+    return PulseItem(
+        topic="FreeToken MoE serving",
+        paper_title="FreeToken",
+        paper_id="2608.16157",
+        paper_url="https://arxiv.org/abs/2608.16157",
+        concept="Mixture of Experts",
+        in_library=False,
+    )
+
+
+def _sample_draft():
+    return draft_decision_memo(
+        _sample_item(),
+        StackFit("High fit", 90, "On your stack (Mixture of Experts)."),
+        ["Mixture of Experts"],
+    )
+
+
+def test_refine_decision_memo_falls_back_without_key():
+    """No provider key -> the heuristic draft is returned untouched."""
+    draft = _sample_draft()
+    assert (
+        refine_decision_memo(_sample_item(), StackFit("High fit", 90, ""), ["Mixture of Experts"], draft)
+        is draft
+    )
+
+
+def test_refine_decision_memo_honors_provider_seam(monkeypatch):
+    """LLM_PROVIDER=openai must be honored, not silently Groq."""
+    captured = {}
+
+    def fake_stream(messages, **kwargs):
+        captured.update(kwargs)
+        yield (
+            '{"verdict":"adopt","constraint":"expert parallelism at serve time",'
+            '"so_what":"cut KV memory for long contexts"}'
+        )
+
+    monkeypatch.setattr("providers.stream_chat", fake_stream)
+    monkeypatch.setenv("LLM_PROVIDER", "openai")
+    monkeypatch.setenv("OPENAI_API_KEY", "sk-test")
+    memo = refine_decision_memo(
+        _sample_item(), StackFit("High fit", 90, ""), ["Mixture of Experts"], _sample_draft()
+    )
+    assert memo.verdict == "adopt"
+    assert "expert parallelism" in memo.constraint
+    assert "KV memory" in memo.so_what
+    assert memo.origin == "openai"
+    assert captured["provider"] == "openai"
+    assert "arxiv.org/abs/2608.16157" in memo.paper_url
+
+
+def test_refine_decision_memo_defaults_to_groq(monkeypatch):
+    def fake_stream(messages, **kwargs):
+        yield '{"verdict":"watch","constraint":"x","so_what":"y"}'
+
+    monkeypatch.setattr("providers.stream_chat", fake_stream)
+    monkeypatch.setenv("GROQ_API_KEY", "gsk_test")
+    monkeypatch.delenv("LLM_PROVIDER", raising=False)
+    memo = refine_decision_memo(
+        _sample_item(), StackFit("High fit", 90, ""), ["Mixture of Experts"], _sample_draft()
+    )
+    assert memo.verdict == "watch"
+    assert memo.origin == "groq"
+
+
+def test_refine_decision_memo_invalid_verdict_keeps_draft(monkeypatch):
+    def fake_stream(messages, **kwargs):
+        yield '{"verdict":"banquet","constraint":"x","so_what":"y"}'
+
+    monkeypatch.setattr("providers.stream_chat", fake_stream)
+    monkeypatch.setenv("GROQ_API_KEY", "gsk_test")
+    monkeypatch.delenv("LLM_PROVIDER", raising=False)
+    draft = _sample_draft()
+    memo = refine_decision_memo(
+        _sample_item(), StackFit("High fit", 90, ""), ["Mixture of Experts"], draft
+    )
+    assert memo.verdict == draft.verdict
+
+
+def test_cluster_with_llm_returns_none_without_key():
+    # No key for the default provider (hermetic env) -> heuristic fallback.
+    signals = [RawSignal(paper_id="2609.00001", title="Hot", source="hf_daily")]
+    assert _cluster_with_llm(signals, None) is None
+
+
+def test_cluster_with_llm_honors_provider(monkeypatch, tmp_path: Path):
+    def fake_stream(messages, **kwargs):
+        captured.update(kwargs)
+        yield (
+            '{"topics":[{"topic":"MoE serving","why":"Two sentences here.",'
+            '"paper_id":"2609.00001","paper_title":"Hot",'
+            '"concept":"Mixture of Experts","concept_blurb":"sparse experts"}]}'
+        )
+
+    captured = {}
+    monkeypatch.setattr("providers.stream_chat", fake_stream)
+    monkeypatch.setenv("LLM_PROVIDER", "anthropic")
+    monkeypatch.setenv("ANTHROPIC_API_KEY", "sk-ant-test")
+    today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    signals = [
+        RawSignal(
+            paper_id="2609.00001",
+            title="Hot",
+            abstract="sparse experts routing",
+            source="hf_daily",
+            published=today,
+        )
+    ]
+    db = PaperDatabase(tmp_path / "mle_knowledge.db")
+    items = _cluster_with_llm(signals, db)
+    assert items is not None
+    assert len(items) == 1
+    assert items[0].topic == "MoE serving"
+    assert items[0].concept == "Mixture of Experts"
+    assert captured["provider"] == "anthropic"

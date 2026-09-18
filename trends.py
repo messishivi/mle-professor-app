@@ -221,14 +221,13 @@ def refine_decision_memo(
     stack: list[str],
     draft: DecisionMemo,
 ) -> DecisionMemo:
-    """Optional Groq pass. Falls back to the heuristic draft on any failure."""
-    api_key = os.getenv("GROQ_API_KEY", "").strip()
-    if not api_key:
-        return draft
-    try:
-        from groq import Groq
-    except ImportError:
-        return draft
+    """Optional LLM pass over the provider seam. Falls back to the heuristic draft on any failure.
+
+    Honors ``LLM_PROVIDER`` like the consultant does (groq when unset); a
+    provider without a key — or any other failure — returns the draft.
+    """
+    import providers  # lazy: keeps trends importable without the SDKs
+
     url = draft.paper_url
     payload = {
         "stack": stack,
@@ -240,29 +239,30 @@ def refine_decision_memo(
         "abstract": (item.abstract or item.why)[:800],
         "allowed_verdicts": ["adopt", "prototype", "watch", "skip"],
     }
+    provider = providers.DEFAULT_PROVIDER
     try:
-        client = Groq(api_key=api_key)
-        model = os.getenv("GROQ_MODEL", "openai/gpt-oss-120b").strip() or "openai/gpt-oss-120b"
-        response = client.chat.completions.create(
-            model=model,
-            messages=[
-                {
-                    "role": "system",
-                    "content": (
-                        "You write a 3-line decision memo for a staff MLE. JSON only: "
-                        '{"verdict":"adopt|prototype|watch|skip","constraint":str,"so_what":str}. '
-                        "Adopt = already investing and should use this as design input. "
-                        "Prototype = worth a time-boxed experiment. Watch = skim only. Skip = ignore. "
-                        "constraint = one production constraint (eval, latency, data, serving). "
-                        "Use only the given paper_url; never invent an arXiv id."
-                    ),
-                },
-                {"role": "user", "content": json.dumps(payload, ensure_ascii=False)},
-            ],
-            temperature=0.2,
-            max_tokens=400,
-        )
-        raw = (response.choices[0].message.content or "").strip()
+        provider = providers.resolve_provider()
+        raw = "".join(
+            providers.stream_chat(
+                [
+                    {
+                        "role": "system",
+                        "content": (
+                            "You write a 3-line decision memo for a staff MLE. JSON only: "
+                            '{"verdict":"adopt|prototype|watch|skip","constraint":str,"so_what":str}. '
+                            "Adopt = already investing and should use this as design input. "
+                            "Prototype = worth a time-boxed experiment. Watch = skim only. Skip = ignore. "
+                            "constraint = one production constraint (eval, latency, data, serving). "
+                            "Use only the given paper_url; never invent an arXiv id."
+                        ),
+                    },
+                    {"role": "user", "content": json.dumps(payload, ensure_ascii=False)},
+                ],
+                provider=provider,
+                temperature=0.2,
+                max_tokens=400,
+            )
+        ).strip()
         body = _parse_json(raw)
     except Exception:
         return draft
@@ -278,7 +278,7 @@ def refine_decision_memo(
         constraint=constraint,
         so_what=so_what,
         paper_url=url,
-        origin="groq",
+        origin=provider,
     )
 
 
@@ -434,13 +434,19 @@ def _items_from_signals(signals: list[RawSignal], store: PaperDatabase) -> list[
     return items
 
 
-def _cluster_with_groq(signals: list[RawSignal], store: PaperDatabase) -> Optional[list[PulseItem]]:
-    api_key = os.getenv("GROQ_API_KEY", "").strip()
-    if not api_key or not signals:
+def _cluster_with_llm(signals: list[RawSignal], store: PaperDatabase) -> Optional[list[PulseItem]]:
+    """Topic clustering over the provider seam. ``None`` = fall back to heuristics.
+
+    Honors ``LLM_PROVIDER`` (groq when unset); no key for the active provider
+    or any failure returns ``None`` so the refresh keeps working offline.
+    """
+    import providers  # lazy: keeps trends importable without the SDKs
+
+    if not signals:
         return None
     try:
-        from groq import Groq
-    except ImportError:
+        provider = providers.resolve_provider()
+    except providers.UnknownProvider:
         return None
     digest = []
     for sig in signals[:PULSE_ITEM_LIMIT]:
@@ -452,8 +458,6 @@ def _cluster_with_groq(signals: list[RawSignal], store: PaperDatabase) -> Option
                 "source": sig.source,
             }
         )
-    client = Groq(api_key=api_key)
-    model = os.getenv("GROQ_MODEL", "openai/gpt-oss-120b").strip() or "openai/gpt-oss-120b"
     prompt = (
         "You map today's ML/AI research chatter to topics a working ML engineer should track.\n"
         "Input is papers circulating on Hugging Face Daily Papers and arXiv cs.LG/CL/AI "
@@ -467,19 +471,20 @@ def _cluster_with_groq(signals: list[RawSignal], store: PaperDatabase) -> Option
         f"Papers:\n{json.dumps(digest, ensure_ascii=False)}"
     )
     try:
-        response = client.chat.completions.create(
-            model=model,
-            messages=[
-                {
-                    "role": "system",
-                    "content": "Return JSON only. ML/AI topics only.",
-                },
-                {"role": "user", "content": prompt},
-            ],
-            temperature=0.2,
-            max_tokens=1800,
-        )
-        raw = (response.choices[0].message.content or "").strip()
+        raw = "".join(
+            providers.stream_chat(
+                [
+                    {
+                        "role": "system",
+                        "content": "Return JSON only. ML/AI topics only.",
+                    },
+                    {"role": "user", "content": prompt},
+                ],
+                provider=provider,
+                temperature=0.2,
+                max_tokens=1800,
+            )
+        ).strip()
         payload = _parse_json(raw)
     except Exception:
         return None
@@ -560,7 +565,7 @@ def refresh_pulse(store: Optional[PaperDatabase] = None) -> PulseSnapshot:
     hf = [s for s in hf if is_recent(s.published, s.paper_id)]
     arxiv = [s for s in arxiv if is_recent(s.published, s.paper_id)]
     signals = _dedupe(hf + arxiv)[:PULSE_ITEM_LIMIT]
-    items = _cluster_with_groq(signals, db)
+    items = _cluster_with_llm(signals, db)
     if items is None:
         items = _items_from_signals(signals, db)
     snapshot = PulseSnapshot(fetched_at=utcnow(), items=items, errors=errors)

@@ -54,7 +54,7 @@ def client(db) -> TestClient:
 @pytest.fixture(autouse=True)
 def _clean_env(monkeypatch):
     """Hermetic: no LLM key, no provider override, no demo mode
-    (consultant.py loads .env at import)."""
+    (api.create_app loads .env once; override=False so process env wins)."""
     monkeypatch.delenv("GROQ_API_KEY", raising=False)
     monkeypatch.delenv("MLE_DEMO_MODE", raising=False)
     monkeypatch.delenv("GROQ_MODEL", raising=False)
@@ -138,6 +138,27 @@ def test_consult_status_bad_llm_provider_degrades_not_500(client, monkeypatch):
     assert body["provider"] == "together"
     assert "Unknown provider" in body["offline_message"]
     assert set(body["providers"]) == {"groq", "openai", "anthropic", "local"}
+
+
+def test_create_app_loads_dotenv_once_process_env_wins(db, monkeypatch, tmp_path):
+    """Plan 03 fix: .env is loaded once at create_app (not per request, not at
+    import) with override=False, so process env always beats .env."""
+    import api as api_mod
+
+    calls: list[tuple[str, dict]] = []
+
+    def fake_load(path, **kwargs):
+        calls.append((str(path), kwargs))
+        return True
+
+    (tmp_path / ".env").write_text("GROQ_API_KEY=from-dotenv\n")
+    monkeypatch.setattr(api_mod, "load_dotenv", fake_load)
+    monkeypatch.setattr(api_mod, "ROOT", tmp_path)
+    with TestClient(create_app(db)):
+        pass
+    assert len(calls) == 1
+    assert calls[0][0] == str(tmp_path / ".env")
+    assert calls[0][1].get("override") is False
 
 
 # ------------------------------------------------------- /consult/chat

@@ -47,14 +47,12 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, PlainTextResponse, StreamingResponse
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
-import grounding
 import pipeline as ingest_pipeline
 import providers
 from consultant import (
     ROOT,
     ChatTurn,
-    build_messages,
-    format_application_context,
+    assemble_consult_context,
     resolve_layer,
 )
 from database import PaperDatabase, get_db, normalize_arxiv_id
@@ -250,6 +248,10 @@ def create_app(
       (``frontend/out``). When set, the app also serves the frontend at
       ``/`` — one process, one port, no Node runtime in the container.
     """
+    # .env is loaded exactly once, here, without overriding the process
+    # environment (12-factor: exported vars win over the file). No per-request
+    # reload — /consult/status and /consult/chat must always agree on readiness.
+    load_dotenv(ROOT / ".env", override=False)
     prefix = (prefix or "").strip().strip("/")
     app = FastAPI(title="MLE Professor API", version=API_VERSION)
     db = store or get_db()
@@ -453,9 +455,6 @@ def create_app(
         except ValueError as exc:
             raise HTTPException(status_code=422, detail=str(exc))
 
-        # Parity with chat_with_consultant: refresh keys from .env per request.
-        load_dotenv(ROOT / ".env", override=True)
-
         # Resolve the provider up front (P5) so a misconfigured
         # LLM_PROVIDER or a bad per-request override is a 422, not a
         # half-streamed error event. Precedence: request > env > default.
@@ -467,31 +466,10 @@ def create_app(
 
         def stream() -> Iterator[str]:
             try:
-                packed = grounding.gather_sources(payload.message, db)
-                repo_url = db.get_repo_url()
-                readme = db.get_repo_readme()
-                readme_url = db.get_repo_readme_url()
-                if repo_url or readme:
-                    packed = list(packed) + [
-                        grounding.Source(
-                            kind="repo",
-                            title="Your repo README",
-                            url=readme_url or repo_url,
-                            snippet=(readme or "")[:280],
-                        )
-                    ]
-                retrieved = grounding.format_sources_for_model(packed)
-                app_block = format_application_context(
-                    db.get_application(),
-                    db.get_stack(),
-                    db.get_known_papers(),
-                    repo_url=repo_url,
-                    repo_readme=readme,
-                )
-                if app_block:
-                    retrieved = f"{app_block}\n\n{retrieved}"
-                messages = build_messages(
-                    payload.message, turns, layer=layer, retrieved=retrieved
+                # Shared grounding pipeline (Plan 03): identical to the
+                # one-shot consultant.chat_with_consultant path.
+                messages, packed = assemble_consult_context(
+                    db, payload.message, turns, layer=layer
                 )
                 source_rows = [s.model_dump(exclude_none=True) for s in packed]
                 yield _sse("sources", {"sources": source_rows})

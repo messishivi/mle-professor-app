@@ -1,25 +1,23 @@
-"""Staff-level consultant via the Groq SDK.
+"""Staff-level consultant over the provider seam (Plan 03).
 
 Layer 1 (default): map a paper onto the user's live system.
 Layer 2: short plain-English briefing.
 Layer 3: production systems critic.
 
-The API key is read from ``GROQ_API_KEY`` only — never hardcoded.
-Default model: ``openai/gpt-oss-120b``. Groq decommissioned ``llama-3.1-70b-versatile``.
+Provider selection goes through ``providers`` (``LLM_PROVIDER`` / per-provider
+key envs) — this module never builds a client directly, and ``.env`` loading
+happens once in ``api.create_app`` (never at import time, never per request).
+Default model: ``openai/gpt-oss-120b`` (the groq default).
 """
 
 from __future__ import annotations
 
-import os
 from pathlib import Path
 from typing import Any, Optional, Sequence
 
-from dotenv import load_dotenv
-from groq import Groq
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 ROOT = Path(__file__).resolve().parent
-load_dotenv(ROOT / ".env", override=True)
 
 APPLY_PROMPT = (
     "You are an MLE implementation guide. The user has a live production system — "
@@ -137,25 +135,12 @@ class ConsultantReply(BaseModel):
 def resolve_layer(layer: Optional[str]) -> str:
     name = (layer or DEFAULT_LAYER).strip().lower()
     if name not in LAYERS:
-        raise ValueError(f"Unknown consultant layer: {layer!r}. Use explain or systems.")
+        raise ValueError(f"Unknown consultant layer: {layer!r}. Use apply, explain, or systems.")
     return name
 
 
 def prompt_for(layer: Optional[str] = None) -> str:
     return LAYERS[resolve_layer(layer)]
-
-
-def _resolve_client() -> tuple[Groq, str]:
-    try:
-        from demo import effective_groq_key
-
-        api_key = effective_groq_key()
-    except Exception:
-        api_key = os.getenv("GROQ_API_KEY", "").strip()
-    if not api_key:
-        raise RuntimeError("Set GROQ_API_KEY in the environment or .env.")
-    model = os.getenv("GROQ_MODEL", DEFAULT_MODEL).strip() or DEFAULT_MODEL
-    return Groq(api_key=api_key), model
 
 
 def _coerce_history(history: Optional[Sequence[Any]]) -> list[ChatTurn]:
@@ -200,77 +185,20 @@ def build_messages(
     return messages
 
 
-class Consultant:
-    """Thin wrapper around the Groq chat completions API."""
-
-    def __init__(
-        self,
-        client: Optional[Groq] = None,
-        *,
-        model: Optional[str] = None,
-    ) -> None:
-        if client is None:
-            client, resolved_model = _resolve_client()
-            self.client = client
-            self.model = model or resolved_model
-        else:
-            self.client = client
-            self.model = model or os.getenv("GROQ_MODEL", DEFAULT_MODEL).strip() or DEFAULT_MODEL
-        self.provider = "groq"
-
-    def chat_with_consultant(
-        self,
-        user_message: str,
-        history: Optional[Sequence[Any]] = None,
-        *,
-        layer: Optional[str] = None,
-        retrieved: str = "",
-        sources: Optional[list[dict[str, Any]]] = None,
-        temperature: float = 0.3,
-        max_tokens: int = 1800,
-    ) -> ConsultantReply:
-        chosen = resolve_layer(layer)
-        messages = build_messages(
-            user_message, history, layer=chosen, retrieved=retrieved
-        )
-        response = self.client.chat.completions.create(
-            model=self.model,
-            messages=messages,
-            temperature=temperature,
-            max_tokens=max_tokens,
-        )
-        content = ""
-        if response.choices:
-            content = (response.choices[0].message.content or "").strip()
-        used_model = getattr(response, "model", None) or self.model
-        return ConsultantReply(
-            content=content,
-            model=used_model,
-            provider=self.provider,
-            layer=chosen,
-            messages=messages,
-            sources=list(sources or []),
-        )
-
-
-_default: Optional[Consultant] = None
-
-
-def chat_with_consultant(
+def assemble_consult_context(
+    store: Any,
     user_message: str,
     history: Optional[Sequence[Any]] = None,
     *,
     layer: Optional[str] = None,
-    store: Any = None,
-    temperature: float = 0.3,
-    max_tokens: int = 1800,
-) -> ConsultantReply:
-    """Send ``user_message`` to the consultant. Default layer is plain-English explain."""
-    global _default
-    load_dotenv(ROOT / ".env", override=True)
-    model = os.getenv("GROQ_MODEL", DEFAULT_MODEL).strip() or DEFAULT_MODEL
-    if _default is None or _default.model != model:
-        _default = Consultant(model=model)
+) -> tuple[list[dict[str, str]], list[Any]]:
+    """Shared grounding pipeline for consultant turns (Plan 03).
+
+    ``gather_sources`` (library + pulse + products + arXiv) → repo README
+    source → application-context block → ``build_messages``. Used by both the
+    one-shot ``chat_with_consultant`` and the API's SSE path so the two can
+    never drift. Returns ``(messages, packed_sources)``.
+    """
     from grounding import Source, format_sources_for_model, gather_sources
 
     packed = gather_sources(user_message, store)
@@ -300,15 +228,51 @@ def chat_with_consultant(
         )
         if app_block:
             retrieved = f"{app_block}\n\n{retrieved}"
+    return build_messages(user_message, history, layer=layer, retrieved=retrieved), packed
+
+
+def chat_with_consultant(
+    user_message: str,
+    history: Optional[Sequence[Any]] = None,
+    *,
+    layer: Optional[str] = None,
+    store: Any = None,
+    provider: Optional[str] = None,
+    api_key: Optional[str] = None,
+    model: Optional[str] = None,
+    temperature: float = 0.3,
+    max_tokens: int = 1800,
+) -> ConsultantReply:
+    """One-shot consultant turn over the provider seam (non-streaming convenience).
+
+    Provider precedence is ``provider`` arg > ``LLM_PROVIDER`` env > groq
+    (``providers.resolve_provider``); the key/model resolve the same way.
+    Raises ``providers.ProviderUnavailable`` when the chosen provider has no
+    key — callers decide how to surface that.
+    """
+    import providers  # lazy: providers imports DEFAULT_MODEL from this module
+
+    messages, packed = assemble_consult_context(store, user_message, history, layer=layer)
     source_rows = [s.model_dump(exclude_none=True) for s in packed]
-    return _default.chat_with_consultant(
-        user_message,
-        history,
-        layer=layer,
-        retrieved=retrieved,
-        sources=source_rows,
+    chosen_provider = providers.resolve_provider(provider)
+    chosen_model = providers.resolve_model(chosen_provider, model)
+    parts: list[str] = []
+    for delta in providers.stream_chat(
+        messages,
+        provider=chosen_provider,
+        api_key=api_key,
+        model=chosen_model,
         temperature=temperature,
         max_tokens=max_tokens,
+    ):
+        parts.append(delta)
+    return ConsultantReply(
+        content="".join(parts).strip(),
+        model=chosen_model,
+        provider=chosen_provider,
+        layer=resolve_layer(layer),
+        messages=messages,
+        sources=source_rows,
     )
 
 
