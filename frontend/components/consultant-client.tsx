@@ -96,16 +96,19 @@ export function ConsultantClient() {
     }
   }, [searchParams]);
 
-  // Run the queued turn once readiness is known (or its load failed).
+  // Run the queued turn once readiness is known — including when the status
+  // load itself failed (status null + statusError): runTurn then takes the
+  // not-ready path and records the exact offline message in the layer history
+  // instead of leaving the queued prompt stuck behind the Retry banner.
   useEffect(() => {
-    if (!queued || status === null) return;
+    if (!queued || (status === null && !statusError)) return;
     const { prompt, layer: queuedLayer } = queued;
     setQueued(null);
     setLayer(queuedLayer);
     router.replace("/consultant");
     void runTurn(prompt, queuedLayer);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [queued, status]);
+  }, [queued, status, statusError]);
 
   const history = histories[layer];
 

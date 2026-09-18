@@ -282,6 +282,24 @@ describe("ConsultantClient", () => {
     expect(routerMock.replace).toHaveBeenCalledWith("/consultant");
   });
 
+  it("queued ?q= still runs when the status load fails (offline path, not stuck)", async () => {
+    statusMock.mockRejectedValue(new Error("boom-status"));
+    paramsMock.current = new URLSearchParams(
+      "q=queued+prompt+text&layer=apply",
+    );
+    render(<ConsultantClient />);
+    // The status failure surfaces in the banner...
+    expect(await screen.findByText("boom-status")).toBeInTheDocument();
+    // ...and the queued prompt is NOT silently stuck: it ran the not-ready
+    // path, landing in the layer history with the exact offline reply.
+    expect(await screen.findByText("queued prompt text")).toBeInTheDocument();
+    expect(
+      (await screen.findAllByText(OFFLINE_MESSAGE)).length,
+    ).toBeGreaterThanOrEqual(2);
+    expect(streamMock).not.toHaveBeenCalled();
+    expect(routerMock.replace).toHaveBeenCalledWith("/consultant");
+  });
+
   it("queued ?q= with an unknown layer falls back to apply", async () => {
     paramsMock.current = new URLSearchParams("q=queued+prompt+text&layer=bogus");
     render(<ConsultantClient />);
