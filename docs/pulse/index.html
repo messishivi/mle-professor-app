@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>ML Pulse — 2026-09-21</title>
+<title>ML Pulse — 2026-09-22</title>
 <style>
 body{font-family:system-ui,-apple-system,sans-serif;max-width:900px;margin:0 auto;padding:24px;color:#e6edf3;background:#0d1117}
 a{color:#79c0ff} h1{letter-spacing:-0.02em} .muted{color:#8b949e}
@@ -14,10 +14,36 @@ a{color:#79c0ff} h1{letter-spacing:-0.02em} .muted{color:#8b949e}
 footer{margin-top:32px;color:#8b949e;font-size:13px}
 </style></head><body>
 <h1>ML Pulse</h1>
-<p class="muted">What moved in ML/AI on 2026-09-21 — trending papers mapped to concepts,
+<p class="muted">What moved in ML/AI on 2026-09-22 — trending papers mapped to concepts,
 ranked for a generalist MLE stack, with a decision memo each. Updated daily.
-Fetched 2026-09-21T18:31:05+00:00.</p>
+Fetched 2026-09-22T17:32:49+00:00.</p>
 
+
+    <article class="card">
+      <div class="card-top"><span class="verdict" style="border-color:#d4a574;color:#d4a574">Prototype</span>
+      <span class="fit">High fit · 86</span></div>
+      <h3>WorldCrafter: Consistent Video World Model with Implicit 3D-aware Memory</h3>
+      
+      <p class="concept"><strong>LoRA / adapters</strong> — Training a thin low-rank update instead of the full network.</p>
+      <p class="why">Video world models enable interactive exploration of dynamic environments, yet struggle to respect prior observations over long horizons and across viewpoints. We present WorldCrafter, a video world model that learns a camera-queryable implicit 3D-aware memory for this purpose. The key insight is to let the requested viewpoint shape how multi-view evidence is compressed into the video generator&#x27;s limited token budget</p>
+      <p class="abstract">Video world models enable interactive exploration of dynamic environments, yet struggle to respect prior observations over long horizons and across viewpoints. We present WorldCrafter, a video world model that learns a camera-queryable implicit 3D-aware memory for this purpose. The key insight is to let the requested viewpoint shape how multi-view evidence is compressed into the video generator&#x27;s limited token budget. Trained jointly with the video generator, a memory encoder and pose-conditioned readout module integrate historical observations into a fixed set of target view-specific tokens b…</p>
+      <p class="constraint">⚠ Decide what stays frozen in prod and how you version adapters per tenant/task.</p>
+      <p class="sowhat">Prototype on LoRA / adapters against your stack — one eval, one constraint, then kill or keep.</p>
+      <div class="links"><a href="https://arxiv.org/abs/2609.24984">Paper &rarr;</a></div>
+    </article>
+
+    <article class="card">
+      <div class="card-top"><span class="verdict" style="border-color:#d4a574;color:#d4a574">Prototype</span>
+      <span class="fit">High fit · 86</span></div>
+      <h3>GameHorizon Suite: Multi-Horizon Data and Evaluation in Gameplay</h3>
+      
+      <p class="concept"><strong>Evaluation / benchmarks</strong> — Measuring what models can actually do, and where they fail.</p>
+      <p class="why">Modern video games provide a measurable testbed for AI models, combining abilities of visual understanding, instruction decomposition, goal planning, and precise action control over multiple temporal horizons. Existing datasets and benchmarks, however, either cover a narrow range of games, lack language instructions, or rely on high-variance online rollouts. To address these challenges, we introduce GameHorizon, a un</p>
+      <p class="abstract">Modern video games provide a measurable testbed for AI models, combining abilities of visual understanding, instruction decomposition, goal planning, and precise action control over multiple temporal horizons. Existing datasets and benchmarks, however, either cover a narrow range of games, lack language instructions, or rely on high-variance online rollouts. To address these challenges, we introduce GameHorizon, a unified data and evaluation suite that measures gameplay capabilities at different horizons for diverse model families. GameHorizon Suite consists of three components. First, GameHor…</p>
+      <p class="constraint">⚠ If it does not match your user task, it is a leaderboard, not a ship gate.</p>
+      <p class="sowhat">Prototype on Evaluation / benchmarks against your stack — one eval, one constraint, then kill or keep.</p>
+      <div class="links"><a href="https://arxiv.org/abs/2609.25001">Paper &rarr;</a></div>
+    </article>
 
     <article class="card">
       <div class="card-top"><span class="verdict" style="border-color:#d4a574;color:#d4a574">Prototype</span>
@@ -46,19 +72,6 @@ Fetched 2026-09-21T18:31:05+00:00.</p>
     </article>
 
     <article class="card">
-      <div class="card-top"><span class="verdict" style="border-color:#d4a574;color:#d4a574">Prototype</span>
-      <span class="fit">High fit · 86</span></div>
-      <h3>Dream-RSI: Recursive Self-Improvement through Evolving Worlds</h3>
-      
-      <p class="concept"><strong>LoRA / adapters</strong> — Training a thin low-rank update instead of the full network.</p>
-      <p class="why">Recursive self-improvement is becoming increasingly vital for autonomous AI agents, where progress hinges on discovering high-value solutions across complex domains. The driver of this process is effective exploration, however, managing and improving exploration strategies remains a major bottleneck. Current systems face a fundamental dilemma: fixed strategies fail to adapt as search spaces scale, while online policy</p>
-      <p class="abstract">Recursive self-improvement is becoming increasingly vital for autonomous AI agents, where progress hinges on discovering high-value solutions across complex domains. The driver of this process is effective exploration, however, managing and improving exploration strategies remains a major bottleneck. Current systems face a fundamental dilemma: fixed strategies fail to adapt as search spaces scale, while online policy optimization requires navigating vast meta-search spaces under delayed and expensive feedback over long-horizon rollouts. We introduce Dream-RSI, a framework for scalable and recu…</p>
-      <p class="constraint">⚠ Decide what stays frozen in prod and how you version adapters per tenant/task.</p>
-      <p class="sowhat">Prototype on LoRA / adapters against your stack — one eval, one constraint, then kill or keep.</p>
-      <div class="links"><a href="https://arxiv.org/abs/2609.14858">Paper &rarr;</a></div>
-    </article>
-
-    <article class="card">
       <div class="card-top"><span class="verdict" style="border-color:#79c0ff;color:#79c0ff">Watch</span>
       <span class="fit">Watch · 46</span></div>
       <h3>FreeToken: Efficient Edge-Native MoE Serving with Bandwidth-Adaptive Execution</h3>
@@ -73,28 +86,28 @@ Fetched 2026-09-21T18:31:05+00:00.</p>
 
     <article class="card">
       <div class="card-top"><span class="verdict" style="border-color:#d4a574;color:#d4a574">Prototype</span>
-      <span class="fit">High fit · 86</span></div>
-      <h3>WeVisDoc: From Coverage to Capability for Robust End-to-End Document Parsing</h3>
+      <span class="fit">High fit · 87</span></div>
+      <h3>RRSI: Regularized Recursive Self-Improvement of Agent Harnesses</h3>
       
-      <p class="concept"><strong>Retrieval-augmented generation</strong> — Fetching documents at query time instead of stuffing everything into weights.</p>
-      <p class="why">Document parsing converts document images into structured content and requires reliable performance across diverse layouts and acquisition conditions. Yet training corpora are biased toward common document types and clean digital pages, while expanding coverage alone does not specify how to address a parser&#x27;s remaining weaknesses. We present WeVisDoc, a two-stage data-centric framework for robust end-to-end document </p>
-      <p class="abstract">Document parsing converts document images into structured content and requires reliable performance across diverse layouts and acquisition conditions. Yet training corpora are biased toward common document types and clean digital pages, while expanding coverage alone does not specify how to address a parser&#x27;s remaining weaknesses. We present WeVisDoc, a two-stage data-centric framework for robust end-to-end document parsing. Stage I broadens semantic, structural, and appearance coverage through heterogeneous data and structure-preserving degradation synthesis. Stage II uses a held-out probe to…</p>
-      <p class="constraint">⚠ Measure retrieval recall on YOUR corpus; the generator cannot fix a dead index.</p>
-      <p class="sowhat">Prototype on Retrieval-augmented generation against your stack — one eval, one constraint, then kill or keep.</p>
-      <div class="links"><a href="https://arxiv.org/abs/2609.20423">Paper &rarr;</a></div>
+      <p class="concept"><strong>Evaluation / benchmarks</strong> — Measuring what models can actually do, and where they fail.</p>
+      <p class="why">An LLM agent&#x27;s capability is largely magnified by its harness, namely the prompts, control flow, tooling, memory, and context management surrounding the frozen backbone model. Recent methods increasingly automate this process by iteratively proposing and selecting component-wise edits of an agent harness, practically establishing a form of recursive self-improvement (RSI) at the agent-system level. However, such recu</p>
+      <p class="abstract">An LLM agent&#x27;s capability is largely magnified by its harness, namely the prompts, control flow, tooling, memory, and context management surrounding the frozen backbone model. Recent methods increasingly automate this process by iteratively proposing and selecting component-wise edits of an agent harness, practically establishing a form of recursive self-improvement (RSI) at the agent-system level. However, such recursive evolution may overfit by memorizing the training tasks, showing large in-distribution gains that shrink or even vanish on out-of-distribution benchmarks. We introduce Regular…</p>
+      <p class="constraint">⚠ If it does not match your user task, it is a leaderboard, not a ship gate.</p>
+      <p class="sowhat">Prototype on Evaluation / benchmarks against your stack — one eval, one constraint, then kill or keep.</p>
+      <div class="links"><a href="https://arxiv.org/abs/2609.24972">Paper &rarr;</a></div>
     </article>
 
     <article class="card">
       <div class="card-top"><span class="verdict" style="border-color:#d4a574;color:#d4a574">Prototype</span>
       <span class="fit">High fit · 86</span></div>
-      <h3>ZGCM-1: A Fully Open and Extremely Efficient Foundation Model for Math and Agentic Search</h3>
+      <h3>Dream-RSI: Recursive Self-Improvement through Evolving Worlds</h3>
       
-      <p class="concept"><strong>Agents</strong> — Models that use tools, memory, and loops to complete tasks.</p>
-      <p class="why">In this work, we present ZGCM-1, a fully open 7B dense foundation model trained from scratch with extreme data, system, and algorithmic efficiency. ZGCM-1 is founded on a core premise: compact models cannot passively memorize the open web, but can overcome parametric capacity limits by coupling deliberate internal thinking with active external tool use. To support this paradigm across a 256K context, we develop an en</p>
-      <p class="abstract">In this work, we present ZGCM-1, a fully open 7B dense foundation model trained from scratch with extreme data, system, and algorithmic efficiency. ZGCM-1 is founded on a core premise: compact models cannot passively memorize the open web, but can overcome parametric capacity limits by coupling deliberate internal thinking with active external tool use. To support this paradigm across a 256K context, we develop an end-to-end, high-efficiency open training recipe: Architecture &amp; System Co-design: interleaved gated sliding-window and full attention, and a stable FP8 Muon optimizer; Progressive C…</p>
-      <p class="constraint">⚠ Tool permissions, loop caps, and eval of multi-step tasks — not a single chat score.</p>
-      <p class="sowhat">Prototype on Agents against your stack — one eval, one constraint, then kill or keep.</p>
-      <div class="links"><a href="https://arxiv.org/abs/2609.13356">Paper &rarr;</a></div>
+      <p class="concept"><strong>LoRA / adapters</strong> — Training a thin low-rank update instead of the full network.</p>
+      <p class="why">Recursive self-improvement is becoming increasingly vital for autonomous AI agents, where progress hinges on discovering high-value solutions across complex domains. The driver of this process is effective exploration, however, managing and improving exploration strategies remains a major bottleneck. Current systems face a fundamental dilemma: fixed strategies fail to adapt as search spaces scale, while online policy</p>
+      <p class="abstract">Recursive self-improvement is becoming increasingly vital for autonomous AI agents, where progress hinges on discovering high-value solutions across complex domains. The driver of this process is effective exploration, however, managing and improving exploration strategies remains a major bottleneck. Current systems face a fundamental dilemma: fixed strategies fail to adapt as search spaces scale, while online policy optimization requires navigating vast meta-search spaces under delayed and expensive feedback over long-horizon rollouts. We introduce Dream-RSI, a framework for scalable and recu…</p>
+      <p class="constraint">⚠ Decide what stays frozen in prod and how you version adapters per tenant/task.</p>
+      <p class="sowhat">Prototype on LoRA / adapters against your stack — one eval, one constraint, then kill or keep.</p>
+      <div class="links"><a href="https://arxiv.org/abs/2609.14858">Paper &rarr;</a></div>
     </article>
 
     <article class="card">
@@ -113,19 +126,6 @@ Fetched 2026-09-21T18:31:05+00:00.</p>
     <article class="card">
       <div class="card-top"><span class="verdict" style="border-color:#d4a574;color:#d4a574">Prototype</span>
       <span class="fit">High fit · 86</span></div>
-      <h3>Atria Dawn: The Dawn of Agentic Superintelligence</h3>
-      
-      <p class="concept"><strong>Evaluation / benchmarks</strong> — Measuring what models can actually do, and where they fail.</p>
-      <p class="why">As AI agents become participants in the development of their successors, they reshape both the production of intelligence and the role of human researchers. We introduce Atria Dawn Preview, a foundation agentic language model designed for scientific research and engineering workflows, with the goal of expanding the frontier of agent productivity in the real world. This model is trained via a Verifiable Experience Pip</p>
-      <p class="abstract">As AI agents become participants in the development of their successors, they reshape both the production of intelligence and the role of human researchers. We introduce Atria Dawn Preview, a foundation agentic language model designed for scientific research and engineering workflows, with the goal of expanding the frontier of agent productivity in the real world. This model is trained via a Verifiable Experience Pipeline that connects tool-mediated interactions to executable environments and externally verified outcomes. Across 16 benchmarks spanning real-world research, engineering, and digi…</p>
-      <p class="constraint">⚠ If it does not match your user task, it is a leaderboard, not a ship gate.</p>
-      <p class="sowhat">Prototype on Evaluation / benchmarks against your stack — one eval, one constraint, then kill or keep.</p>
-      <div class="links"><a href="https://arxiv.org/abs/2609.15818">Paper &rarr;</a></div>
-    </article>
-
-    <article class="card">
-      <div class="card-top"><span class="verdict" style="border-color:#d4a574;color:#d4a574">Prototype</span>
-      <span class="fit">High fit · 86</span></div>
       <h3>VoiceMem: Streaming Dual-Brain Memory for Real-Time Interaction</h3>
       
       <p class="concept"><strong>Evaluation / benchmarks</strong> — Measuring what models can actually do, and where they fail.</p>
@@ -134,19 +134,6 @@ Fetched 2026-09-21T18:31:05+00:00.</p>
       <p class="constraint">⚠ If it does not match your user task, it is a leaderboard, not a ship gate.</p>
       <p class="sowhat">Prototype on Evaluation / benchmarks against your stack — one eval, one constraint, then kill or keep.</p>
       <div class="links"><a href="https://arxiv.org/abs/2608.26005">Paper &rarr;</a></div>
-    </article>
-
-    <article class="card">
-      <div class="card-top"><span class="verdict" style="border-color:#d4a574;color:#d4a574">Prototype</span>
-      <span class="fit">High fit · 87</span></div>
-      <h3>RecreationWorld: Scalable and Verifiable Environments for Hybrid Computer-Use Agents</h3>
-      
-      <p class="concept"><strong>Evaluation / benchmarks</strong> — Measuring what models can actually do, and where they fail.</p>
-      <p class="why">Computer-use agents (CUAs) have advanced along two separate lines: graphical interaction and software development through code and the command line. Real digital work requires both, interleaved rather than stacked end to end. We study hybrid CUAs that autonomously decide when to explore an interface, implement software, and run and visually verify their artifacts. We introduce RecreationWorld, a five-platform framewo</p>
-      <p class="abstract">Computer-use agents (CUAs) have advanced along two separate lines: graphical interaction and software development through code and the command line. Real digital work requires both, interleaved rather than stacked end to end. We study hybrid CUAs that autonomously decide when to explore an interface, implement software, and run and visually verify their artifacts. We introduce RecreationWorld, a five-platform framework built around recreation: given a running reference, an agent must discover its behavior and build a faithful implementation with no prescribed workflow. RecreationWorld provides…</p>
-      <p class="constraint">⚠ If it does not match your user task, it is a leaderboard, not a ship gate.</p>
-      <p class="sowhat">Prototype on Evaluation / benchmarks against your stack — one eval, one constraint, then kill or keep.</p>
-      <div class="links"><a href="https://arxiv.org/abs/2609.22000">Paper &rarr;</a></div>
     </article>
 
     <article class="card">
@@ -177,106 +164,119 @@ Fetched 2026-09-21T18:31:05+00:00.</p>
 
     <article class="card">
       <div class="card-top"><span class="verdict" style="border-color:#d4a574;color:#d4a574">Prototype</span>
-      <span class="fit">High fit · 89</span></div>
-      <h3>AI for Games in the Foundation Model Era</h3>
+      <span class="fit">High fit · 86</span></div>
+      <h3>WeVisDoc: From Coverage to Capability for Robust End-to-End Document Parsing</h3>
       
-      <p class="concept"><strong>RL post-training</strong> — Aligning a pretrained model with preference or reward data (RLHF, DPO, GRPO).</p>
-      <p class="why">Foundation models, alongside advances in learned game-world models, are reshaping AI across the game lifecycle. Beyond playing games, recent systems model players and game dynamics, support design and development, adapt player-facing experiences at runtime, and evaluate resulting artifacts. Yet these directions have evolved largely separately, obscuring which capabilities transfer across settings and which remain tie</p>
-      <p class="abstract">Foundation models, alongside advances in learned game-world models, are reshaping AI across the game lifecycle. Beyond playing games, recent systems model players and game dynamics, support design and development, adapt player-facing experiences at runtime, and evaluate resulting artifacts. Yet these directions have evolved largely separately, obscuring which capabilities transfer across settings and which remain tied to particular games, engines, interfaces, or player populations. We organize the literature into six roles according to the immediate use of AI output: playing and acting; modeli…</p>
-      <p class="constraint">⚠ You need preference data and a held-out harm/quality eval, not a vibes demo.</p>
-      <p class="sowhat">Prototype on RL post-training against your stack — one eval, one constraint, then kill or keep.</p>
-      <div class="links"><a href="https://arxiv.org/abs/2609.16679">Paper &rarr;</a></div>
-    </article>
-
-    <article class="card">
-      <div class="card-top"><span class="verdict" style="border-color:#79c0ff;color:#79c0ff">Watch</span>
-      <span class="fit">Watch · 47</span></div>
-      <h3>The Other Half of the Memory Wall: Serving 35B MoEs from SSD with Trained Routing Prediction</h3>
-      
-      <p class="concept"><strong>Mixture of Experts</strong> — Sparse routing so only some model experts fire per token.</p>
-      <p class="why">Mixture-of-experts (MoE) inference on consumer hardware is bounded by weight memory: a 35B-class model is 19.5GB at 4-bit, and sparsity shrinks the compute per token, not the bytes that must be held. Naive offloading to SSD does not help on its own, because layer N+1&#x27;s experts must be chosen before layer N&#x27;s output exists, so the reads cannot start early enough to hide behind compute. We present Edge0, a streaming Mo</p>
-      <p class="abstract">Mixture-of-experts (MoE) inference on consumer hardware is bounded by weight memory: a 35B-class model is 19.5GB at 4-bit, and sparsity shrinks the compute per token, not the bytes that must be held. Naive offloading to SSD does not help on its own, because layer N+1&#x27;s experts must be chosen before layer N&#x27;s output exists, so the reads cannot start early enough to hide behind compute. We present Edge0, a streaming MoE inference engine that closes the gap with a prerouter: a per-layer head predicts the next layer&#x27;s routing one token ahead, and the prediction is consumed as the routing itself, s…</p>
-      <p class="constraint">⚠ Serving cost is routing and all-to-all bandwidth, not just train FLOPs.</p>
-      <p class="sowhat">Adjacent to Quantization. Skim the abstract; deep-read only if it names your failure mode.</p>
-      <div class="links"><a href="https://arxiv.org/abs/2609.18063">Paper &rarr;</a></div>
+      <p class="concept"><strong>Retrieval-augmented generation</strong> — Fetching documents at query time instead of stuffing everything into weights.</p>
+      <p class="why">Document parsing converts document images into structured content and requires reliable performance across diverse layouts and acquisition conditions. Yet training corpora are biased toward common document types and clean digital pages, while expanding coverage alone does not specify how to address a parser&#x27;s remaining weaknesses. We present WeVisDoc, a two-stage data-centric framework for robust end-to-end document </p>
+      <p class="abstract">Document parsing converts document images into structured content and requires reliable performance across diverse layouts and acquisition conditions. Yet training corpora are biased toward common document types and clean digital pages, while expanding coverage alone does not specify how to address a parser&#x27;s remaining weaknesses. We present WeVisDoc, a two-stage data-centric framework for robust end-to-end document parsing. Stage I broadens semantic, structural, and appearance coverage through heterogeneous data and structure-preserving degradation synthesis. Stage II uses a held-out probe to…</p>
+      <p class="constraint">⚠ Measure retrieval recall on YOUR corpus; the generator cannot fix a dead index.</p>
+      <p class="sowhat">Prototype on Retrieval-augmented generation against your stack — one eval, one constraint, then kill or keep.</p>
+      <div class="links"><a href="https://arxiv.org/abs/2609.20423">Paper &rarr;</a></div>
     </article>
 
     <article class="card">
       <div class="card-top"><span class="verdict" style="border-color:#d4a574;color:#d4a574">Prototype</span>
-      <span class="fit">High fit · 86</span></div>
-      <h3>RSIAgent: Autonomous Exploration for Recursive Self-improvement in New Environments</h3>
-      
-      <p class="concept"><strong>LoRA / adapters</strong> — Training a thin low-rank update instead of the full network.</p>
-      <p class="why">Digital agents must often adapt to new environments whose interfaces, tools, and failure modes are not fully captured by pretrained models. We introduce RSIAgent, a training-free multi-agent framework for recursive self-improvement through autonomous memory construction. RSIAgent coordinates curriculum, actor, and verifier agents to continually explore the environment, validate outcomes, and retain environment-specif</p>
-      <p class="abstract">Digital agents must often adapt to new environments whose interfaces, tools, and failure modes are not fully captured by pretrained models. We introduce RSIAgent, a training-free multi-agent framework for recursive self-improvement through autonomous memory construction. RSIAgent coordinates curriculum, actor, and verifier agents to continually explore the environment, validate outcomes, and retain environment-specific knowledge, including reusable causal relationships between actions, conditions, and consequences. It further adopts a broad-then-deep exploration strategy, combining parallel br…</p>
-      <p class="constraint">⚠ Decide what stays frozen in prod and how you version adapters per tenant/task.</p>
-      <p class="sowhat">Prototype on LoRA / adapters against your stack — one eval, one constraint, then kill or keep.</p>
-      <div class="links"><a href="https://arxiv.org/abs/2609.15364">Paper &rarr;</a></div>
-    </article>
-
-    <article class="card">
-      <div class="card-top"><span class="verdict" style="border-color:#d4a574;color:#d4a574">Prototype</span>
-      <span class="fit">High fit · 86</span></div>
-      <h3>Designer-RSI: Evolving Procedural Memory from User Traffic for Agentic Graphic Design</h3>
+      <span class="fit">High fit · 87</span></div>
+      <h3>RecreationWorld: Scalable and Verifiable Environments for Hybrid Computer-Use Agents</h3>
       
       <p class="concept"><strong>Evaluation / benchmarks</strong> — Measuring what models can actually do, and where they fail.</p>
-      <p class="why">Professional graphic design is a long-horizon agentic task in which structured, editable artifacts emerge from many interdependent actions, yet outcomes admit no reliable programmatic oracle. We introduce a continual adaptation framework in which a frozen frontier model operates professional design software through more than 230 tools, while an external procedural memory of natural-language skills accumulates and ref</p>
-      <p class="abstract">Professional graphic design is a long-horizon agentic task in which structured, editable artifacts emerge from many interdependent actions, yet outcomes admit no reliable programmatic oracle. We introduce a continual adaptation framework in which a frozen frontier model operates professional design software through more than 230 tools, while an external procedural memory of natural-language skills accumulates and refines reusable design procedures from experience. The memory widens by acquiring procedures for recurring uncovered subtasks and deepens by revising existing procedures against thei…</p>
+      <p class="why">Computer-use agents (CUAs) have advanced along two separate lines: graphical interaction and software development through code and the command line. Real digital work requires both, interleaved rather than stacked end to end. We study hybrid CUAs that autonomously decide when to explore an interface, implement software, and run and visually verify their artifacts. We introduce RecreationWorld, a five-platform framewo</p>
+      <p class="abstract">Computer-use agents (CUAs) have advanced along two separate lines: graphical interaction and software development through code and the command line. Real digital work requires both, interleaved rather than stacked end to end. We study hybrid CUAs that autonomously decide when to explore an interface, implement software, and run and visually verify their artifacts. We introduce RecreationWorld, a five-platform framework built around recreation: given a running reference, an agent must discover its behavior and build a faithful implementation with no prescribed workflow. RecreationWorld provides…</p>
       <p class="constraint">⚠ If it does not match your user task, it is a leaderboard, not a ship gate.</p>
       <p class="sowhat">Prototype on Evaluation / benchmarks against your stack — one eval, one constraint, then kill or keep.</p>
-      <div class="links"><a href="https://arxiv.org/abs/2609.22086v1">Paper &rarr;</a></div>
+      <div class="links"><a href="https://arxiv.org/abs/2609.22000">Paper &rarr;</a></div>
+    </article>
+
+    <article class="card">
+      <div class="card-top"><span class="verdict" style="border-color:#d4a574;color:#d4a574">Prototype</span>
+      <span class="fit">High fit · 86</span></div>
+      <h3>ZGCM-1: A Fully Open and Extremely Efficient Foundation Model for Math and Agentic Search</h3>
+      
+      <p class="concept"><strong>Agents</strong> — Models that use tools, memory, and loops to complete tasks.</p>
+      <p class="why">In this work, we present ZGCM-1, a fully open 7B dense foundation model trained from scratch with extreme data, system, and algorithmic efficiency. ZGCM-1 is founded on a core premise: compact models cannot passively memorize the open web, but can overcome parametric capacity limits by coupling deliberate internal thinking with active external tool use. To support this paradigm across a 256K context, we develop an en</p>
+      <p class="abstract">In this work, we present ZGCM-1, a fully open 7B dense foundation model trained from scratch with extreme data, system, and algorithmic efficiency. ZGCM-1 is founded on a core premise: compact models cannot passively memorize the open web, but can overcome parametric capacity limits by coupling deliberate internal thinking with active external tool use. To support this paradigm across a 256K context, we develop an end-to-end, high-efficiency open training recipe: Architecture &amp; System Co-design: interleaved gated sliding-window and full attention, and a stable FP8 Muon optimizer; Progressive C…</p>
+      <p class="constraint">⚠ Tool permissions, loop caps, and eval of multi-step tasks — not a single chat score.</p>
+      <p class="sowhat">Prototype on Agents against your stack — one eval, one constraint, then kill or keep.</p>
+      <div class="links"><a href="https://arxiv.org/abs/2609.13356">Paper &rarr;</a></div>
+    </article>
+
+    <article class="card">
+      <div class="card-top"><span class="verdict" style="border-color:#d4a574;color:#d4a574">Prototype</span>
+      <span class="fit">High fit · 87</span></div>
+      <h3>Critical-State RL: Diagnosing Trainable States for Multi-Turn Tool Use</h3>
+      
+      <p class="concept"><strong>Agents</strong> — Models that use tools, memory, and loops to complete tasks.</p>
+      <p class="why">Multi-turn tool-use failures can hinge on a single model call, yet reward variation alone does not reveal which call would benefit from training. When rewards depend on later interactions, their variation can reflect downstream randomness rather than differences between the current actions. We introduce Critical-State RL to identify trainable states in multi-turn interactions. Given task-defined candidate calls and l</p>
+      <p class="abstract">Multi-turn tool-use failures can hinge on a single model call, yet reward variation alone does not reveal which call would benefit from training. When rewards depend on later interactions, their variation can reflect downstream randomness rather than differences between the current actions. We introduce Critical-State RL to identify trainable states in multi-turn interactions. Given task-defined candidate calls and local rewards, the method assesses whether each reward captures the action&#x27;s effect on task success and whether improvement over a reference policy is possible. It then uses nested …</p>
+      <p class="constraint">⚠ Tool permissions, loop caps, and eval of multi-step tasks — not a single chat score.</p>
+      <p class="sowhat">Prototype on Agents against your stack — one eval, one constraint, then kill or keep.</p>
+      <div class="links"><a href="https://arxiv.org/abs/2609.24985v1">Paper &rarr;</a></div>
+    </article>
+
+    <article class="card">
+      <div class="card-top"><span class="verdict" style="border-color:#d4a574;color:#d4a574">Prototype</span>
+      <span class="fit">High fit · 87</span></div>
+      <h3>onPanda: Efficient Annotation of On-Policy Alignment Data for LLMs and Agents via Token-Level Correction</h3>
+      
+      <p class="concept"><strong>Evaluation / benchmarks</strong> — Measuring what models can actually do, and where they fail.</p>
+      <p class="why">We present onPanda, an interactive tool for efficiently annotating LLM alignment data and agent trajectories. onPanda adopts token-level correction as its core interaction: while reading a model response, the annotator locates the first inappropriate token and either picks a substitute from the model&#x27;s candidate tokens or types the correct text via free-form editing. The system then truncates everything after that po</p>
+      <p class="abstract">We present onPanda, an interactive tool for efficiently annotating LLM alignment data and agent trajectories. onPanda adopts token-level correction as its core interaction: while reading a model response, the annotator locates the first inappropriate token and either picks a substitute from the model&#x27;s candidate tokens or types the correct text via free-form editing. The system then truncates everything after that position and continues generation from the corrected prefix, repeating this locate-correct-continue loop until a satisfactory response is obtained. This mechanism lets annotators pre…</p>
+      <p class="constraint">⚠ If it does not match your user task, it is a leaderboard, not a ship gate.</p>
+      <p class="sowhat">Prototype on Evaluation / benchmarks against your stack — one eval, one constraint, then kill or keep.</p>
+      <div class="links"><a href="https://arxiv.org/abs/2609.24983v1">Paper &rarr;</a></div>
+    </article>
+
+    <article class="card">
+      <div class="card-top"><span class="verdict" style="border-color:#d4a574;color:#d4a574">Prototype</span>
+      <span class="fit">High fit · 87</span></div>
+      <h3>LoRA-generating hypernetworks for efficient on-device LLM generative personalization</h3>
+      
+      <p class="concept"><strong>LoRA / adapters</strong> — Training a thin low-rank update instead of the full network.</p>
+      <p class="why">On-device large language models (`LLMs&#x27;), e.g. running on mobile phones, are ripe for improvement via personalization. The limited compute resources of mobile devices impose limits on model scale and thus model quality, making any realizable quality gains highly impactful. At the same time, their personal nature (i.e., the close coupling to a particular user) means that a given on-device LLM tends to be used in simil</p>
+      <p class="abstract">On-device large language models (`LLMs&#x27;), e.g. running on mobile phones, are ripe for improvement via personalization. The limited compute resources of mobile devices impose limits on model scale and thus model quality, making any realizable quality gains highly impactful. At the same time, their personal nature (i.e., the close coupling to a particular user) means that a given on-device LLM tends to be used in similar, predictable patterns over the course of time. This paper presents a novel method for personalizing on-device LLMs. It trains a hypernetwork to map a user&#x27;s context tokens to a …</p>
+      <p class="constraint">⚠ Decide what stays frozen in prod and how you version adapters per tenant/task.</p>
+      <p class="sowhat">Prototype on LoRA / adapters against your stack — one eval, one constraint, then kill or keep.</p>
+      <div class="links"><a href="https://arxiv.org/abs/2609.24979v1">Paper &rarr;</a></div>
     </article>
 
     <article class="card">
       <div class="card-top"><span class="verdict" style="border-color:#79c0ff;color:#79c0ff">Watch</span>
       <span class="fit">Watch · 46</span></div>
-      <h3>Cross-sector generalization of accident-process role classification in occupational accident narratives</h3>
+      <h3>DexTacWAM: A Visuo-Tactile World-Action Model for Dexterous Manipulation</h3>
       
       <p class="concept"><strong>Mixture of Experts</strong> — Sparse routing so only some model experts fire per token.</p>
-      <p class="why">Occupational accident narratives contain valuable information about work situations, unfavourable conditions, accident events, and their consequences. Automatically structuring these narratives can facilitate large-scale accident analysis and support occupational risk prevention. However, the terminology and writing styles used to describe accidents vary considerably across sectors and organisations, raising question</p>
-      <p class="abstract">Occupational accident narratives contain valuable information about work situations, unfavourable conditions, accident events, and their consequences. Automatically structuring these narratives can facilitate large-scale accident analysis and support occupational risk prevention. However, the terminology and writing styles used to describe accidents vary considerably across sectors and organisations, raising questions about the ability of automated coding systems to generalize beyond their training domain. In this paper, we evaluate the cross-sector generalization of accident-process role clas…</p>
+      <p class="why">Dexterous manipulation depends on contact dynamics that are often only partially observable from vision. Recent World-Action Models (WAMs) couple predictive video world modeling with action generation, but remain largely vision-centric and therefore cannot directly model these contact dynamics. We present DexTacWAM, a visuo-tactile WAM that encodes each fingertip independently, aggregates the resulting features throu</p>
+      <p class="abstract">Dexterous manipulation depends on contact dynamics that are often only partially observable from vision. Recent World-Action Models (WAMs) couple predictive video world modeling with action generation, but remain largely vision-centric and therefore cannot directly model these contact dynamics. We present DexTacWAM, a visuo-tactile WAM that encodes each fingertip independently, aggregates the resulting features through a finger- and pose-aware tactile compressor, and injects the tactile latent into a video diffusion world model for joint visuo-tactile world modeling. Across six contact-rich de…</p>
       <p class="constraint">⚠ Serving cost is routing and all-to-all bandwidth, not just train FLOPs.</p>
       <p class="sowhat">Adjacent to Retrieval-augmented generation. Skim the abstract; deep-read only if it names your failure mode.</p>
-      <div class="links"><a href="https://arxiv.org/abs/2609.22081v1">Paper &rarr;</a></div>
-    </article>
-
-    <article class="card">
-      <div class="card-top"><span class="verdict" style="border-color:#d4a574;color:#d4a574">Prototype</span>
-      <span class="fit">High fit · 88</span></div>
-      <h3>CodeMidas: Scaling Agentic Coding RL Environments from Code Itself</h3>
-      
-      <p class="concept"><strong>RL post-training</strong> — Aligning a pretrained model with preference or reward data (RLHF, DPO, GRPO).</p>
-      <p class="why">Training capable coding agents via reinforcement learning (RL) requires diverse tasks with reliable verifiers. Open-source codebases offer a rich source of such tasks, while existing methods typically rely on development artifacts such as issues and commits, limiting the range of tasks that can be extracted. To better scale RL environments, we present CodeMidas, an agentic pipeline that turns implemented functionalit</p>
-      <p class="abstract">Training capable coding agents via reinforcement learning (RL) requires diverse tasks with reliable verifiers. Open-source codebases offer a rich source of such tasks, while existing methods typically rely on development artifacts such as issues and commits, limiting the range of tasks that can be extracted. To better scale RL environments, we present CodeMidas, an agentic pipeline that turns implemented functionality in existing codebases into executable RL environments using source code as its only task-specific input. CodeMidas allocates agentic compute to every stage of environment constru…</p>
-      <p class="constraint">⚠ You need preference data and a held-out harm/quality eval, not a vibes demo.</p>
-      <p class="sowhat">Prototype on RL post-training against your stack — one eval, one constraint, then kill or keep.</p>
-      <div class="links"><a href="https://arxiv.org/abs/2609.22068v1">Paper &rarr;</a></div>
+      <div class="links"><a href="https://arxiv.org/abs/2609.24976v1">Paper &rarr;</a></div>
     </article>
 
     <article class="card">
       <div class="card-top"><span class="verdict" style="border-color:#d4a574;color:#d4a574">Prototype</span>
       <span class="fit">High fit · 86</span></div>
-      <h3>Value-Sensitive Delegation in Everyday AI Agent Use: Evidence from OpenClaw</h3>
+      <h3>Harness-Zero: Harness Distillation via Agent-as-Harness</h3>
       
-      <p class="concept"><strong>Transformers</strong> — The backbone architecture behind modern language and vision models.</p>
-      <p class="why">Users increasingly delegate work to autonomous AI agents, yet evaluations typically measure task completion rather than the values users prioritize. Using Value Sensitive Design, we analyzed, with LLM assistance, 73,093 first-person Reddit posts about using OpenClaw, each for its human value, agent aspect, value fulfillment, and user outcome. The 21 values form six value groups, including Autonomous, Dependable, and </p>
-      <p class="abstract">Users increasingly delegate work to autonomous AI agents, yet evaluations typically measure task completion rather than the values users prioritize. Using Value Sensitive Design, we analyzed, with LLM assistance, 73,093 first-person Reddit posts about using OpenClaw, each for its human value, agent aspect, value fulfillment, and user outcome. The 21 values form six value groups, including Autonomous, Dependable, and Affordable Operation, Bounded Reach, Reviewability, and Equitable Access. Relative to each aspect&#x27;s corpus share, values clustered not at the agent&#x27;s outputs but at the operating c…</p>
-      <p class="constraint">⚠ Watch sequence length and attention memory before you copy the architecture.</p>
-      <p class="sowhat">Prototype on Transformers against your stack — one eval, one constraint, then kill or keep.</p>
-      <div class="links"><a href="https://arxiv.org/abs/2609.22067v1">Paper &rarr;</a></div>
+      <p class="concept"><strong>Agents</strong> — Models that use tools, memory, and loops to complete tasks.</p>
+      <p class="why">Agent harnesses, the external systems that mediate model-environment interaction, can substantially improve agent performance, but their gains remain tied to the harness at deployment. Because the best harness varies across domains, instances, and models, a general-purpose agent must either settle for a suboptimal shared harness or route among an ever-growing set of specialized ones. We therefore study agent harness </p>
+      <p class="abstract">Agent harnesses, the external systems that mediate model-environment interaction, can substantially improve agent performance, but their gains remain tied to the harness at deployment. Because the best harness varies across domains, instances, and models, a general-purpose agent must either settle for a suboptimal shared harness or route among an ever-growing set of specialized ones. We therefore study agent harness distillation: using a domain- or instance-optimized harness as training-time guidance and transferring the behaviors it induces into model weights, so that its gains survive under …</p>
+      <p class="constraint">⚠ Tool permissions, loop caps, and eval of multi-step tasks — not a single chat score.</p>
+      <p class="sowhat">Prototype on Agents against your stack — one eval, one constraint, then kill or keep.</p>
+      <div class="links"><a href="https://arxiv.org/abs/2609.24974v1">Paper &rarr;</a></div>
     </article>
 
     <article class="card">
       <div class="card-top"><span class="verdict" style="border-color:#d4a574;color:#d4a574">Prototype</span>
       <span class="fit">High fit · 86</span></div>
-      <h3>BrainWideBench: Benchmarking large-scale pretraining and across-animal transfer in multi-region neural recordings</h3>
+      <h3>DolphinBench: Mapping the Pareto Frontier of Agent Memory</h3>
       
       <p class="concept"><strong>Evaluation / benchmarks</strong> — Measuring what models can actually do, and where they fail.</p>
-      <p class="why">Advances in large-scale neural recording have made it possible to collect data across many animals and distributed brain regions, raising the question of whether this scale can be exploited to learn general-purpose neural representations transferable across diverse downstream tasks. Yet, progress toward this goal has been limited by fragmented evaluation protocols and a narrow focus on individual task domains. Here, </p>
-      <p class="abstract">Advances in large-scale neural recording have made it possible to collect data across many animals and distributed brain regions, raising the question of whether this scale can be exploited to learn general-purpose neural representations transferable across diverse downstream tasks. Yet, progress toward this goal has been limited by fragmented evaluation protocols and a narrow focus on individual task domains. Here, we present BrainWideBench, a benchmark for evaluating across-animal transfer on multi-region neural recordings, built on the International Brain Laboratory Brainwide Map dataset of…</p>
+      <p class="why">Agents today often take real-world actions that depend on long-term memory and context recall over time. However, most current memory benchmarks are built for a conversational question-answer format, where the question itself signals that some fact must be retrieved, and often which one. Moreover, benchmarks rarely require anything beyond accuracy from submissions, allowing memory systems to make unreasonable cost/ti</p>
+      <p class="abstract">Agents today often take real-world actions that depend on long-term memory and context recall over time. However, most current memory benchmarks are built for a conversational question-answer format, where the question itself signals that some fact must be retrieved, and often which one. Moreover, benchmarks rarely require anything beyond accuracy from submissions, allowing memory systems to make unreasonable cost/time tradeoffs to achieve higher scores. We present DolphinBench, a benchmark that evaluates memory directly through an agent&#x27;s task completion. DolphinBench includes three knowledge…</p>
       <p class="constraint">⚠ If it does not match your user task, it is a leaderboard, not a ship gate.</p>
       <p class="sowhat">Prototype on Evaluation / benchmarks against your stack — one eval, one constraint, then kill or keep.</p>
-      <div class="links"><a href="https://arxiv.org/abs/2609.22064v1">Paper &rarr;</a></div>
+      <div class="links"><a href="https://arxiv.org/abs/2609.24971v1">Paper &rarr;</a></div>
     </article>
 <footer>Generated by <a href="https://github.com/messishivi/mle-professor-app">MLE Professor</a>
 · verdicts are rule-based drafts, not financial/production advice.</footer>
