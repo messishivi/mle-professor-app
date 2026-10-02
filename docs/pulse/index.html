@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>ML Pulse — 2026-10-01</title>
+<title>ML Pulse — 2026-10-02</title>
 <style>
 body{font-family:system-ui,-apple-system,sans-serif;max-width:900px;margin:0 auto;padding:24px;color:#e6edf3;background:#0d1117}
 a{color:#79c0ff} h1{letter-spacing:-0.02em} .muted{color:#8b949e}
@@ -14,10 +14,23 @@ a{color:#79c0ff} h1{letter-spacing:-0.02em} .muted{color:#8b949e}
 footer{margin-top:32px;color:#8b949e;font-size:13px}
 </style></head><body>
 <h1>ML Pulse</h1>
-<p class="muted">What moved in ML/AI on 2026-10-01 — trending papers mapped to concepts,
+<p class="muted">What moved in ML/AI on 2026-10-02 — trending papers mapped to concepts,
 ranked for a generalist MLE stack, with a decision memo each. Updated daily.
-Fetched 2026-10-01T18:43:20+00:00.</p>
+Fetched 2026-10-02T18:15:03+00:00.</p>
 
+
+    <article class="card">
+      <div class="card-top"><span class="verdict" style="border-color:#d4a574;color:#d4a574">Prototype</span>
+      <span class="fit">High fit · 86</span></div>
+      <h3>UniMate: One Unified Model to Animate Diverse Skeletons</h3>
+      
+      <p class="concept"><strong>Transformers</strong> — The backbone architecture behind modern language and vision models.</p>
+      <p class="why">Recent advances in automatic rigging now deliver animation-ready 3D assets at scale, yet generating the motion to drive them remains a bottleneck. Existing learned animators are topology-constrained: they rely on category-specific templates or require per-skeleton fine-tuning and reference motions at inference. We present UniMate, a unified foundation model that synthesizes articulated motion for arbitrary skeletons </p>
+      <p class="abstract">Recent advances in automatic rigging now deliver animation-ready 3D assets at scale, yet generating the motion to drive them remains a bottleneck. Existing learned animators are topology-constrained: they rely on category-specific templates or require per-skeleton fine-tuning and reference motions at inference. We present UniMate, a unified foundation model that synthesizes articulated motion for arbitrary skeletons from a rigged 3D asset and a text prompt, with no test-time optimization or per-skeleton retraining. UniMate introduces a topology-aware diffusion transformer, which integrates ske…</p>
+      <p class="constraint">⚠ Watch sequence length and attention memory before you copy the architecture.</p>
+      <p class="sowhat">Prototype on Transformers against your stack — one eval, one constraint, then kill or keep.</p>
+      <div class="links"><a href="https://arxiv.org/abs/2609.05415">Paper &rarr;</a></div>
+    </article>
 
     <article class="card">
       <div class="card-top"><span class="verdict" style="border-color:#d4a574;color:#d4a574">Prototype</span>
@@ -34,15 +47,15 @@ Fetched 2026-10-01T18:43:20+00:00.</p>
 
     <article class="card">
       <div class="card-top"><span class="verdict" style="border-color:#d4a574;color:#d4a574">Prototype</span>
-      <span class="fit">High fit · 86</span></div>
-      <h3>UniMate: One Unified Model to Animate Diverse Skeletons</h3>
+      <span class="fit">High fit · 85</span></div>
+      <h3>Context Language Models</h3>
       
-      <p class="concept"><strong>Transformers</strong> — The backbone architecture behind modern language and vision models.</p>
-      <p class="why">Recent advances in automatic rigging now deliver animation-ready 3D assets at scale, yet generating the motion to drive them remains a bottleneck. Existing learned animators are topology-constrained: they rely on category-specific templates or require per-skeleton fine-tuning and reference motions at inference. We present UniMate, a unified foundation model that synthesizes articulated motion for arbitrary skeletons </p>
-      <p class="abstract">Recent advances in automatic rigging now deliver animation-ready 3D assets at scale, yet generating the motion to drive them remains a bottleneck. Existing learned animators are topology-constrained: they rely on category-specific templates or require per-skeleton fine-tuning and reference motions at inference. We present UniMate, a unified foundation model that synthesizes articulated motion for arbitrary skeletons from a rigged 3D asset and a text prompt, with no test-time optimization or per-skeleton retraining. UniMate introduces a topology-aware diffusion transformer, which integrates ske…</p>
-      <p class="constraint">⚠ Watch sequence length and attention memory before you copy the architecture.</p>
-      <p class="sowhat">Prototype on Transformers against your stack — one eval, one constraint, then kill or keep.</p>
-      <div class="links"><a href="https://arxiv.org/abs/2609.05415">Paper &rarr;</a></div>
+      <p class="concept"><strong>Agents</strong> — Models that use tools, memory, and loops to complete tasks.</p>
+      <p class="why">We introduce Context Language Models (CLMs), language models that natively manage their own context. We implement this by treating the context as a file and allowing the model to make unrestricted updates to this file. This allows the model to learn what is most important to maintain in context, and naturally extends to multi-agent systems where multiple agent contexts coexist as files. Building CLMs zero-shot with e</p>
+      <p class="abstract">We introduce Context Language Models (CLMs), language models that natively manage their own context. We implement this by treating the context as a file and allowing the model to make unrestricted updates to this file. This allows the model to learn what is most important to maintain in context, and naturally extends to multi-agent systems where multiple agent contexts coexist as files. Building CLMs zero-shot with existing models outperforms SOTA context management strategies across a variety of tasks: 11.4% higher accuracy with 21.5% fewer FLOPs on BrowseComp-Plus, 5% higher scores with 59% …</p>
+      <p class="constraint">⚠ Tool permissions, loop caps, and eval of multi-step tasks — not a single chat score.</p>
+      <p class="sowhat">Prototype on Agents against your stack — one eval, one constraint, then kill or keep.</p>
+      <div class="links"><a href="https://arxiv.org/abs/2609.37725">Paper &rarr;</a></div>
     </article>
 
     <article class="card">
@@ -61,19 +74,6 @@ Fetched 2026-10-01T18:43:20+00:00.</p>
     <article class="card">
       <div class="card-top"><span class="verdict" style="border-color:#d4a574;color:#d4a574">Prototype</span>
       <span class="fit">High fit · 85</span></div>
-      <h3>Context Language Models</h3>
-      
-      <p class="concept"><strong>Agents</strong> — Models that use tools, memory, and loops to complete tasks.</p>
-      <p class="why">We introduce Context Language Models (CLMs), language models that natively manage their own context. We implement this by treating the context as a file and allowing the model to make unrestricted updates to this file. This allows the model to learn what is most important to maintain in context, and naturally extends to multi-agent systems where multiple agent contexts coexist as files. Building CLMs zero-shot with e</p>
-      <p class="abstract">We introduce Context Language Models (CLMs), language models that natively manage their own context. We implement this by treating the context as a file and allowing the model to make unrestricted updates to this file. This allows the model to learn what is most important to maintain in context, and naturally extends to multi-agent systems where multiple agent contexts coexist as files. Building CLMs zero-shot with existing models outperforms SOTA context management strategies across a variety of tasks: 11.4% higher accuracy with 21.5% fewer FLOPs on BrowseComp-Plus, 5% higher scores with 59% …</p>
-      <p class="constraint">⚠ Tool permissions, loop caps, and eval of multi-step tasks — not a single chat score.</p>
-      <p class="sowhat">Prototype on Agents against your stack — one eval, one constraint, then kill or keep.</p>
-      <div class="links"><a href="https://arxiv.org/abs/2609.37725">Paper &rarr;</a></div>
-    </article>
-
-    <article class="card">
-      <div class="card-top"><span class="verdict" style="border-color:#d4a574;color:#d4a574">Prototype</span>
-      <span class="fit">High fit · 85</span></div>
       <h3>VisionHOPE: Visual Backbones as Self-Modifying Learning Systems</h3>
       
       <p class="concept"><strong>Transformers</strong> — The backbone architecture behind modern language and vision models.</p>
@@ -85,29 +85,29 @@ Fetched 2026-10-01T18:43:20+00:00.</p>
     </article>
 
     <article class="card">
-      <div class="card-top"><span class="verdict" style="border-color:#79c0ff;color:#79c0ff">Watch</span>
-      <span class="fit">Watch · 46</span></div>
-      <h3>What Makes World Action Models Generalize? An Empirical Study of Test-Time Future Modeling</h3>
+      <div class="card-top"><span class="verdict" style="border-color:#8b949e;color:#8b949e">Skip</span>
+      <span class="fit">Skip · 10</span></div>
+      <h3>Hierarchical Continuous Diffusion Language Models</h3>
       
-      <p class="concept"><strong>Mixture of Experts</strong> — Sparse routing so only some model experts fire per token.</p>
-      <p class="why">World action models (WAMs) predict the future alongside actions during training. Due to the heavy computation cost of video denoising, whether the future must still be generated during inference is disputed: Explicit WAMs denoise it into clean frames along with every action chunk, whereas Latent WAMs discard it entirely for acceleration. We find that latent WAMs, despite matching explicit ones on in-distribution task</p>
-      <p class="abstract">World action models (WAMs) predict the future alongside actions during training. Due to the heavy computation cost of video denoising, whether the future must still be generated during inference is disputed: Explicit WAMs denoise it into clean frames along with every action chunk, whereas Latent WAMs discard it entirely for acceleration. We find that latent WAMs, despite matching explicit ones on in-distribution tasks, fail to retain the generalization benefits that originally motivated WAMs. To demonstrate this, we evaluate generalization along three axes: environmental perturbation, data eff…</p>
-      <p class="constraint">⚠ Serving cost is routing and all-to-all bandwidth, not just train FLOPs.</p>
-      <p class="sowhat">Adjacent to Evaluation / benchmarks. Skim the abstract; deep-read only if it names your failure mode.</p>
-      <div class="links"><a href="https://arxiv.org/abs/2609.34981">Paper &rarr;</a></div>
+      <p class="concept"><strong>Diffusion</strong> — Generative models that denoise step by step, now used beyond images.</p>
+      <p class="why">Discrete diffusion language models offer a compelling alternative to autoregressive generation for tasks demanding bidirectional reasoning and global constraint satisfaction. Yet they share a structural bottleneck: when decoding in parallel, each token is sampled independently from its marginal, severing the statistical dependencies among the tokens decoded together. Continuous diffusion language models avoid this by</p>
+      <p class="abstract">Discrete diffusion language models offer a compelling alternative to autoregressive generation for tasks demanding bidirectional reasoning and global constraint satisfaction. Yet they share a structural bottleneck: when decoding in parallel, each token is sampled independently from its marginal, severing the statistical dependencies among the tokens decoded together. Continuous diffusion language models avoid this by denoising a shared continuous state, but their denoiser sees only that state, so nothing ties it to a valid token configuration until it is finally decoded. To address this, we pr…</p>
+      <p class="constraint">⚠ Sample steps vs quality is the product constraint; batch the reverse process if you serve it.</p>
+      <p class="sowhat">Skip unless curious — it does not overlap Transformers, RL post-training, Retrieval-augmented generation.</p>
+      <div class="links"><a href="https://arxiv.org/abs/2610.02193">Paper &rarr;</a></div>
     </article>
 
     <article class="card">
       <div class="card-top"><span class="verdict" style="border-color:#d4a574;color:#d4a574">Prototype</span>
-      <span class="fit">High fit · 87</span></div>
-      <h3>NeoHorse-1: Towards Recursive Self-Improvement via Agentic Post-Training with Routing Harness</h3>
+      <span class="fit">High fit · 86</span></div>
+      <h3>PixelUMM: Encoder-Free Unified Image and Video Understanding and Generation</h3>
       
-      <p class="concept"><strong>Evaluation / benchmarks</strong> — Measuring what models can actually do, and where they fail.</p>
-      <p class="why">Recursive self-improvement (RSI) requires a concrete mechanism through which an AI system observes its capabilities and converts that evidence into the next round of learning. We present NeoHorse-1, a family of agent-native models developed to explore this path through agentic post-training. Our system combines a heterogeneous model pool with intelligent routing, recording the predicted capability demand, selected se</p>
-      <p class="abstract">Recursive self-improvement (RSI) requires a concrete mechanism through which an AI system observes its capabilities and converts that evidence into the next round of learning. We present NeoHorse-1, a family of agent-native models developed to explore this path through agentic post-training. Our system combines a heterogeneous model pool with intelligent routing, recording the predicted capability demand, selected service tier, and subsequent interaction for each user turn. These records are converted into training examples that preserve interleaved reasoning, tool calls, and harness context, …</p>
-      <p class="constraint">⚠ If it does not match your user task, it is a leaderboard, not a ship gate.</p>
-      <p class="sowhat">Prototype on Evaluation / benchmarks against your stack — one eval, one constraint, then kill or keep.</p>
-      <div class="links"><a href="https://arxiv.org/abs/2609.08183">Paper &rarr;</a></div>
+      <p class="concept"><strong>Transformers</strong> — The backbone architecture behind modern language and vision models.</p>
+      <p class="why">Unified Multimodal Models (UMMs) often rely on separate visual representations for understanding and generation, increasing visual context length and complicating integration with established vision-language pretraining pipelines. Recent advances in pixel-space modeling offer an encoder-free alternative, but extending this paradigm from images to videos is non-trivial: video understanding and generation adopt differe</p>
+      <p class="abstract">Unified Multimodal Models (UMMs) often rely on separate visual representations for understanding and generation, increasing visual context length and complicating integration with established vision-language pretraining pipelines. Recent advances in pixel-space modeling offer an encoder-free alternative, but extending this paradigm from images to videos is non-trivial: video understanding and generation adopt different temporal representations, leaving the design of a unified visual interface an open question. We present PixelUMM, an encoder-free model for unified image and video understanding…</p>
+      <p class="constraint">⚠ Watch sequence length and attention memory before you copy the architecture.</p>
+      <p class="sowhat">Prototype on Transformers against your stack — one eval, one constraint, then kill or keep.</p>
+      <div class="links"><a href="https://arxiv.org/abs/2609.38597">Paper &rarr;</a></div>
     </article>
 
     <article class="card">
@@ -125,15 +125,41 @@ Fetched 2026-10-01T18:43:20+00:00.</p>
 
     <article class="card">
       <div class="card-top"><span class="verdict" style="border-color:#d4a574;color:#d4a574">Prototype</span>
-      <span class="fit">High fit · 86</span></div>
-      <h3>RSIGame: Autonomous Agentic Game Development with Recursive Self-improvement</h3>
+      <span class="fit">High fit · 87</span></div>
+      <h3>NeoHorse-1: Towards Recursive Self-Improvement via Agentic Post-Training with Routing Harness</h3>
       
-      <p class="concept"><strong>Retrieval-augmented generation</strong> — Fetching documents at query time instead of stuffing everything into weights.</p>
-      <p class="why">Recent advances in large language models have made automatic game generation increasingly feasible, yet reliably improving generated games beyond a playable version remains challenging. Naive iterative refinement can easily overfit a small set of test cases, producing fragile games with unresolved bugs, missing behaviors, and poor generalization to broader player interactions. We introduce RSIGame, an autonomous agen</p>
-      <p class="abstract">Recent advances in large language models have made automatic game generation increasingly feasible, yet reliably improving generated games beyond a playable version remains challenging. Naive iterative refinement can easily overfit a small set of test cases, producing fragile games with unresolved bugs, missing behaviors, and poor generalization to broader player interactions. We introduce RSIGame, an autonomous agentic game development framework with recursive self-improvement. RSIGame organizes development into complementary local and global loops. Concretely, a local explore-diagnose-improv…</p>
-      <p class="constraint">⚠ Measure retrieval recall on YOUR corpus; the generator cannot fix a dead index.</p>
-      <p class="sowhat">Prototype on Retrieval-augmented generation against your stack — one eval, one constraint, then kill or keep.</p>
-      <div class="links"><a href="https://arxiv.org/abs/2609.39045">Paper &rarr;</a></div>
+      <p class="concept"><strong>Evaluation / benchmarks</strong> — Measuring what models can actually do, and where they fail.</p>
+      <p class="why">Recursive self-improvement (RSI) requires a concrete mechanism through which an AI system observes its capabilities and converts that evidence into the next round of learning. We present NeoHorse-1, a family of agent-native models developed to explore this path through agentic post-training. Our system combines a heterogeneous model pool with intelligent routing, recording the predicted capability demand, selected se</p>
+      <p class="abstract">Recursive self-improvement (RSI) requires a concrete mechanism through which an AI system observes its capabilities and converts that evidence into the next round of learning. We present NeoHorse-1, a family of agent-native models developed to explore this path through agentic post-training. Our system combines a heterogeneous model pool with intelligent routing, recording the predicted capability demand, selected service tier, and subsequent interaction for each user turn. These records are converted into training examples that preserve interleaved reasoning, tool calls, and harness context, …</p>
+      <p class="constraint">⚠ If it does not match your user task, it is a leaderboard, not a ship gate.</p>
+      <p class="sowhat">Prototype on Evaluation / benchmarks against your stack — one eval, one constraint, then kill or keep.</p>
+      <div class="links"><a href="https://arxiv.org/abs/2609.08183">Paper &rarr;</a></div>
+    </article>
+
+    <article class="card">
+      <div class="card-top"><span class="verdict" style="border-color:#79c0ff;color:#79c0ff">Watch</span>
+      <span class="fit">Watch · 46</span></div>
+      <h3>What Makes World Action Models Generalize? An Empirical Study of Test-Time Future Modeling</h3>
+      
+      <p class="concept"><strong>Mixture of Experts</strong> — Sparse routing so only some model experts fire per token.</p>
+      <p class="why">World action models (WAMs) predict the future alongside actions during training. Due to the heavy computation cost of video denoising, whether the future must still be generated during inference is disputed: Explicit WAMs denoise it into clean frames along with every action chunk, whereas Latent WAMs discard it entirely for acceleration. We find that latent WAMs, despite matching explicit ones on in-distribution task</p>
+      <p class="abstract">World action models (WAMs) predict the future alongside actions during training. Due to the heavy computation cost of video denoising, whether the future must still be generated during inference is disputed: Explicit WAMs denoise it into clean frames along with every action chunk, whereas Latent WAMs discard it entirely for acceleration. We find that latent WAMs, despite matching explicit ones on in-distribution tasks, fail to retain the generalization benefits that originally motivated WAMs. To demonstrate this, we evaluate generalization along three axes: environmental perturbation, data eff…</p>
+      <p class="constraint">⚠ Serving cost is routing and all-to-all bandwidth, not just train FLOPs.</p>
+      <p class="sowhat">Adjacent to Evaluation / benchmarks. Skim the abstract; deep-read only if it names your failure mode.</p>
+      <div class="links"><a href="https://arxiv.org/abs/2609.34981">Paper &rarr;</a></div>
+    </article>
+
+    <article class="card">
+      <div class="card-top"><span class="verdict" style="border-color:#79c0ff;color:#79c0ff">Watch</span>
+      <span class="fit">Watch · 47</span></div>
+      <h3>The Other Half of the Memory Wall: Serving 35B MoEs from SSD with Trained Routing Prediction</h3>
+      
+      <p class="concept"><strong>Mixture of Experts</strong> — Sparse routing so only some model experts fire per token.</p>
+      <p class="why">Mixture-of-experts (MoE) inference on consumer hardware is bounded by weight memory: a 35B-class model is 19.5GB at 4-bit, and sparsity shrinks the compute per token, not the bytes that must be held. Naive offloading to SSD does not help on its own, because layer N+1&#x27;s experts must be chosen before layer N&#x27;s output exists, so the reads cannot start early enough to hide behind compute. We present Edge0, a streaming Mo</p>
+      <p class="abstract">Mixture-of-experts (MoE) inference on consumer hardware is bounded by weight memory: a 35B-class model is 19.5GB at 4-bit, and sparsity shrinks the compute per token, not the bytes that must be held. Naive offloading to SSD does not help on its own, because layer N+1&#x27;s experts must be chosen before layer N&#x27;s output exists, so the reads cannot start early enough to hide behind compute. We present Edge0, a streaming MoE inference engine that closes the gap with a prerouter: a per-layer head predicts the next layer&#x27;s routing one token ahead, and the prediction is consumed as the routing itself, s…</p>
+      <p class="constraint">⚠ Serving cost is routing and all-to-all bandwidth, not just train FLOPs.</p>
+      <p class="sowhat">Adjacent to Quantization. Skim the abstract; deep-read only if it names your failure mode.</p>
+      <div class="links"><a href="https://arxiv.org/abs/2609.18063">Paper &rarr;</a></div>
     </article>
 
     <article class="card">
@@ -147,32 +173,6 @@ Fetched 2026-10-01T18:43:20+00:00.</p>
       <p class="constraint">⚠ If it does not match your user task, it is a leaderboard, not a ship gate.</p>
       <p class="sowhat">Prototype on Evaluation / benchmarks against your stack — one eval, one constraint, then kill or keep.</p>
       <div class="links"><a href="https://arxiv.org/abs/2609.33757">Paper &rarr;</a></div>
-    </article>
-
-    <article class="card">
-      <div class="card-top"><span class="verdict" style="border-color:#d4a574;color:#d4a574">Prototype</span>
-      <span class="fit">High fit · 89</span></div>
-      <h3>HOI-Retarget: Contact-Centric Retargeting for Human-Object Interaction</h3>
-      
-      <p class="concept"><strong>RL post-training</strong> — Aligning a pretrained model with preference or reward data (RLHF, DPO, GRPO).</p>
-      <p class="why">Learning from demonstration (LfD) has enabled humanoid robots to acquire diverse whole-body skills, but extending this paradigm to human-object interaction (HOI) is limited by the availability of robot-compatible interaction references. We present HOI-Retarget, a contact-centric retargeting method that transfers HOI onto a humanoid robot for large-scale motion-data generation. Its windowed trajectory optimization use</p>
-      <p class="abstract">Learning from demonstration (LfD) has enabled humanoid robots to acquire diverse whole-body skills, but extending this paradigm to human-object interaction (HOI) is limited by the availability of robot-compatible interaction references. We present HOI-Retarget, a contact-centric retargeting method that transfers HOI onto a humanoid robot for large-scale motion-data generation. Its windowed trajectory optimization uses every labeled contact as a target in the object frame, balancing body tracking, foot support and smoothness under the robot&#x27;s kinematic limits. The method can augment a single de…</p>
-      <p class="constraint">⚠ You need preference data and a held-out harm/quality eval, not a vibes demo.</p>
-      <p class="sowhat">Prototype on RL post-training against your stack — one eval, one constraint, then kill or keep.</p>
-      <div class="links"><a href="https://arxiv.org/abs/2609.34674">Paper &rarr;</a></div>
-    </article>
-
-    <article class="card">
-      <div class="card-top"><span class="verdict" style="border-color:#79c0ff;color:#79c0ff">Watch</span>
-      <span class="fit">Watch · 46</span></div>
-      <h3>Training Object Permanence in World Models</h3>
-      
-      <p class="concept"><strong>World models</strong> — Learning a simulator of the environment instead of only a policy.</p>
-      <p class="why">Object permanence and solidity are hallmarks of human cognitive priors. Recent studies show that video generation models, a paradigmatic class of current world models, have begun to show emerged reasoning abilities, making them ideal candidates for building human-like physical intelligence. Do video models have emerged object permanence in them? If not, could we train them with a core-cognition inspired dataset? We i</p>
-      <p class="abstract">Object permanence and solidity are hallmarks of human cognitive priors. Recent studies show that video generation models, a paradigmatic class of current world models, have begun to show emerged reasoning abilities, making them ideal candidates for building human-like physical intelligence. Do video models have emerged object permanence in them? If not, could we train them with a core-cognition inspired dataset? We introduce WROP (World Reasoning with Object Permanence), a data infrastructure of 150 hand-designed cognitive science inspired tasks, divided into six cognitive categories. We build…</p>
-      <p class="constraint">⚠ Sim-to-real gap and reset cost dominate; do not plan a policy on an uncalibrated latent.</p>
-      <p class="sowhat">Adjacent to Evaluation / benchmarks. Skim the abstract; deep-read only if it names your failure mode.</p>
-      <div class="links"><a href="https://arxiv.org/abs/2609.28654">Paper &rarr;</a></div>
     </article>
 
     <article class="card">
@@ -191,6 +191,19 @@ Fetched 2026-10-01T18:43:20+00:00.</p>
     <article class="card">
       <div class="card-top"><span class="verdict" style="border-color:#d4a574;color:#d4a574">Prototype</span>
       <span class="fit">High fit · 86</span></div>
+      <h3>RSIGame: Autonomous Agentic Game Development with Recursive Self-improvement</h3>
+      
+      <p class="concept"><strong>Retrieval-augmented generation</strong> — Fetching documents at query time instead of stuffing everything into weights.</p>
+      <p class="why">Recent advances in large language models have made automatic game generation increasingly feasible, yet reliably improving generated games beyond a playable version remains challenging. Naive iterative refinement can easily overfit a small set of test cases, producing fragile games with unresolved bugs, missing behaviors, and poor generalization to broader player interactions. We introduce RSIGame, an autonomous agen</p>
+      <p class="abstract">Recent advances in large language models have made automatic game generation increasingly feasible, yet reliably improving generated games beyond a playable version remains challenging. Naive iterative refinement can easily overfit a small set of test cases, producing fragile games with unresolved bugs, missing behaviors, and poor generalization to broader player interactions. We introduce RSIGame, an autonomous agentic game development framework with recursive self-improvement. RSIGame organizes development into complementary local and global loops. Concretely, a local explore-diagnose-improv…</p>
+      <p class="constraint">⚠ Measure retrieval recall on YOUR corpus; the generator cannot fix a dead index.</p>
+      <p class="sowhat">Prototype on Retrieval-augmented generation against your stack — one eval, one constraint, then kill or keep.</p>
+      <div class="links"><a href="https://arxiv.org/abs/2609.39045">Paper &rarr;</a></div>
+    </article>
+
+    <article class="card">
+      <div class="card-top"><span class="verdict" style="border-color:#d4a574;color:#d4a574">Prototype</span>
+      <span class="fit">High fit · 86</span></div>
       <h3>GameHorizon Suite: Multi-Horizon Data and Evaluation in Gameplay</h3>
       
       <p class="concept"><strong>Evaluation / benchmarks</strong> — Measuring what models can actually do, and where they fail.</p>
@@ -203,80 +216,67 @@ Fetched 2026-10-01T18:43:20+00:00.</p>
 
     <article class="card">
       <div class="card-top"><span class="verdict" style="border-color:#d4a574;color:#d4a574">Prototype</span>
-      <span class="fit">High fit · 86</span></div>
-      <h3>Ranking-Aware Prompt Optimization for Multimodal Clinical Diagnosis</h3>
+      <span class="fit">High fit · 89</span></div>
+      <h3>One Basis to Animate Them All: Gaussian Blendshape Distillation for Real-Time Avatars</h3>
       
-      <p class="concept"><strong>Retrieval-augmented generation</strong> — Fetching documents at query time instead of stuffing everything into weights.</p>
-      <p class="why">Multimodal large language models (MLLMs) are rapidly advancing clinical diagnosis, yet their adaptation pipelines remain anchored to accuracy-based objectives. Clinical data are heavily class-imbalanced: a constant-majority predictor can score above 90% accuracy while being clinically useless. We therefore evaluate and optimize for AUROC, a threshold-free score that ranks positives above negatives and is invariant to</p>
-      <p class="abstract">Multimodal large language models (MLLMs) are rapidly advancing clinical diagnosis, yet their adaptation pipelines remain anchored to accuracy-based objectives. Clinical data are heavily class-imbalanced: a constant-majority predictor can score above 90% accuracy while being clinically useless. We therefore evaluate and optimize for AUROC, a threshold-free score that ranks positives above negatives and is invariant to class balance. We focus on prompt optimization in MLLMs. Reflective methods such as GEPA use a binary scores matrix with one row per evaluation instance and one column per candida…</p>
-      <p class="constraint">⚠ Measure retrieval recall on YOUR corpus; the generator cannot fix a dead index.</p>
-      <p class="sowhat">Prototype on Retrieval-augmented generation against your stack — one eval, one constraint, then kill or keep.</p>
-      <div class="links"><a href="https://arxiv.org/abs/2609.40361v1">Paper &rarr;</a></div>
+      <p class="concept"><strong>RL post-training</strong> — Aligning a pretrained model with preference or reward data (RLHF, DPO, GRPO).</p>
+      <p class="why">3D Gaussian avatars support fast rendering, however, their real-time animation is often challenged by the costly neural inference. We address this bottleneck and show that the animation of pretrained avatar models can be closely approximated by a linear combination of identity-independent blendshapes. Building on this finding, we introduce GALA (Gaussian Animation via Linear Approximation), a distillation method that</p>
+      <p class="abstract">3D Gaussian avatars support fast rendering, however, their real-time animation is often challenged by the costly neural inference. We address this bottleneck and show that the animation of pretrained avatar models can be closely approximated by a linear combination of identity-independent blendshapes. Building on this finding, we introduce GALA (Gaussian Animation via Linear Approximation), a distillation method that replaces per-frame heavy neural decoding with a shallow coefficient predictor and a linear blend. To improve fidelity and reduce memory requirements, we propose to construct the b…</p>
+      <p class="constraint">⚠ You need preference data and a held-out harm/quality eval, not a vibes demo.</p>
+      <p class="sowhat">Prototype on RL post-training against your stack — one eval, one constraint, then kill or keep.</p>
+      <div class="links"><a href="https://arxiv.org/abs/2610.02207v1">Paper &rarr;</a></div>
     </article>
 
     <article class="card">
       <div class="card-top"><span class="verdict" style="border-color:#d4a574;color:#d4a574">Prototype</span>
       <span class="fit">High fit · 86</span></div>
-      <h3>Semifactual Credit-Augmented Policy Optimization</h3>
+      <h3>KaliBench: A Fine-Grained Benchmark for Cybersecurity Tool Use on Kali Linux with Runtime-Free Verifiable Rewards</h3>
       
-      <p class="concept"><strong>Evaluation / benchmarks</strong> — Measuring what models can actually do, and where they fail.</p>
-      <p class="why">Reinforcement learning with verifiable rewards (RLVR) has improved the reasoning capabilities of large language models (LLMs), yet their predictions remain sensitive to task-irrelevant prompt features. We investigate this sensitivity through semifactual prompt interventions that preserve the underlying problem and its answer. Our analysis reveals substantial variation in token-level sensitivity and shows that suppres</p>
-      <p class="abstract">Reinforcement learning with verifiable rewards (RLVR) has improved the reasoning capabilities of large language models (LLMs), yet their predictions remain sensitive to task-irrelevant prompt features. We investigate this sensitivity through semifactual prompt interventions that preserve the underlying problem and its answer. Our analysis reveals substantial variation in token-level sensitivity and shows that suppressing high-drift token candidates during decoding improves reasoning accuracy without updating model weights. These findings highlight a limitation of Group Relative Policy Optimiza…</p>
-      <p class="constraint">⚠ If it does not match your user task, it is a leaderboard, not a ship gate.</p>
-      <p class="sowhat">Prototype on Evaluation / benchmarks against your stack — one eval, one constraint, then kill or keep.</p>
-      <div class="links"><a href="https://arxiv.org/abs/2609.40360v1">Paper &rarr;</a></div>
-    </article>
-
-    <article class="card">
-      <div class="card-top"><span class="verdict" style="border-color:#d4a574;color:#d4a574">Prototype</span>
-      <span class="fit">High fit · 86</span></div>
-      <h3>Removing Timing Shortcuts Improves Non-Invasive Brain-to-Text</h3>
-      
-      <p class="concept"><strong>Retrieval-augmented generation</strong> — Fetching documents at query time instead of stuffing everything into weights.</p>
-      <p class="why">We find that major reported improvements in decoding words from non-invasive brain recordings are largely reproducible without any brain data. In the influential work of d&#x27;Ascoli et al. (2025), time series of brain activity from subjects perceiving continuous speech are segmented into fixed-length windows starting at each word. A neural network then generates predictions for all of the words in a sentence together. N</p>
-      <p class="abstract">We find that major reported improvements in decoding words from non-invasive brain recordings are largely reproducible without any brain data. In the influential work of d&#x27;Ascoli et al. (2025), time series of brain activity from subjects perceiving continuous speech are segmented into fixed-length windows starting at each word. A neural network then generates predictions for all of the words in a sentence together. Neighbouring windows partially overlap, implicitly revealing the interval between words. Since these intervals indicate the duration of the words spoken, and different words tend to…</p>
-      <p class="constraint">⚠ Measure retrieval recall on YOUR corpus; the generator cannot fix a dead index.</p>
-      <p class="sowhat">Prototype on Retrieval-augmented generation against your stack — one eval, one constraint, then kill or keep.</p>
-      <div class="links"><a href="https://arxiv.org/abs/2609.40359v1">Paper &rarr;</a></div>
-    </article>
-
-    <article class="card">
-      <div class="card-top"><span class="verdict" style="border-color:#d4a574;color:#d4a574">Prototype</span>
-      <span class="fit">High fit · 86</span></div>
-      <h3>ViTeX-Bench: Benchmarking High-Fidelity Video Scene Text Editing</h3>
-      
-      <p class="concept"><strong>Evaluation / benchmarks</strong> — Measuring what models can actually do, and where they fail.</p>
-      <p class="why">Recent video generation is increasingly realistic and controllable, yet video editing remains less developed, particularly for precise local edits that must preserve the original scene dynamics. Video scene text editing replaces text on scene surfaces, such as storefront signs, whiteboards, and product labels, while preserving the surrounding content, motion, and camera dynamics. Although scene text editing is well s</p>
-      <p class="abstract">Recent video generation is increasingly realistic and controllable, yet video editing remains less developed, particularly for precise local edits that must preserve the original scene dynamics. Video scene text editing replaces text on scene surfaces, such as storefront signs, whiteboards, and product labels, while preserving the surrounding content, motion, and camera dynamics. Although scene text editing is well studied for images, video scene text editing that achieves high visual quality, temporal consistency, and edit locality remains underexplored. Existing resources offer limited paire…</p>
-      <p class="constraint">⚠ If it does not match your user task, it is a leaderboard, not a ship gate.</p>
-      <p class="sowhat">Prototype on Evaluation / benchmarks against your stack — one eval, one constraint, then kill or keep.</p>
-      <div class="links"><a href="https://arxiv.org/abs/2609.40356v1">Paper &rarr;</a></div>
+      <p class="concept"><strong>Agents</strong> — Models that use tools, memory, and loops to complete tasks.</p>
+      <p class="why">LLMs are increasingly applied to cybersecurity workflows, where they are expected to translate analysts&#x27; intent into tool invocations. However, existing evaluations focus on knowledge-based assessments or end-to-end agentic tasks, and do not directly measure LLMs&#x27; ability to generate executable commands for real-world cybersecurity tools. This gap is critical because cybersecurity operations rely on strict command-li</p>
+      <p class="abstract">LLMs are increasingly applied to cybersecurity workflows, where they are expected to translate analysts&#x27; intent into tool invocations. However, existing evaluations focus on knowledge-based assessments or end-to-end agentic tasks, and do not directly measure LLMs&#x27; ability to generate executable commands for real-world cybersecurity tools. This gap is critical because cybersecurity operations rely on strict command-line interfaces (CLIs), where minor syntax errors, incorrect flag--value bindings, or argument misordering can invalidate execution. We introduce KaliBench, a fine-grained benchmark …</p>
+      <p class="constraint">⚠ Tool permissions, loop caps, and eval of multi-step tasks — not a single chat score.</p>
+      <p class="sowhat">Prototype on Agents against your stack — one eval, one constraint, then kill or keep.</p>
+      <div class="links"><a href="https://arxiv.org/abs/2610.02206v1">Paper &rarr;</a></div>
     </article>
 
     <article class="card">
       <div class="card-top"><span class="verdict" style="border-color:#d4a574;color:#d4a574">Prototype</span>
       <span class="fit">High fit · 85</span></div>
-      <h3>Image Classifiers are Efficient Self-Supervised Video Representation Learners</h3>
+      <h3>Reconstruct, Practice, Go Real: Guided Self-Improvement for Embodied Agents</h3>
+      
+      <p class="concept"><strong>Agents</strong> — Models that use tools, memory, and loops to complete tasks.</p>
+      <p class="why">Building reliable robot capabilities across diverse tasks requires substantial human effort to develop and maintain skills, design rewards, and integrate perception with control. We present Reconstruct, Practice, Go Real (RPG), a framework for autonomous improvement of robot execution systems without updating model weights. RPG identifies manipulation capabilities in an offline dataset and constructs related practice</p>
+      <p class="abstract">Building reliable robot capabilities across diverse tasks requires substantial human effort to develop and maintain skills, design rewards, and integrate perception with control. We present Reconstruct, Practice, Go Real (RPG), a framework for autonomous improvement of robot execution systems without updating model weights. RPG identifies manipulation capabilities in an offline dataset and constructs related practice tasks in simulation. During practice, RPG uses execution feedback, privileged simulator state, and available dataset videos to diagnose failures. It develops new reusable symbolic…</p>
+      <p class="constraint">⚠ Tool permissions, loop caps, and eval of multi-step tasks — not a single chat score.</p>
+      <p class="sowhat">Prototype on Agents against your stack — one eval, one constraint, then kill or keep.</p>
+      <div class="links"><a href="https://arxiv.org/abs/2610.02204v1">Paper &rarr;</a></div>
+    </article>
+
+    <article class="card">
+      <div class="card-top"><span class="verdict" style="border-color:#d4a574;color:#d4a574">Prototype</span>
+      <span class="fit">High fit · 85</span></div>
+      <h3>Embedding Prediction Helps Image Generation</h3>
       
       <p class="concept"><strong>Transformers</strong> — The backbone architecture behind modern language and vision models.</p>
-      <p class="why">We introduce VideoMSN, a Masked Siamese Network framework for efficient self-supervised spatio-temporal representation learning in videos. Instead of relying on heavy 3D architectures or reconstruction-based autoencoders for learning with unlabeled data, we repurpose standard image Vision Transformers by representing videos as super images which are grids composed of frames sampled from videos. From each super image,</p>
-      <p class="abstract">We introduce VideoMSN, a Masked Siamese Network framework for efficient self-supervised spatio-temporal representation learning in videos. Instead of relying on heavy 3D architectures or reconstruction-based autoencoders for learning with unlabeled data, we repurpose standard image Vision Transformers by representing videos as super images which are grids composed of frames sampled from videos. From each super image, we construct two views: one with spatial patch masking and the other with temporal frame masking, ensuring no information leakage across frames. A shared Vision Transformer (ViT) …</p>
+      <p class="why">In diffusion transformers, a class label or a text prompt is embedded once, and the same condition is reused at every denoising step. We ask whether predicted embeddings can serve as this condition instead. Next-Embedding Predictive Autoregression (NEPA) trains a Transformer to predict the next continuous embedding in a sequence. In generation, the clean image follows the noisy image, so its embeddings are the next e</p>
+      <p class="abstract">In diffusion transformers, a class label or a text prompt is embedded once, and the same condition is reused at every denoising step. We ask whether predicted embeddings can serve as this condition instead. Next-Embedding Predictive Autoregression (NEPA) trains a Transformer to predict the next continuous embedding in a sequence. In generation, the clean image follows the noisy image, so its embeddings are the next embeddings after the condition and the noisy image. We train a NEPA model to predict them all at once with Multi-Embedding Prediction, and in Embedding Conditioned Generation, a DiT…</p>
       <p class="constraint">⚠ Watch sequence length and attention memory before you copy the architecture.</p>
       <p class="sowhat">Prototype on Transformers against your stack — one eval, one constraint, then kill or keep.</p>
-      <div class="links"><a href="https://arxiv.org/abs/2609.40347v1">Paper &rarr;</a></div>
+      <div class="links"><a href="https://arxiv.org/abs/2610.02203v1">Paper &rarr;</a></div>
     </article>
 
     <article class="card">
       <div class="card-top"><span class="verdict" style="border-color:#d4a574;color:#d4a574">Prototype</span>
-      <span class="fit">High fit · 85</span></div>
-      <h3>EvoDuet: Bilevel Co-Evolution of Web Searching and Task Solving for Scientific Discovery</h3>
+      <span class="fit">High fit · 86</span></div>
+      <h3>ScholarCatalyst: A Benchmark for Retrieving Papers That Inspire New Research</h3>
       
       <p class="concept"><strong>Retrieval-augmented generation</strong> — Fetching documents at query time instead of stuffing everything into weights.</p>
-      <p class="why">Evolutionary search with large language models (LLMs) can stall when progress requires external knowledge the model lacks. Supplying relevant documents helps, but simply adding web search tool can keep returning the same pages as solutions change. We introduce EvoDuet, a bi-level optimization method that co-evolves solutions and search queries with fixed model parameters. At each iteration, a retrieval gate lets the </p>
-      <p class="abstract">Evolutionary search with large language models (LLMs) can stall when progress requires external knowledge the model lacks. Supplying relevant documents helps, but simply adding web search tool can keep returning the same pages as solutions change. We introduce EvoDuet, a bi-level optimization method that co-evolves solutions and search queries with fixed model parameters. At each iteration, a retrieval gate lets the LLM assess its knowledge gap and choose to retrieve new documents, reuse stored ones, or proceed without them. An inner loop refines queries and ranks documents by the solution sco…</p>
+      <p class="why">What makes great scientists great? Even as AI systems start to make progress on open problems, scientists remain far ahead of them at sensing which prior idea, buried in an ever-growing archive of research, a new problem needs. To study this skill, we draw on researchers who know firsthand which earlier work advanced their completed projects, with papers serving as pointers to the ideas within. Using our automated pi</p>
+      <p class="abstract">What makes great scientists great? Even as AI systems start to make progress on open problems, scientists remain far ahead of them at sensing which prior idea, buried in an ever-growing archive of research, a new problem needs. To study this skill, we draw on researchers who know firsthand which earlier work advanced their completed projects, with papers serving as pointers to the ideas within. Using our automated pipeline that makes author annotation scalable, we build ScholarCatalyst by having 184 lead authors of 207 recent computer science papers label which candidates did or could have adv…</p>
       <p class="constraint">⚠ Measure retrieval recall on YOUR corpus; the generator cannot fix a dead index.</p>
       <p class="sowhat">Prototype on Retrieval-augmented generation against your stack — one eval, one constraint, then kill or keep.</p>
-      <div class="links"><a href="https://arxiv.org/abs/2609.40340v1">Paper &rarr;</a></div>
+      <div class="links"><a href="https://arxiv.org/abs/2610.02202v1">Paper &rarr;</a></div>
     </article>
 <footer>Generated by <a href="https://github.com/messishivi/mle-professor-app">MLE Professor</a>
 · verdicts are rule-based drafts, not financial/production advice.</footer>
