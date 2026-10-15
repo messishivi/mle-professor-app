@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>ML Pulse — 2026-10-14</title>
+<title>ML Pulse — 2026-10-15</title>
 <style>
 body{font-family:system-ui,-apple-system,sans-serif;max-width:900px;margin:0 auto;padding:24px;color:#e6edf3;background:#0d1117}
 a{color:#79c0ff} h1{letter-spacing:-0.02em} .muted{color:#8b949e}
@@ -14,9 +14,9 @@ a{color:#79c0ff} h1{letter-spacing:-0.02em} .muted{color:#8b949e}
 footer{margin-top:32px;color:#8b949e;font-size:13px}
 </style></head><body>
 <h1>ML Pulse</h1>
-<p class="muted">What moved in ML/AI on 2026-10-14 — trending papers mapped to concepts,
+<p class="muted">What moved in ML/AI on 2026-10-15 — trending papers mapped to concepts,
 ranked for a generalist MLE stack, with a decision memo each. Updated daily.
-Fetched 2026-10-14T17:49:51+00:00.</p>
+Fetched 2026-10-15T17:38:56+00:00.</p>
 
 
     <article class="card">
@@ -33,6 +33,19 @@ Fetched 2026-10-14T17:49:51+00:00.</p>
     </article>
 
     <article class="card">
+      <div class="card-top"><span class="verdict" style="border-color:#d4a574;color:#d4a574">Prototype</span>
+      <span class="fit">High fit · 85</span></div>
+      <h3>Any Time, Any Space: A World-State-Centric Framework for Agentic Video Generation</h3>
+      
+      <p class="concept"><strong>Agents</strong> — Models that use tools, memory, and loops to complete tasks.</p>
+      <p class="why">Long-form agentic video generation must turn a screenplay into shots that remain spatially and temporally consistent across nonconsecutive requests. Passing prompts or recent frames between shots does not provide a shared spatial frame for revisiting a scene or a time-indexed record for replaying an earlier event. We present Any Time, Any Space (ATAS), which compiles a screenplay into shot requests with explicit loca</p>
+      <p class="abstract">Long-form agentic video generation must turn a screenplay into shots that remain spatially and temporally consistent across nonconsecutive requests. Passing prompts or recent frames between shots does not provide a shared spatial frame for revisiting a scene or a time-indexed record for replaying an earlier event. We present Any Time, Any Space (ATAS), which compiles a screenplay into shot requests with explicit location, camera, and event-time references. Before generation, it retrieves relevant evidence from a scene memory of registered static geometry and an event memory of dynamic observat…</p>
+      <p class="constraint">⚠ Tool permissions, loop caps, and eval of multi-step tasks — not a single chat score.</p>
+      <p class="sowhat">Prototype on Agents against your stack — one eval, one constraint, then kill or keep.</p>
+      <div class="links"><a href="https://arxiv.org/abs/2610.20571">Paper &rarr;</a></div>
+    </article>
+
+    <article class="card">
       <div class="card-top"><span class="verdict" style="border-color:#79c0ff;color:#79c0ff">Watch</span>
       <span class="fit">Watch · 47</span></div>
       <h3>The Other Half of the Memory Wall: Serving 35B MoEs from SSD with Trained Routing Prediction</h3>
@@ -43,6 +56,32 @@ Fetched 2026-10-14T17:49:51+00:00.</p>
       <p class="constraint">⚠ Serving cost is routing and all-to-all bandwidth, not just train FLOPs.</p>
       <p class="sowhat">Adjacent to Quantization. Skim the abstract; deep-read only if it names your failure mode.</p>
       <div class="links"><a href="https://arxiv.org/abs/2609.18063">Paper &rarr;</a></div>
+    </article>
+
+    <article class="card">
+      <div class="card-top"><span class="verdict" style="border-color:#d4a574;color:#d4a574">Prototype</span>
+      <span class="fit">High fit · 89</span></div>
+      <h3>Player-1: Learning to Play from Synthetic Experience</h3>
+      
+      <p class="concept"><strong>RL post-training</strong> — Aligning a pretrained model with preference or reward data (RLHF, DPO, GRPO).</p>
+      <p class="why">Computer-use agents have demonstrated strong capabilities in interpreting screens and executing keyboard and mouse actions. However, games, with their visually rich worlds and diverse mechanics, remain challenging and offer a demanding next step toward general digital control. Current game-agent learning pipelines often rely on large-scale demonstrations with limited coverage of dynamic game states, while scalable en</p>
+      <p class="abstract">Computer-use agents have demonstrated strong capabilities in interpreting screens and executing keyboard and mouse actions. However, games, with their visually rich worlds and diverse mechanics, remain challenging and offer a demanding next step toward general digital control. Current game-agent learning pipelines often rely on large-scale demonstrations with limited coverage of dynamic game states, while scalable environments for interactive training remain difficult to obtain. We introduce Player-1, a post-training framework for learning game control beyond demonstrations through synthetic e…</p>
+      <p class="constraint">⚠ You need preference data and a held-out harm/quality eval, not a vibes demo.</p>
+      <p class="sowhat">Prototype on RL post-training against your stack — one eval, one constraint, then kill or keep.</p>
+      <div class="links"><a href="https://arxiv.org/abs/2610.20584">Paper &rarr;</a></div>
+    </article>
+
+    <article class="card">
+      <div class="card-top"><span class="verdict" style="border-color:#d4a574;color:#d4a574">Prototype</span>
+      <span class="fit">High fit · 85</span></div>
+      <h3>nanoMuse: An Open-Source Personal Agent for Every Device You Own</h3>
+      
+      <p class="concept"><strong>Agents</strong> — Models that use tools, memory, and loops to complete tasks.</p>
+      <p class="why">Assistants from 2011 answered and waited, and agents from 2023 did a task and stopped. In September 2026 Meta&#x27;s Muse showed an agent for one person, with accounts, devices, memory and a conversation that lasts, closed, in a vendor&#x27;s cloud, in one country. Such an agent is expected to act on a person&#x27;s accounts and devices, remember them across weeks, speak first when it is worth it, and answer for what it did. It is </p>
+      <p class="abstract">Assistants from 2011 answered and waited, and agents from 2023 did a task and stopped. In September 2026 Meta&#x27;s Muse showed an agent for one person, with accounts, devices, memory and a conversation that lasts, closed, in a vendor&#x27;s cloud, in one country. Such an agent is expected to act on a person&#x27;s accounts and devices, remember them across weeks, speak first when it is worth it, and answer for what it did. It is a kind of software, not a model, and until now had no open counterpart. This report defines the personal agent in five questions and three horizons. It reads how Muse is built from…</p>
+      <p class="constraint">⚠ Tool permissions, loop caps, and eval of multi-step tasks — not a single chat score.</p>
+      <p class="sowhat">Prototype on Agents against your stack — one eval, one constraint, then kill or keep.</p>
+      <div class="links"><a href="https://arxiv.org/abs/2610.08699">Paper &rarr;</a></div>
     </article>
 
     <article class="card">
@@ -74,19 +113,6 @@ Fetched 2026-10-14T17:49:51+00:00.</p>
     <article class="card">
       <div class="card-top"><span class="verdict" style="border-color:#d4a574;color:#d4a574">Prototype</span>
       <span class="fit">High fit · 85</span></div>
-      <h3>nanoMuse: An Open-Source Personal Agent for Every Device You Own</h3>
-      
-      <p class="concept"><strong>Agents</strong> — Models that use tools, memory, and loops to complete tasks.</p>
-      <p class="why">Assistants from 2011 answered and waited, and agents from 2023 did a task and stopped. In September 2026 Meta&#x27;s Muse showed an agent for one person, with accounts, devices, memory and a conversation that lasts, closed, in a vendor&#x27;s cloud, in one country. Such an agent is expected to act on a person&#x27;s accounts and devices, remember them across weeks, speak first when it is worth it, and answer for what it did. It is </p>
-      <p class="abstract">Assistants from 2011 answered and waited, and agents from 2023 did a task and stopped. In September 2026 Meta&#x27;s Muse showed an agent for one person, with accounts, devices, memory and a conversation that lasts, closed, in a vendor&#x27;s cloud, in one country. Such an agent is expected to act on a person&#x27;s accounts and devices, remember them across weeks, speak first when it is worth it, and answer for what it did. It is a kind of software, not a model, and until now had no open counterpart. This report defines the personal agent in five questions and three horizons. It reads how Muse is built from…</p>
-      <p class="constraint">⚠ Tool permissions, loop caps, and eval of multi-step tasks — not a single chat score.</p>
-      <p class="sowhat">Prototype on Agents against your stack — one eval, one constraint, then kill or keep.</p>
-      <div class="links"><a href="https://arxiv.org/abs/2610.08699">Paper &rarr;</a></div>
-    </article>
-
-    <article class="card">
-      <div class="card-top"><span class="verdict" style="border-color:#d4a574;color:#d4a574">Prototype</span>
-      <span class="fit">High fit · 85</span></div>
       <h3>VideoJev: System One Model for Video Understanding and Interaction</h3>
       
       <p class="concept"><strong>Agents</strong> — Models that use tools, memory, and loops to complete tasks.</p>
@@ -95,6 +121,71 @@ Fetched 2026-10-14T17:49:51+00:00.</p>
       <p class="constraint">⚠ Tool permissions, loop caps, and eval of multi-step tasks — not a single chat score.</p>
       <p class="sowhat">Prototype on Agents against your stack — one eval, one constraint, then kill or keep.</p>
       <div class="links"><a href="https://arxiv.org/abs/2610.18615">Paper &rarr;</a></div>
+    </article>
+
+    <article class="card">
+      <div class="card-top"><span class="verdict" style="border-color:#d4a574;color:#d4a574">Prototype</span>
+      <span class="fit">High fit · 87</span></div>
+      <h3>Towards Agentic Robots: Model, Data, Environment, and Harness</h3>
+      
+      <p class="concept"><strong>Evaluation / benchmarks</strong> — Measuring what models can actually do, and where they fail.</p>
+      <p class="why">Foundation models are driving a paradigm shift in robotic intelligence, moving beyond low-level action prediction to goal-directed orchestration of data collection, model training, task planning, and real-world execution. We characterize this emerging paradigm as an agentic robots, in which agents reason over human instructions, interact with robotic environments, rectify execution errors autonomously, and dynamicall</p>
+      <p class="abstract">Foundation models are driving a paradigm shift in robotic intelligence, moving beyond low-level action prediction to goal-directed orchestration of data collection, model training, task planning, and real-world execution. We characterize this emerging paradigm as an agentic robots, in which agents reason over human instructions, interact with robotic environments, rectify execution errors autonomously, and dynamically adjust operational strategies. Although this field develops fast, current studies are not well connected. Researchers have no consistent view of how to combine different agentic …</p>
+      <p class="constraint">⚠ If it does not match your user task, it is a leaderboard, not a ship gate.</p>
+      <p class="sowhat">Prototype on Evaluation / benchmarks against your stack — one eval, one constraint, then kill or keep.</p>
+      <div class="links"><a href="https://arxiv.org/abs/2610.20442">Paper &rarr;</a></div>
+    </article>
+
+    <article class="card">
+      <div class="card-top"><span class="verdict" style="border-color:#d4a574;color:#d4a574">Prototype</span>
+      <span class="fit">High fit · 89</span></div>
+      <h3>Jeva: System One Models from First Principles</h3>
+      
+      <p class="concept"><strong>RL post-training</strong> — Aligning a pretrained model with preference or reward data (RLHF, DPO, GRPO).</p>
+      <p class="why">System one models enable direct, low-latency decision-making. Yet recent practice of predicting an answer from serialized text does not, by itself, respect the structure of a decision problem. We argue that current designs underemphasize four important structural requirements. (i) null-aware: Models should distinguish answer absence from uncertainty among candidates; (ii) permutation-invariant: Reordering alternative</p>
+      <p class="abstract">System one models enable direct, low-latency decision-making. Yet recent practice of predicting an answer from serialized text does not, by itself, respect the structure of a decision problem. We argue that current designs underemphasize four important structural requirements. (i) null-aware: Models should distinguish answer absence from uncertainty among candidates; (ii) permutation-invariant: Reordering alternatives should not change the decision; (iii) option-scalable: Growing candidate sets should not require redefining the output space; (iv) cacheable: Request-independent computation over…</p>
+      <p class="constraint">⚠ You need preference data and a held-out harm/quality eval, not a vibes demo.</p>
+      <p class="sowhat">Prototype on RL post-training against your stack — one eval, one constraint, then kill or keep.</p>
+      <div class="links"><a href="https://arxiv.org/abs/2610.18773">Paper &rarr;</a></div>
+    </article>
+
+    <article class="card">
+      <div class="card-top"><span class="verdict" style="border-color:#d4a574;color:#d4a574">Prototype</span>
+      <span class="fit">High fit · 86</span></div>
+      <h3>Agent-Reflex: Teaching Language Agents to Act Reflectively</h3>
+      
+      <p class="concept"><strong>Agents</strong> — Models that use tools, memory, and loops to complete tasks.</p>
+      <p class="why">Large language models have evolved from single-turn chatbots into interactive agents capable of long-horizon reasoning. In real deployments, MCP tool services can return noisy feedback and users may intervene to correct the agent, but existing methods provide limited supervision for reflection learning and failure recovery. To bridge this gap, we propose Agent-Reflex, a general training framework for incentivizing pr</p>
+      <p class="abstract">Large language models have evolved from single-turn chatbots into interactive agents capable of long-horizon reasoning. In real deployments, MCP tool services can return noisy feedback and users may intervene to correct the agent, but existing methods provide limited supervision for reflection learning and failure recovery. To bridge this gap, we propose Agent-Reflex, a general training framework for incentivizing proactive reflection in agents. Specifically, Agent-Reflex comprises three stages. First, Environment Reflection Skill Discovery (RSD) injects grounded tool-feedback perturbations in…</p>
+      <p class="constraint">⚠ Tool permissions, loop caps, and eval of multi-step tasks — not a single chat score.</p>
+      <p class="sowhat">Prototype on Agents against your stack — one eval, one constraint, then kill or keep.</p>
+      <div class="links"><a href="https://arxiv.org/abs/2610.17953">Paper &rarr;</a></div>
+    </article>
+
+    <article class="card">
+      <div class="card-top"><span class="verdict" style="border-color:#d4a574;color:#d4a574">Prototype</span>
+      <span class="fit">High fit · 89</span></div>
+      <h3>FlashVSR+: Efficient Video Super-Resolution via Hybrid Attention and Reward-Yield Distribution Matching</h3>
+      
+      <p class="concept"><strong>RL post-training</strong> — Aligning a pretrained model with preference or reward data (RLHF, DPO, GRPO).</p>
+      <p class="why">Recent video super-resolution (VSR) models achieve efficient one-step generation through diffusion distillation. However, high-resolution inference remains costly, and distilled models are difficult to align with human preferences. These challenges call for improvements in both model architecture and training strategy. We present FlashVSR+ to address both limitations. On the architecture side, we introduce hybrid att</p>
+      <p class="abstract">Recent video super-resolution (VSR) models achieve efficient one-step generation through diffusion distillation. However, high-resolution inference remains costly, and distilled models are difficult to align with human preferences. These challenges call for improvements in both model architecture and training strategy. We present FlashVSR+ to address both limitations. On the architecture side, we introduce hybrid attention based on the strong locality observed in pretrained VSR models, while retaining sparse global interaction for long-range consistency. It achieves up to 2times DiT speedup an…</p>
+      <p class="constraint">⚠ You need preference data and a held-out harm/quality eval, not a vibes demo.</p>
+      <p class="sowhat">Prototype on RL post-training against your stack — one eval, one constraint, then kill or keep.</p>
+      <div class="links"><a href="https://arxiv.org/abs/2610.17552">Paper &rarr;</a></div>
+    </article>
+
+    <article class="card">
+      <div class="card-top"><span class="verdict" style="border-color:#d4a574;color:#d4a574">Prototype</span>
+      <span class="fit">High fit · 89</span></div>
+      <h3>More Methods, Better Agents? A Reality Check on Self-Distillation in Agentic Reinforcement Learning</h3>
+      
+      <p class="concept"><strong>RL post-training</strong> — Aligning a pretrained model with preference or reward data (RLHF, DPO, GRPO).</p>
+      <p class="why">Self-distillation in agentic reinforcement learning has produced a growing number of methods. However, existing evaluations often reuse published baseline scores under differing experimental conditions, provide few direct comparisons among contemporaneous methods, and give limited attention to training stability and computational cost. These limitations obscure the source of reported gains and the practical strengths</p>
+      <p class="abstract">Self-distillation in agentic reinforcement learning has produced a growing number of methods. However, existing evaluations often reuse published baseline scores under differing experimental conditions, provide few direct comparisons among contemporaneous methods, and give limited attention to training stability and computational cost. These limitations obscure the source of reported gains and the practical strengths and weaknesses of competing methods. Costly agent training further motivates a common basis for comparison. To address these gaps, we compare ten representative methods against GR…</p>
+      <p class="constraint">⚠ You need preference data and a held-out harm/quality eval, not a vibes demo.</p>
+      <p class="sowhat">Prototype on RL post-training against your stack — one eval, one constraint, then kill or keep.</p>
+      <div class="links"><a href="https://arxiv.org/abs/2610.19789">Paper &rarr;</a></div>
     </article>
 
     <article class="card">
@@ -126,157 +217,66 @@ Fetched 2026-10-14T17:49:51+00:00.</p>
     <article class="card">
       <div class="card-top"><span class="verdict" style="border-color:#d4a574;color:#d4a574">Prototype</span>
       <span class="fit">High fit · 86</span></div>
-      <h3>Prism: Dynamic Sparse Attention for Native 2K Joint Video-Audio Generation Model Training</h3>
+      <h3>Modeling and Understanding Neural Weights of Humanoid Policies with Diffusion</h3>
       
       <p class="concept"><strong>Transformers</strong> — The backbone architecture behind modern language and vision models.</p>
-      <p class="why">Natively training joint video-audio generation models at higher resolutions empowers them to learn richer visual details and sharper motion dynamics. However, full attention incurs quadratic cost and, as resolution increases, spreads attention over increasingly redundant tokens, diluting learning signals for informative content and disrupting pretrained priors. Existing sparse attention methods either target training</p>
-      <p class="abstract">Natively training joint video-audio generation models at higher resolutions empowers them to learn richer visual details and sharper motion dynamics. However, full attention incurs quadratic cost and, as resolution increases, spreads attention over increasingly redundant tokens, diluting learning signals for informative content and disrupting pretrained priors. Existing sparse attention methods either target training-free acceleration or overlook the unique structure of joint video-audio data, where cross-modal interactions are inherently concentrated around sound-producing regions. To address…</p>
+      <p class="why">Recent advances in robot learning have driven rapid progress in humanoid control, enabling increasingly agile behaviors in the real world. However, humanoid control networks are typically obtained through conventional training procedures, while comparatively little attention has been given to directly modeling the distribution of their learned weights and generating functional networks in weight space. In this work, </p>
+      <p class="abstract">Recent advances in robot learning have driven rapid progress in humanoid control, enabling increasingly agile behaviors in the real world. However, humanoid control networks are typically obtained through conventional training procedures, while comparatively little attention has been given to directly modeling the distribution of their learned weights and generating functional networks in weight space. In this work, we investigate whether high-performing humanoid control networks can be generatively modeled directly through their weights. We adopt a latent diffusion framework that couples a li…</p>
       <p class="constraint">⚠ Watch sequence length and attention memory before you copy the architecture.</p>
       <p class="sowhat">Prototype on Transformers against your stack — one eval, one constraint, then kill or keep.</p>
-      <div class="links"><a href="https://arxiv.org/abs/2610.05416">Paper &rarr;</a></div>
-    </article>
-
-    <article class="card">
-      <div class="card-top"><span class="verdict" style="border-color:#d4a574;color:#d4a574">Prototype</span>
-      <span class="fit">High fit · 87</span></div>
-      <h3>Prime Agent: A Self-Improving RLM Harness</h3>
-      
-      <p class="concept"><strong>Evaluation / benchmarks</strong> — Measuring what models can actually do, and where they fail.</p>
-      <p class="why">Language models are sequential processors, but long-horizon agency requires external information and computation beyond model weights and active context. Prime Agent is an open-source harness for long-horizon evaluation and coding-agent workflows. A persistent IPython REPL follows the Recursive Language Model abstraction for programmatic context processing and test-time compute, while Continual Harness preserves hist</p>
-      <p class="abstract">Language models are sequential processors, but long-horizon agency requires external information and computation beyond model weights and active context. Prime Agent is an open-source harness for long-horizon evaluation and coding-agent workflows. A persistent IPython REPL follows the Recursive Language Model abstraction for programmatic context processing and test-time compute, while Continual Harness preserves histories, memories, skills, prompts, and subagent specifications across trajectories. Recursive subagents coordinate through direct agent-to-agent communication, and the Agents View l…</p>
-      <p class="constraint">⚠ If it does not match your user task, it is a leaderboard, not a ship gate.</p>
-      <p class="sowhat">Prototype on Evaluation / benchmarks against your stack — one eval, one constraint, then kill or keep.</p>
-      <div class="links"><a href="https://arxiv.org/abs/2608.23552">Paper &rarr;</a></div>
-    </article>
-
-    <article class="card">
-      <div class="card-top"><span class="verdict" style="border-color:#d4a574;color:#d4a574">Prototype</span>
-      <span class="fit">High fit · 85</span></div>
-      <h3>ChunkAct: Action Chunking for Agentic Robotics</h3>
-      
-      <p class="concept"><strong>Agents</strong> — Models that use tools, memory, and loops to complete tasks.</p>
-      <p class="why">Agentic robotics places a large language model (LLM) agent in the robot control loop, where it composes perception, motion, and vision-language-action (VLA) tools under the guidance of a memory and thereby generalizes to new tasks without retraining. This generality comes at a steep price in efficiency. Every primitive requires a round of LLM reasoning over the full interaction history, so the cost of an episode grow</p>
-      <p class="abstract">Agentic robotics places a large language model (LLM) agent in the robot control loop, where it composes perception, motion, and vision-language-action (VLA) tools under the guidance of a memory and thereby generalizes to new tasks without retraining. This generality comes at a steep price in efficiency. Every primitive requires a round of LLM reasoning over the full interaction history, so the cost of an episode grows with the number of primitives. We find this reasoning largely redundant: once a sub-goal is chosen, its primitives follow a routine already prescribed by memory. We present Chunk…</p>
-      <p class="constraint">⚠ Tool permissions, loop caps, and eval of multi-step tasks — not a single chat score.</p>
-      <p class="sowhat">Prototype on Agents against your stack — one eval, one constraint, then kill or keep.</p>
-      <div class="links"><a href="https://arxiv.org/abs/2610.18874v1">Paper &rarr;</a></div>
-    </article>
-
-    <article class="card">
-      <div class="card-top"><span class="verdict" style="border-color:#d4a574;color:#d4a574">Prototype</span>
-      <span class="fit">High fit · 86</span></div>
-      <h3>Cepheid: Decoupling Scale from Structure for Cross-Family Motion Completion</h3>
-      
-      <p class="concept"><strong>Evaluation / benchmarks</strong> — Measuring what models can actually do, and where they fail.</p>
-      <p class="why">Sparse-to-dense motion completion recovers dense mesh motion from sparse vertex displacements. Residual priors trained on one geometry family frequently fail to beat parameter-free harmonic extension off-family. Moreover, cross-family training meets a scaling barrier: residual amplitude varies by more than an order of magnitude across geometry families and collapses as observations become denser. Since this scale dep</p>
-      <p class="abstract">Sparse-to-dense motion completion recovers dense mesh motion from sparse vertex displacements. Residual priors trained on one geometry family frequently fail to beat parameter-free harmonic extension off-family. Moreover, cross-family training meets a scaling barrier: residual amplitude varies by more than an order of magnitude across geometry families and collapses as observations become denser. Since this scale depends on unknown target motion, it cannot be measured directly at test time. We decouple residual structure from physical scale by learning a dimensionless prior, estimating amplitu…</p>
-      <p class="constraint">⚠ If it does not match your user task, it is a leaderboard, not a ship gate.</p>
-      <p class="sowhat">Prototype on Evaluation / benchmarks against your stack — one eval, one constraint, then kill or keep.</p>
-      <div class="links"><a href="https://arxiv.org/abs/2610.18871v1">Paper &rarr;</a></div>
-    </article>
-
-    <article class="card">
-      <div class="card-top"><span class="verdict" style="border-color:#d4a574;color:#d4a574">Prototype</span>
-      <span class="fit">High fit · 89</span></div>
-      <h3>What Matters in Quality-Aware VLA Pretraining: A Benchmark and Empirical Study</h3>
-      
-      <p class="concept"><strong>RL post-training</strong> — Aligning a pretrained model with preference or reward data (RLHF, DPO, GRPO).</p>
-      <p class="why">How should demonstration quality be used during vision-language-action (VLA) pretraining to improve performance after target-task fine-tuning? We compare weighting, filtering, and conditioning across reward definitions and label granularities using 5,000 naturally suboptimal human demonstrations and 24 target tasks. Within each VLA, we match demonstrations and training budgets. Additional comparisons examine pretrain</p>
-      <p class="abstract">How should demonstration quality be used during vision-language-action (VLA) pretraining to improve performance after target-task fine-tuning? We compare weighting, filtering, and conditioning across reward definitions and label granularities using 5,000 naturally suboptimal human demonstrations and 24 target tasks. Within each VLA, we match demonstrations and training budgets. Additional comparisons examine pretraining data size and the roles of quality tags during fine-tuning and inference. Across three VLAs, we find that approach-aware episode conditioning improves mean success over plain b…</p>
-      <p class="constraint">⚠ You need preference data and a held-out harm/quality eval, not a vibes demo.</p>
-      <p class="sowhat">Prototype on RL post-training against your stack — one eval, one constraint, then kill or keep.</p>
-      <div class="links"><a href="https://arxiv.org/abs/2610.18869v1">Paper &rarr;</a></div>
-    </article>
-
-    <article class="card">
-      <div class="card-top"><span class="verdict" style="border-color:#d4a574;color:#d4a574">Prototype</span>
-      <span class="fit">High fit · 86</span></div>
-      <h3>Tev: Scaling Long-Horizon Agentic Environments with Dense Progress Rewards</h3>
-      
-      <p class="concept"><strong>Transformers</strong> — The backbone architecture behind modern language and vision models.</p>
-      <p class="why">Long-horizon agents have drawn growing attention for their ability to work autonomously -- from hours to days -- on economically valuable tasks, a capability essential to automated discovery and recursive self-improvement (RSI). Yet open-source models still struggle on long-horizon tasks, largely for lack of both training data and a working recipe, and scaling both is hard: long, complex tasks are difficult to curate</p>
-      <p class="abstract">Long-horizon agents have drawn growing attention for their ability to work autonomously -- from hours to days -- on economically valuable tasks, a capability essential to automated discovery and recursive self-improvement (RSI). Yet open-source models still struggle on long-horizon tasks, largely for lack of both training data and a working recipe, and scaling both is hard: long, complex tasks are difficult to curate and verify, and their rewards are sparse. We address both. First, we introduce Tev-Gym, the first long-horizon agent training dataset with verifiable, dense, progressive rewards -…</p>
-      <p class="constraint">⚠ Watch sequence length and attention memory before you copy the architecture.</p>
-      <p class="sowhat">Prototype on Transformers against your stack — one eval, one constraint, then kill or keep.</p>
-      <div class="links"><a href="https://arxiv.org/abs/2610.18868v1">Paper &rarr;</a></div>
+      <div class="links"><a href="https://arxiv.org/abs/2610.20606v1">Paper &rarr;</a></div>
     </article>
 
     <article class="card">
       <div class="card-top"><span class="verdict" style="border-color:#79c0ff;color:#79c0ff">Watch</span>
       <span class="fit">Watch · 46</span></div>
-      <h3>Data Free Training of Diffusion Models for Lattice Field Theories</h3>
+      <h3>Hierarchical Residual Policy Learning for Real-World Mobile Manipulation with Sparse Human Guidance</h3>
       
-      <p class="concept"><strong>Diffusion</strong> — Generative models that denoise step by step, now used beyond images.</p>
-      <p class="why">Sampling equilibrium field configurations remains a major computational bottleneck in lattice field theory, motivating the development of generative samplers that can produce independent configurations. Diffusion models are promising for this purpose, but their standard denoising score matching objective requires samples from the target distribution, seemingly reintroducing the original sampling problem. Here, we sho</p>
-      <p class="abstract">Sampling equilibrium field configurations remains a major computational bottleneck in lattice field theory, motivating the development of generative samplers that can produce independent configurations. Diffusion models are promising for this purpose, but their standard denoising score matching objective requires samples from the target distribution, seemingly reintroducing the original sampling problem. Here, we show that diffusion models can instead be trained from their own generated samples using the target score identity, provided access to the unnormalized probability density. Importance…</p>
-      <p class="constraint">⚠ Sample steps vs quality is the product constraint; batch the reverse process if you serve it.</p>
-      <p class="sowhat">Adjacent to Evaluation / benchmarks. Skim the abstract; deep-read only if it names your failure mode.</p>
-      <div class="links"><a href="https://arxiv.org/abs/2610.18863v1">Paper &rarr;</a></div>
+      <p class="concept"><strong>Mixture of Experts</strong> — Sparse routing so only some model experts fire per token.</p>
+      <p class="why">Mobile Manipulation (MoMa) is a cornerstone of autonomous robotic systems, yet real-world fine-tuning remains a formidable challenge because of high-dimensional action spaces and intricate coupling between heterogeneous modules. In this paper, we propose HiRe-MoMa (Hierarchical Residual Mobile Manipulation), a systematic framework for stable and sample-efficient real-world fine-tuning of complex MoMa systems. At its </p>
+      <p class="abstract">Mobile Manipulation (MoMa) is a cornerstone of autonomous robotic systems, yet real-world fine-tuning remains a formidable challenge because of high-dimensional action spaces and intricate coupling between heterogeneous modules. In this paper, we propose HiRe-MoMa (Hierarchical Residual Mobile Manipulation), a systematic framework for stable and sample-efficient real-world fine-tuning of complex MoMa systems. At its core, HiRe-MoMa adopts a Hierarchical Residual Architecture that fine-tunes a frozen base policy. A Policy-Agnostic Residual learns additive corrections atop the base policy, while…</p>
+      <p class="constraint">⚠ Serving cost is routing and all-to-all bandwidth, not just train FLOPs.</p>
+      <p class="sowhat">Adjacent to Retrieval-augmented generation. Skim the abstract; deep-read only if it names your failure mode.</p>
+      <div class="links"><a href="https://arxiv.org/abs/2610.20607v1">Paper &rarr;</a></div>
+    </article>
+
+    <article class="card">
+      <div class="card-top"><span class="verdict" style="border-color:#d4a574;color:#d4a574">Prototype</span>
+      <span class="fit">High fit · 88</span></div>
+      <h3>Co-Evolving Acting and Forecasting for Language Agents</h3>
+      
+      <p class="concept"><strong>RL post-training</strong> — Aligning a pretrained model with preference or reward data (RLHF, DPO, GRPO).</p>
+      <p class="why">Training language agents is bottlenecked by the high cost of long-horizon rollouts, yet standard agentic reinforcement learning (RL) learns only from a terminal scalar reward, leaving the supervision in intermediate steps largely unused. Prior work exploits this supervision through value targets that estimate per-step success probabilities or observation targets that fit environment response. Both are hard to constru</p>
+      <p class="abstract">Training language agents is bottlenecked by the high cost of long-horizon rollouts, yet standard agentic reinforcement learning (RL) learns only from a terminal scalar reward, leaving the supervision in intermediate steps largely unused. Prior work exploits this supervision through value targets that estimate per-step success probabilities or observation targets that fit environment response. Both are hard to construct well: (1) value targets come from the same single scalar signal for each step in the trajectory, and (2) observation targets, such as web pages and terminal logs, are long and n…</p>
+      <p class="constraint">⚠ You need preference data and a held-out harm/quality eval, not a vibes demo.</p>
+      <p class="sowhat">Prototype on RL post-training against your stack — one eval, one constraint, then kill or keep.</p>
+      <div class="links"><a href="https://arxiv.org/abs/2610.20597v1">Paper &rarr;</a></div>
+    </article>
+
+    <article class="card">
+      <div class="card-top"><span class="verdict" style="border-color:#d4a574;color:#d4a574">Prototype</span>
+      <span class="fit">High fit · 86</span></div>
+      <h3>Your Transformer Is Secretly Elastic</h3>
+      
+      <p class="concept"><strong>Transformers</strong> — The backbone architecture behind modern language and vision models.</p>
+      <p class="why">Scaling up transformers has produced models with broad capabilities, deployed across heterogeneous hardware and fluctuating workloads. Yet, model families offer only a few fixed sizes (e.g., S, B, L), forcing users to commit to a model based on hardware and latency constraints. This rigidity is often suboptimal under varying query loads. We introduce a retraining-free method that elastifies pre-trained transformers i</p>
+      <p class="abstract">Scaling up transformers has produced models with broad capabilities, deployed across heterogeneous hardware and fluctuating workloads. Yet, model families offer only a few fixed sizes (e.g., S, B, L), forcing users to commit to a model based on hardware and latency constraints. This rigidity is often suboptimal under varying query loads. We introduce a retraining-free method that elastifies pre-trained transformers into a single model that adapts on-the-fly across a continuum of computational budgets. Our key contribution is a differentiable relaxation of the functional unit-ranking problem: u…</p>
+      <p class="constraint">⚠ Watch sequence length and attention memory before you copy the architecture.</p>
+      <p class="sowhat">Prototype on Transformers against your stack — one eval, one constraint, then kill or keep.</p>
+      <div class="links"><a href="https://arxiv.org/abs/2610.20588v1">Paper &rarr;</a></div>
     </article>
 
     <article class="card">
       <div class="card-top"><span class="verdict" style="border-color:#d4a574;color:#d4a574">Prototype</span>
       <span class="fit">High fit · 85</span></div>
-      <h3>DoubtLess: Training-Free Contrastive Decoding for Efficient Reasoning</h3>
+      <h3>Price of Anarchy of First-Price Auctions in Agentic Markets</h3>
       
       <p class="concept"><strong>Agents</strong> — Models that use tools, memory, and loops to complete tasks.</p>
-      <p class="why">Reasoning models achieve strong performance through long chains of thought (CoT), but often spend more tokens than needed to solve a problem. Existing ways to shorten the CoT require additional training for each model, add a fixed steering vector to the model&#x27;s hidden states, or use decoding heuristics such as stopping early or banning words like &quot;wait&quot;, which can reduce accuracy. We propose DoubtLess, a training-fre</p>
-      <p class="abstract">Reasoning models achieve strong performance through long chains of thought (CoT), but often spend more tokens than needed to solve a problem. Existing ways to shorten the CoT require additional training for each model, add a fixed steering vector to the model&#x27;s hidden states, or use decoding heuristics such as stopping early or banning words like &quot;wait&quot;, which can reduce accuracy. We propose DoubtLess, a training-free decoding method in which a much smaller reasoning model steers the large one towards brevity. The small model reads the large model&#x27;s CoT so far twice, once prompted to be brief …</p>
+      <p class="why">An agentic market is a decentralized serving-time market where AI agents bid to claim each user prompt. An agent&#x27;s bid is based on its expected value for the prompt, which is the expectation of the reward for its response minus its inference costs. First-price auctions (FPAs), in which the highest bidder pays its bid and receives the prompt, are a natural way to allocate prompts in such a market, since they are simpl</p>
+      <p class="abstract">An agentic market is a decentralized serving-time market where AI agents bid to claim each user prompt. An agent&#x27;s bid is based on its expected value for the prompt, which is the expectation of the reward for its response minus its inference costs. First-price auctions (FPAs), in which the highest bidder pays its bid and receives the prompt, are a natural way to allocate prompts in such a market, since they are simple and transparent to run, and do not require central knowledge of private capabilities and costs. However, FPAs are not truthful: participants may bid less than their true value in…</p>
       <p class="constraint">⚠ Tool permissions, loop caps, and eval of multi-step tasks — not a single chat score.</p>
       <p class="sowhat">Prototype on Agents against your stack — one eval, one constraint, then kill or keep.</p>
-      <div class="links"><a href="https://arxiv.org/abs/2610.18862v1">Paper &rarr;</a></div>
-    </article>
-
-    <article class="card">
-      <div class="card-top"><span class="verdict" style="border-color:#d4a574;color:#d4a574">Prototype</span>
-      <span class="fit">High fit · 86</span></div>
-      <h3>AesCode: Aesthetic Code Generation with Decoupled Cross-Modal Rewards</h3>
-      
-      <p class="concept"><strong>Evaluation / benchmarks</strong> — Measuring what models can actually do, and where they fail.</p>
-      <p class="why">Generating information-rich visual artifacts such as slides, posters, and dashboards as code is appealing because the outputs are structured, editable, and verifiable. Yet code models cannot see how their choices of layout and color come together on the canvas, often limiting spatial planning and aesthetic quality. Image generators excel at visual design but can misrender requested content, making their outputs unrel</p>
-      <p class="abstract">Generating information-rich visual artifacts such as slides, posters, and dashboards as code is appealing because the outputs are structured, editable, and verifiable. Yet code models cannot see how their choices of layout and color come together on the canvas, often limiting spatial planning and aesthetic quality. Image generators excel at visual design but can misrender requested content, making their outputs unreliable targets for direct reproduction. We therefore introduce AesCode, which generates code grounded in the content prompt while using an image generated from the same prompt as an…</p>
-      <p class="constraint">⚠ If it does not match your user task, it is a leaderboard, not a ship gate.</p>
-      <p class="sowhat">Prototype on Evaluation / benchmarks against your stack — one eval, one constraint, then kill or keep.</p>
-      <div class="links"><a href="https://arxiv.org/abs/2610.18860v1">Paper &rarr;</a></div>
-    </article>
-
-    <article class="card">
-      <div class="card-top"><span class="verdict" style="border-color:#d4a574;color:#d4a574">Prototype</span>
-      <span class="fit">High fit · 86</span></div>
-      <h3>Hybrid Reasoning Agents</h3>
-      
-      <p class="concept"><strong>Evaluation / benchmarks</strong> — Measuring what models can actually do, and where they fail.</p>
-      <p class="why">How can we build an agent that thinks beyond human language, yet still acts through it in the external environment? Modern LLM agents still reason and interact through text, while latent reasoning offers an efficient internal medium but lacks native tool access and reasoning transparency. We bridge these two directions with Hybrid Reasoning Agents (HybridAgents), which dynamically navigate between latent reasoning an</p>
-      <p class="abstract">How can we build an agent that thinks beyond human language, yet still acts through it in the external environment? Modern LLM agents still reason and interact through text, while latent reasoning offers an efficient internal medium but lacks native tool access and reasoning transparency. We bridge these two directions with Hybrid Reasoning Agents (HybridAgents), which dynamically navigate between latent reasoning and text-based interaction throughout a unified generation process. Architecturally, a lightweight HybridLink enables seamless transitions between text and latent modes, while the ag…</p>
-      <p class="constraint">⚠ If it does not match your user task, it is a leaderboard, not a ship gate.</p>
-      <p class="sowhat">Prototype on Evaluation / benchmarks against your stack — one eval, one constraint, then kill or keep.</p>
-      <div class="links"><a href="https://arxiv.org/abs/2610.18861v1">Paper &rarr;</a></div>
-    </article>
-
-    <article class="card">
-      <div class="card-top"><span class="verdict" style="border-color:#d4a574;color:#d4a574">Prototype</span>
-      <span class="fit">High fit · 86</span></div>
-      <h3>Exact Topological Compliance: Generating Persistence-Equivalent Graphs</h3>
-      
-      <p class="concept"><strong>Evaluation / benchmarks</strong> — Measuring what models can actually do, and where they fail.</p>
-      <p class="why">Persistent homology summarizes the topological evolution of a graph as persistence diagrams (PDs). Generating graphs whose topology matches a target descriptor is increasingly important, yet existing topology-aware generative models rely on soft regularization, producing graphs whose PDs may only be approximately similar. We initiate a principled investigation of the generation problem: produce graphs that realize a </p>
-      <p class="abstract">Persistent homology summarizes the topological evolution of a graph as persistence diagrams (PDs). Generating graphs whose topology matches a target descriptor is increasingly important, yet existing topology-aware generative models rely on soft regularization, producing graphs whose PDs may only be approximately similar. We initiate a principled investigation of the generation problem: produce graphs that realize a target PD exactly. We propose two approaches guided by the implicit local and global constraints a target PD imposes. The local approach builds degree-based PD-equivalent graphs it…</p>
-      <p class="constraint">⚠ If it does not match your user task, it is a leaderboard, not a ship gate.</p>
-      <p class="sowhat">Prototype on Evaluation / benchmarks against your stack — one eval, one constraint, then kill or keep.</p>
-      <div class="links"><a href="https://arxiv.org/abs/2610.18856v1">Paper &rarr;</a></div>
-    </article>
-
-    <article class="card">
-      <div class="card-top"><span class="verdict" style="border-color:#d4a574;color:#d4a574">Prototype</span>
-      <span class="fit">High fit · 89</span></div>
-      <h3>Two Clocks: Why Larger Rollout Batches Learn Slower but Fail on Schedule in Reinforcement Learning with Verifiable Rewards</h3>
-      
-      <p class="concept"><strong>RL post-training</strong> — Aligning a pretrained model with preference or reward data (RLHF, DPO, GRPO).</p>
-      <p class="why">Reinforcement learning with verifiable rewards (RLVR) relies on costly model-generated responses, motivating larger rollout batches and square-root learning-rate scaling. Reported to approximately preserve progress per sample with one optimizer step per rollout, this rule is less understood in practical multi-step training. We develop a two-clock framework that separates the samples needed to make progress from those</p>
-      <p class="abstract">Reinforcement learning with verifiable rewards (RLVR) relies on costly model-generated responses, motivating larger rollout batches and square-root learning-rate scaling. Reported to approximately preserve progress per sample with one optimizer step per rollout, this rule is less understood in practical multi-step training. We develop a two-clock framework that separates the samples needed to make progress from those consumed before collapse. Under a local quadratic model, the square-root rule preserves first-order drift per sample but not progress: larger batches take fewer, longer updates an…</p>
-      <p class="constraint">⚠ You need preference data and a held-out harm/quality eval, not a vibes demo.</p>
-      <p class="sowhat">Prototype on RL post-training against your stack — one eval, one constraint, then kill or keep.</p>
-      <div class="links"><a href="https://arxiv.org/abs/2610.18853v1">Paper &rarr;</a></div>
+      <div class="links"><a href="https://arxiv.org/abs/2610.20587v1">Paper &rarr;</a></div>
     </article>
 <footer>Generated by <a href="https://github.com/messishivi/mle-professor-app">MLE Professor</a>
 · verdicts are rule-based drafts, not financial/production advice.</footer>
