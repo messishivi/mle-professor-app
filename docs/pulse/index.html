@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>ML Pulse — 2026-11-01</title>
+<title>ML Pulse — 2026-11-02</title>
 <style>
 body{font-family:system-ui,-apple-system,sans-serif;max-width:900px;margin:0 auto;padding:24px;color:#e6edf3;background:#0d1117}
 a{color:#79c0ff} h1{letter-spacing:-0.02em} .muted{color:#8b949e}
@@ -14,9 +14,9 @@ a{color:#79c0ff} h1{letter-spacing:-0.02em} .muted{color:#8b949e}
 footer{margin-top:32px;color:#8b949e;font-size:13px}
 </style></head><body>
 <h1>ML Pulse</h1>
-<p class="muted">What moved in ML/AI on 2026-11-01 — trending papers mapped to concepts,
+<p class="muted">What moved in ML/AI on 2026-11-02 — trending papers mapped to concepts,
 ranked for a generalist MLE stack, with a decision memo each. Updated daily.
-Fetched 2026-11-01T18:17:35+00:00.</p>
+Fetched 2026-11-02T22:11:25+00:00.</p>
 
 
     <article class="card">
@@ -72,16 +72,16 @@ Fetched 2026-11-01T18:17:35+00:00.</p>
     </article>
 
     <article class="card">
-      <div class="card-top"><span class="verdict" style="border-color:#d4a574;color:#d4a574">Prototype</span>
-      <span class="fit">High fit · 86</span></div>
-      <h3>Investor&#x27;s Last Exam: Can AI Agents Do Equity Investment Without Seeing the Future?</h3>
+      <div class="card-top"><span class="verdict" style="border-color:#79c0ff;color:#79c0ff">Watch</span>
+      <span class="fit">Watch · 46</span></div>
+      <h3>Xiaomi-OCR-0 Technical Report</h3>
       
-      <p class="concept"><strong>Evaluation / benchmarks</strong> — Measuring what models can actually do, and where they fail.</p>
-      <p class="why">Financial agents must form forecasts and investment judgments from decision-time evidence, with predictions evaluated against subsequent outcomes. Existing benchmarks assess financial knowledge, research workflows, or forecasting, but evaluating the full research process requires a strictly frozen information set and professional evaluation criteria. We introduce Investor&#x27;s Last Exam (ILE), an equity-research benchma</p>
-      <p class="abstract">Financial agents must form forecasts and investment judgments from decision-time evidence, with predictions evaluated against subsequent outcomes. Existing benchmarks assess financial knowledge, research workflows, or forecasting, but evaluating the full research process requires a strictly frozen information set and professional evaluation criteria. We introduce Investor&#x27;s Last Exam (ILE), an equity-research benchmark led by experienced buy-side investors and fund managers. Its three components are a versioned financial database spanning 3.43 million document versions and nine source categori…</p>
-      <p class="constraint">⚠ If it does not match your user task, it is a leaderboard, not a ship gate.</p>
-      <p class="sowhat">Prototype on Evaluation / benchmarks against your stack — one eval, one constraint, then kill or keep.</p>
-      <div class="links"><a href="https://arxiv.org/abs/2610.38342">Paper &rarr;</a></div>
+      <p class="concept"><strong>Mixture of Experts</strong> — Sparse routing so only some model experts fire per token.</p>
+      <p class="why">Compact OCR-specific vision-language models achieve strong document parsing performance, but often rely on costly supervision and focus primarily on visual-text reconstruction. We introduce Xiaomi-OCR-0, a unified 0.8B model for document parsing and OCR-centric understanding. We build an approximately 170M-sample OCR-centric corpus using an automated data engine that combines expert consensus, render-based verificati</p>
+      <p class="abstract">Compact OCR-specific vision-language models achieve strong document parsing performance, but often rely on costly supervision and focus primarily on visual-text reconstruction. We introduce Xiaomi-OCR-0, a unified 0.8B model for document parsing and OCR-centric understanding. We build an approximately 170M-sample OCR-centric corpus using an automated data engine that combines expert consensus, render-based verification, and targeted synthesis. Starting from Qwen3.5-0.8B, our progressive training recipe combines Q-Mask-based text anchoring, continued pretraining, and mixed-task reinforcement le…</p>
+      <p class="constraint">⚠ Serving cost is routing and all-to-all bandwidth, not just train FLOPs.</p>
+      <p class="sowhat">Adjacent to Retrieval-augmented generation. Skim the abstract; deep-read only if it names your failure mode.</p>
+      <div class="links"><a href="https://arxiv.org/abs/2609.36136">Paper &rarr;</a></div>
     </article>
 
     <article class="card">
@@ -111,16 +111,29 @@ Fetched 2026-11-01T18:17:35+00:00.</p>
     </article>
 
     <article class="card">
-      <div class="card-top"><span class="verdict" style="border-color:#79c0ff;color:#79c0ff">Watch</span>
-      <span class="fit">Watch · 46</span></div>
-      <h3>Xiaomi-OCR-0 Technical Report</h3>
+      <div class="card-top"><span class="verdict" style="border-color:#d4a574;color:#d4a574">Prototype</span>
+      <span class="fit">High fit · 86</span></div>
+      <h3>Investor&#x27;s Last Exam: Can AI Agents Do Equity Investment Without Seeing the Future?</h3>
       
-      <p class="concept"><strong>Mixture of Experts</strong> — Sparse routing so only some model experts fire per token.</p>
-      <p class="why">Compact OCR-specific vision-language models achieve strong document parsing performance, but often rely on costly supervision and focus primarily on visual-text reconstruction. We introduce Xiaomi-OCR-0, a unified 0.8B model for document parsing and OCR-centric understanding. We build an approximately 170M-sample OCR-centric corpus using an automated data engine that combines expert consensus, render-based verificati</p>
-      <p class="abstract">Compact OCR-specific vision-language models achieve strong document parsing performance, but often rely on costly supervision and focus primarily on visual-text reconstruction. We introduce Xiaomi-OCR-0, a unified 0.8B model for document parsing and OCR-centric understanding. We build an approximately 170M-sample OCR-centric corpus using an automated data engine that combines expert consensus, render-based verification, and targeted synthesis. Starting from Qwen3.5-0.8B, our progressive training recipe combines Q-Mask-based text anchoring, continued pretraining, and mixed-task reinforcement le…</p>
-      <p class="constraint">⚠ Serving cost is routing and all-to-all bandwidth, not just train FLOPs.</p>
-      <p class="sowhat">Adjacent to Retrieval-augmented generation. Skim the abstract; deep-read only if it names your failure mode.</p>
-      <div class="links"><a href="https://arxiv.org/abs/2609.36136">Paper &rarr;</a></div>
+      <p class="concept"><strong>Evaluation / benchmarks</strong> — Measuring what models can actually do, and where they fail.</p>
+      <p class="why">Financial agents must form forecasts and investment judgments from decision-time evidence, with predictions evaluated against subsequent outcomes. Existing benchmarks assess financial knowledge, research workflows, or forecasting, but evaluating the full research process requires a strictly frozen information set and professional evaluation criteria. We introduce Investor&#x27;s Last Exam (ILE), an equity-research benchma</p>
+      <p class="abstract">Financial agents must form forecasts and investment judgments from decision-time evidence, with predictions evaluated against subsequent outcomes. Existing benchmarks assess financial knowledge, research workflows, or forecasting, but evaluating the full research process requires a strictly frozen information set and professional evaluation criteria. We introduce Investor&#x27;s Last Exam (ILE), an equity-research benchmark led by experienced buy-side investors and fund managers. Its three components are a versioned financial database spanning 3.43 million document versions and nine source categori…</p>
+      <p class="constraint">⚠ If it does not match your user task, it is a leaderboard, not a ship gate.</p>
+      <p class="sowhat">Prototype on Evaluation / benchmarks against your stack — one eval, one constraint, then kill or keep.</p>
+      <div class="links"><a href="https://arxiv.org/abs/2610.38342">Paper &rarr;</a></div>
+    </article>
+
+    <article class="card">
+      <div class="card-top"><span class="verdict" style="border-color:#d4a574;color:#d4a574">Prototype</span>
+      <span class="fit">High fit · 86</span></div>
+      <h3>ReLift: Dense 3D Tracking as Lifted Trajectory Repair</h3>
+      
+      <p class="concept"><strong>Transformers</strong> — The backbone architecture behind modern language and vision models.</p>
+      <p class="why">Dense 3D tracking from monocular video requires establishing point correspondences over time, estimating their depth, and inferring their trajectories during occlusion. Existing methods typically learn these tasks jointly, a demanding objective given the scarcity of 4D supervision. We show that strong pretrained 2D trackers and 3D geometry models provide an effective foundation: lifted trajectories, with occluded seg</p>
+      <p class="abstract">Dense 3D tracking from monocular video requires establishing point correspondences over time, estimating their depth, and inferring their trajectories during occlusion. Existing methods typically learn these tasks jointly, a demanding objective given the scarcity of 4D supervision. We show that strong pretrained 2D trackers and 3D geometry models provide an effective foundation: lifted trajectories, with occluded segments simply interpolated, already rival dedicated 3D trackers using the same geometry. However, lifted trajectories inherit correspondence and depth errors, and under occlusion, t…</p>
+      <p class="constraint">⚠ Watch sequence length and attention memory before you copy the architecture.</p>
+      <p class="sowhat">Prototype on Transformers against your stack — one eval, one constraint, then kill or keep.</p>
+      <div class="links"><a href="https://arxiv.org/abs/2610.42136">Paper &rarr;</a></div>
     </article>
 
     <article class="card">
@@ -134,6 +147,19 @@ Fetched 2026-11-01T18:17:35+00:00.</p>
       <p class="constraint">⚠ Tool permissions, loop caps, and eval of multi-step tasks — not a single chat score.</p>
       <p class="sowhat">Prototype on Agents against your stack — one eval, one constraint, then kill or keep.</p>
       <div class="links"><a href="https://arxiv.org/abs/2610.08699">Paper &rarr;</a></div>
+    </article>
+
+    <article class="card">
+      <div class="card-top"><span class="verdict" style="border-color:#d4a574;color:#d4a574">Prototype</span>
+      <span class="fit">High fit · 85</span></div>
+      <h3>Next-Concept Modeling: Fast, Parallel Coarse-to-Fine Text Generation</h3>
+      
+      <p class="concept"><strong>Transformers</strong> — The backbone architecture behind modern language and vision models.</p>
+      <p class="why">Diffusion language models (DLMs) offer parallel sampling for faster generation than autoregressive models, an increasingly important advantage as inference becomes a dominant computational workload. However, DLMs degrade quickly with fewer sampling steps, process the full sequence at every step, and require many passes over the dataset to reach good quality. We introduce Next-Concept Modeling (NCM), a two-stage, coar</p>
+      <p class="abstract">Diffusion language models (DLMs) offer parallel sampling for faster generation than autoregressive models, an increasingly important advantage as inference becomes a dominant computational workload. However, DLMs degrade quickly with fewer sampling steps, process the full sequence at every step, and require many passes over the dataset to reach good quality. We introduce Next-Concept Modeling (NCM), a two-stage, coarse-to-fine framework: a multiscale residual VQ-VAE encodes text into a hierarchy of discrete codes, and a transformer generates one level at a time, predicting all codes within a l…</p>
+      <p class="constraint">⚠ Watch sequence length and attention memory before you copy the architecture.</p>
+      <p class="sowhat">Prototype on Transformers against your stack — one eval, one constraint, then kill or keep.</p>
+      <div class="links"><a href="https://arxiv.org/abs/2610.14162">Paper &rarr;</a></div>
     </article>
 
     <article class="card">
@@ -152,131 +178,105 @@ Fetched 2026-11-01T18:17:35+00:00.</p>
     <article class="card">
       <div class="card-top"><span class="verdict" style="border-color:#d4a574;color:#d4a574">Prototype</span>
       <span class="fit">High fit · 85</span></div>
-      <h3>Next-Concept Modeling: Fast, Parallel Coarse-to-Fine Text Generation</h3>
+      <h3>SUPRA-TEX: 3D Generation with Super-Aligned Texture</h3>
       
       <p class="concept"><strong>Transformers</strong> — The backbone architecture behind modern language and vision models.</p>
-      <p class="why">Diffusion language models (DLMs) offer parallel sampling for faster generation than autoregressive models, an increasingly important advantage as inference becomes a dominant computational workload. However, DLMs degrade quickly with fewer sampling steps, process the full sequence at every step, and require many passes over the dataset to reach good quality. We introduce Next-Concept Modeling (NCM), a two-stage, coar</p>
-      <p class="abstract">Diffusion language models (DLMs) offer parallel sampling for faster generation than autoregressive models, an increasingly important advantage as inference becomes a dominant computational workload. However, DLMs degrade quickly with fewer sampling steps, process the full sequence at every step, and require many passes over the dataset to reach good quality. We introduce Next-Concept Modeling (NCM), a two-stage, coarse-to-fine framework: a multiscale residual VQ-VAE encodes text into a hierarchy of discrete codes, and a transformer generates one level at a time, predicting all codes within a l…</p>
+      <p class="why">Single image 3D generation aims to dress a given 3D mesh with relightable materials while faithfully preserving the visual details of a reference image. Existing methods either introduce artifacts when fusing inconsistent multi-view predictions or struggle to preserve fine details through implicit image-feature conditioning. To resolve these challenges, we introduce SUPRA-Tex, built on the principle of decoupling vis</p>
+      <p class="abstract">Single image 3D generation aims to dress a given 3D mesh with relightable materials while faithfully preserving the visual details of a reference image. Existing methods either introduce artifacts when fusing inconsistent multi-view predictions or struggle to preserve fine details through implicit image-feature conditioning. To resolve these challenges, we introduce SUPRA-Tex, built on the principle of decoupling visible-material estimation, surface alignment, and observation-guided 3D completion. This division of labor allows the 3D generator, trained on limited 3D data, to focus its capacity…</p>
       <p class="constraint">⚠ Watch sequence length and attention memory before you copy the architecture.</p>
       <p class="sowhat">Prototype on Transformers against your stack — one eval, one constraint, then kill or keep.</p>
-      <div class="links"><a href="https://arxiv.org/abs/2610.14162">Paper &rarr;</a></div>
-    </article>
-
-    <article class="card">
-      <div class="card-top"><span class="verdict" style="border-color:#79c0ff;color:#79c0ff">Watch</span>
-      <span class="fit">Watch · 46</span></div>
-      <h3>WeVisOne-VL: Unified Visual Perception from Objects to Pixels</h3>
-      
-      <p class="concept"><strong>Multimodal</strong> — One model that takes text plus image, audio, or video.</p>
-      <p class="why">Existing vision-language models (VLMs) remain unreliable for fine-grained visual perception. In this report, we present WeVisOne-VL (WeChat Vision All-in-One), a powerful VLM that unifies object-level and pixel-level perception through structured next-token prediction. It supports multiple visual tasks including object detection, referring localization, counting, OCR, segmentation, and matting, enabling localization </p>
-      <p class="abstract">Existing vision-language models (VLMs) remain unreliable for fine-grained visual perception. In this report, we present WeVisOne-VL (WeChat Vision All-in-One), a powerful VLM that unifies object-level and pixel-level perception through structured next-token prediction. It supports multiple visual tasks including object detection, referring localization, counting, OCR, segmentation, and matting, enabling localization at any user-specific granularity, from points and boxes to masks and alpha mattes. Architecturally, we integrate a lightweight pixel decoder into the VLM via a special &lt;OBJ&gt; token …</p>
-      <p class="constraint">⚠ Modality lag and labeling cost usually beat model choice in the first quarter.</p>
-      <p class="sowhat">Adjacent to RL post-training. Skim the abstract; deep-read only if it names your failure mode.</p>
-      <div class="links"><a href="https://arxiv.org/abs/2610.31329">Paper &rarr;</a></div>
-    </article>
-
-    <article class="card">
-      <div class="card-top"><span class="verdict" style="border-color:#d4a574;color:#d4a574">Prototype</span>
-      <span class="fit">High fit · 86</span></div>
-      <h3>YuE2: Unifying Symbolic and Audio Music Generation at Frontier Quality</h3>
-      
-      <p class="concept"><strong>Evaluation / benchmarks</strong> — Measuring what models can actually do, and where they fail.</p>
-      <p class="why">Symbolic models make melody, harmony, rhythm, and form explicit but typically stop before a finished recording; audio models produce complete songs while leaving composition implicit. We introduce YuE2, which unifies symbolic and audio music generation at frontier quality through symbolic planning. A single AR-NAR Mixture-of-Transformers (MoT) first writes a readable score specifying melody and harmony, expands it in</p>
-      <p class="abstract">Symbolic models make melody, harmony, rhythm, and form explicit but typically stop before a finished recording; audio models produce complete songs while leaving composition implicit. We introduce YuE2, which unifies symbolic and audio music generation at frontier quality through symbolic planning. A single AR-NAR Mixture-of-Transformers (MoT) first writes a readable score specifying melody and harmony, expands it into semantic music tokens, and realizes it as full-song audio. In comparisons using the same checkpoint, experts prefer symbolic planning for overall quality and musicality, with 49…</p>
-      <p class="constraint">⚠ If it does not match your user task, it is a leaderboard, not a ship gate.</p>
-      <p class="sowhat">Prototype on Evaluation / benchmarks against your stack — one eval, one constraint, then kill or keep.</p>
-      <div class="links"><a href="https://arxiv.org/abs/2609.33757">Paper &rarr;</a></div>
-    </article>
-
-    <article class="card">
-      <div class="card-top"><span class="verdict" style="border-color:#d4a574;color:#d4a574">Prototype</span>
-      <span class="fit">High fit · 86</span></div>
-      <h3>DynaFlow: Learning Free-Form Multi-Agent Orchestration</h3>
-      
-      <p class="concept"><strong>Evaluation / benchmarks</strong> — Measuring what models can actually do, and where they fail.</p>
-      <p class="why">Multi-agent systems often rely on predefined collaboration structures, limiting their ability to adapt to diverse task requirements. We introduce DynaFlow, a framework that integrates free-form executable workflow synthesis into the action space of the main agent. The agent decides when collaboration is needed and generates task-specific programs that coordinate sub-agents through sequential or parallel execution, st</p>
-      <p class="abstract">Multi-agent systems often rely on predefined collaboration structures, limiting their ability to adapt to diverse task requirements. We introduce DynaFlow, a framework that integrates free-form executable workflow synthesis into the action space of the main agent. The agent decides when collaboration is needed and generates task-specific programs that coordinate sub-agents through sequential or parallel execution, structured information exchange, and verification. Execution results and traces inform subsequent actions, enabling the agent to adapt collaboration as reasoning progresses. We train…</p>
-      <p class="constraint">⚠ If it does not match your user task, it is a leaderboard, not a ship gate.</p>
-      <p class="sowhat">Prototype on Evaluation / benchmarks against your stack — one eval, one constraint, then kill or keep.</p>
-      <div class="links"><a href="https://arxiv.org/abs/2610.34467">Paper &rarr;</a></div>
-    </article>
-
-    <article class="card">
-      <div class="card-top"><span class="verdict" style="border-color:#d4a574;color:#d4a574">Prototype</span>
-      <span class="fit">High fit · 86</span></div>
-      <h3>Prism: Dynamic Sparse Attention for Native 2K Joint Video-Audio Generation Model Training</h3>
-      
-      <p class="concept"><strong>Transformers</strong> — The backbone architecture behind modern language and vision models.</p>
-      <p class="why">Natively training joint video-audio generation models at higher resolutions empowers them to learn richer visual details and sharper motion dynamics. However, full attention incurs quadratic cost and, as resolution increases, spreads attention over increasingly redundant tokens, diluting learning signals for informative content and disrupting pretrained priors. Existing sparse attention methods either target training</p>
-      <p class="abstract">Natively training joint video-audio generation models at higher resolutions empowers them to learn richer visual details and sharper motion dynamics. However, full attention incurs quadratic cost and, as resolution increases, spreads attention over increasingly redundant tokens, diluting learning signals for informative content and disrupting pretrained priors. Existing sparse attention methods either target training-free acceleration or overlook the unique structure of joint video-audio data, where cross-modal interactions are inherently concentrated around sound-producing regions. To address…</p>
-      <p class="constraint">⚠ Watch sequence length and attention memory before you copy the architecture.</p>
-      <p class="sowhat">Prototype on Transformers against your stack — one eval, one constraint, then kill or keep.</p>
-      <div class="links"><a href="https://arxiv.org/abs/2610.05416">Paper &rarr;</a></div>
-    </article>
-
-    <article class="card">
-      <div class="card-top"><span class="verdict" style="border-color:#d4a574;color:#d4a574">Prototype</span>
-      <span class="fit">High fit · 86</span></div>
-      <h3>Elucidating the Design Space of LM Data Attribution</h3>
-      
-      <p class="concept"><strong>Retrieval-augmented generation</strong> — Fetching documents at query time instead of stuffing everything into weights.</p>
-      <p class="why">Data attribution methods for Language Models (LMs) are typically evaluated using downstream tasks like fact retrieval. However, existing evaluations vary multiple dataset properties simultaneously, making it impossible to isolate exactly why an attribution algorithm fails. To diagnose these failures, we explore the design space of LLM data attribution, with a primary focus on evaluation. We introduce the Controlled A</p>
-      <p class="abstract">Data attribution methods for Language Models (LMs) are typically evaluated using downstream tasks like fact retrieval. However, existing evaluations vary multiple dataset properties simultaneously, making it impossible to isolate exactly why an attribution algorithm fails. To diagnose these failures, we explore the design space of LLM data attribution, with a primary focus on evaluation. We introduce the Controlled Attribution Benchmark (CATT) for fact tracing, in which we fine-tune LLMs on entirely fictitious knowledge, providing unambiguous ground truth for attribution. This synthetic setup …</p>
-      <p class="constraint">⚠ Measure retrieval recall on YOUR corpus; the generator cannot fix a dead index.</p>
-      <p class="sowhat">Prototype on Retrieval-augmented generation against your stack — one eval, one constraint, then kill or keep.</p>
-      <div class="links"><a href="https://arxiv.org/abs/2610.40655v1">Paper &rarr;</a></div>
+      <div class="links"><a href="https://arxiv.org/abs/2610.22352">Paper &rarr;</a></div>
     </article>
 
     <article class="card">
       <div class="card-top"><span class="verdict" style="border-color:#8b949e;color:#8b949e">Skip</span>
       <span class="fit">Skip · 10</span></div>
-      <h3>Propose-Filter-Release: Scaling Noise to Typical Sensitivity via Private Filtering</h3>
+      <h3>Building Auditable AI Text Detectors with Sparse Autoencoders</h3>
       
       <p class="concept"><strong>Deep learning methods</strong> — A current technique in neural network training or inference.</p>
-      <p class="why">An estimator can be accurate and stable on typical data, yet sensitive to a few possible records. Differentially private mechanisms commonly scale their noise to the worst-case influence of a single record, which lets these records dictate the noise even when the remaining data would allow far less. Removing them first would restore the smaller scale, but the removal must itself be private. We introduce \emph{propose</p>
-      <p class="abstract">An estimator can be accurate and stable on typical data, yet sensitive to a few possible records. Differentially private mechanisms commonly scale their noise to the worst-case influence of a single record, which lets these records dictate the noise even when the remaining data would allow far less. Removing them first would restore the smaller scale, but the removal must itself be private. We introduce \emph{propose-filter-release} (PFR), which, by privately filtering its input, turns a mechanism that protects the addition or removal of a typical record, one that fits the remaining data, into…</p>
+      <p class="why">AI-generated text detectors are increasingly deployed in consequential settings---peer review, education, admissions, journalism, and content moderation---where their outputs directly affect individuals. Yet the strongest detectors are fine-tuned neural classifiers whose decisions are opaque, while transparent alternatives (stylometric and linguistic-feature classifiers) underperform them by wide margins. We present </p>
+      <p class="abstract">AI-generated text detectors are increasingly deployed in consequential settings---peer review, education, admissions, journalism, and content moderation---where their outputs directly affect individuals. Yet the strongest detectors are fine-tuned neural classifiers whose decisions are opaque, while transparent alternatives (stylometric and linguistic-feature classifiers) underperform them by wide margins. We present a pipeline that converts a fine-tuned neural detector into a classifier that operates on human-readable concepts. We accomplish this by training sparse autoencoders (SAEs) directly…</p>
       <p class="constraint">⚠ Name the eval, the latency budget, and the data you would need before a prototype.</p>
       <p class="sowhat">Skip unless curious — it does not overlap Transformers, RL post-training, Retrieval-augmented generation.</p>
-      <div class="links"><a href="https://arxiv.org/abs/2610.40654v1">Paper &rarr;</a></div>
-    </article>
-
-    <article class="card">
-      <div class="card-top"><span class="verdict" style="border-color:#8b949e;color:#8b949e">Skip</span>
-      <span class="fit">Skip · 10</span></div>
-      <h3>Rethinking Neural Thickets Without Weight Perturbations</h3>
-      
-      <p class="concept"><strong>Mixture of Experts</strong> — Sparse routing so only some model experts fire per token.</p>
-      <p class="why">The Neural Thickets hypothesis posits that pretrained language models lie in dense neighborhoods of task-specific experts in weight space, which random Gaussian perturbations can uncover. We reproduce the reported gains, but show that they do not require this geometric explanation. Perturbing a single decoder block already recovers much of the improvement, while keeping the model entirely frozen and adding a random b</p>
-      <p class="abstract">The Neural Thickets hypothesis posits that pretrained language models lie in dense neighborhoods of task-specific experts in weight space, which random Gaussian perturbations can uncover. We reproduce the reported gains, but show that they do not require this geometric explanation. Perturbing a single decoder block already recovers much of the improvement, while keeping the model entirely frozen and adding a random bias to its output logits matches or exceeds full-weight perturbations on most reasoning tasks. This suggests an alternative explanation based on output diversity, validation-based …</p>
-      <p class="constraint">⚠ Serving cost is routing and all-to-all bandwidth, not just train FLOPs.</p>
-      <p class="sowhat">Skip unless curious — it does not overlap Transformers, RL post-training, Retrieval-augmented generation.</p>
-      <div class="links"><a href="https://arxiv.org/abs/2610.40649v1">Paper &rarr;</a></div>
+      <div class="links"><a href="https://arxiv.org/abs/2610.30006">Paper &rarr;</a></div>
     </article>
 
     <article class="card">
       <div class="card-top"><span class="verdict" style="border-color:#d4a574;color:#d4a574">Prototype</span>
       <span class="fit">High fit · 86</span></div>
-      <h3>Read, Allocate, Route: Role-Coupled Tokenization for Pixel-Space Generative Transformers</h3>
+      <h3>Latent Reasoning in Continuous Space for Unified Multimodal Models</h3>
+      
+      <p class="concept"><strong>Evaluation / benchmarks</strong> — Measuring what models can actually do, and where they fail.</p>
+      <p class="why">Unified Multimodal Models (UMMs) achieve remarkable success on diverse multimodal understanding and generation tasks, yet they still struggle to effectively leverage language-based chain-of-thought reasoning for image generation. As a result, existing reasoning-augmented UMMs often fail to inherit the test-time scaling and fine-grained controllability observed in large language models. We attribute this failure to a </p>
+      <p class="abstract">Unified Multimodal Models (UMMs) achieve remarkable success on diverse multimodal understanding and generation tasks, yet they still struggle to effectively leverage language-based chain-of-thought reasoning for image generation. As a result, existing reasoning-augmented UMMs often fail to inherit the test-time scaling and fine-grained controllability observed in large language models. We attribute this failure to a fundamental modality mismatch: reasoning is performed in a discrete token space, whereas image generation operates in a continuous space. To bridge this gap, we introduce a Latent …</p>
+      <p class="constraint">⚠ If it does not match your user task, it is a leaderboard, not a ship gate.</p>
+      <p class="sowhat">Prototype on Evaluation / benchmarks against your stack — one eval, one constraint, then kill or keep.</p>
+      <div class="links"><a href="https://arxiv.org/abs/2610.42149v1">Paper &rarr;</a></div>
+    </article>
+
+    <article class="card">
+      <div class="card-top"><span class="verdict" style="border-color:#d4a574;color:#d4a574">Prototype</span>
+      <span class="fit">High fit · 86</span></div>
+      <h3>Flide: Accelerating Decision Inference with Exact State Forking</h3>
       
       <p class="concept"><strong>Transformers</strong> — The backbone architecture behind modern language and vision models.</p>
-      <p class="why">Pixel-space generative Transformers typically use one token per image patch, so capturing finer detail requires more tokens and makes global attention increasingly expensive. We observe that finer detail does not necessarily require more global communication: low-frequency structure benefits from global exchange, while high-frequency detail can be modeled locally. Based on this insight, we introduce SpecSlot, a pixel</p>
-      <p class="abstract">Pixel-space generative Transformers typically use one token per image patch, so capturing finer detail requires more tokens and makes global attention increasingly expensive. We observe that finer detail does not necessarily require more global communication: low-frequency structure benefits from global exchange, while high-frequency detail can be modeled locally. Based on this insight, we introduce SpecSlot, a pixel-space rectified-flow Transformer that decouples output detail from the length of the global attention sequence. SpecSlot expands each spatial anchor into multiple slots, each assi…</p>
+      <p class="why">Decision models such as Jev have emerged as a highly promising paradigm for LLM agent systems, providing lightweight and reliable categorical reasoning for rapid System One execution. However, existing generation-oriented inference engines fail to support these workloads effectively, suffering from severe prefix recomputation overheads or distorted output probabilities. To address this challenge, we propose Flide, an</p>
+      <p class="abstract">Decision models such as Jev have emerged as a highly promising paradigm for LLM agent systems, providing lightweight and reliable categorical reasoning for rapid System One execution. However, existing generation-oriented inference engines fail to support these workloads effectively, suffering from severe prefix recomputation overheads or distorted output probabilities. To address this challenge, we propose Flide, an efficient and exact inference engine that decouples the logical tree structure of a decision request from its physical execution within a single flattened token stream. Through Fo…</p>
       <p class="constraint">⚠ Watch sequence length and attention memory before you copy the architecture.</p>
       <p class="sowhat">Prototype on Transformers against your stack — one eval, one constraint, then kill or keep.</p>
-      <div class="links"><a href="https://arxiv.org/abs/2610.40647v1">Paper &rarr;</a></div>
+      <div class="links"><a href="https://arxiv.org/abs/2610.42148v1">Paper &rarr;</a></div>
+    </article>
+
+    <article class="card">
+      <div class="card-top"><span class="verdict" style="border-color:#d4a574;color:#d4a574">Prototype</span>
+      <span class="fit">High fit · 86</span></div>
+      <h3>Latent Sparse Attention: Towards Subquadratic Ultra-Long Context Attention</h3>
+      
+      <p class="concept"><strong>Long context</strong> — Letting a model read far more tokens without blowing memory or quality.</p>
+      <p class="why">Agentic workflows are increasingly shifting towards long-horizon tasks, such as open-ended scientific work, where models benefit from long context windows. However, at ultra-long context (above 1M tokens), full attention is prohibitively expensive. A promising approach is sparse attention, in which a dedicated indexer selects a subset of keys for the attention. Yet current methods of indexing either still have quadra</p>
+      <p class="abstract">Agentic workflows are increasingly shifting towards long-horizon tasks, such as open-ended scientific work, where models benefit from long context windows. However, at ultra-long context (above 1M tokens), full attention is prohibitively expensive. A promising approach is sparse attention, in which a dedicated indexer selects a subset of keys for the attention. Yet current methods of indexing either still have quadratic cost in context size or lose accuracy at ultra-long context scale. We address this with Latent Sparse Attention (LSA), an efficient attention method that maintains accuracy at …</p>
+      <p class="constraint">⚠ Price the KV cache at your real context; quality often dies before the window does.</p>
+      <p class="sowhat">Prototype on Long context against your stack — one eval, one constraint, then kill or keep.</p>
+      <div class="links"><a href="https://arxiv.org/abs/2610.42147v1">Paper &rarr;</a></div>
+    </article>
+
+    <article class="card">
+      <div class="card-top"><span class="verdict" style="border-color:#d4a574;color:#d4a574">Prototype</span>
+      <span class="fit">High fit · 86</span></div>
+      <h3>Hierarchical World Models with Implicit Dynamics</h3>
+      
+      <p class="concept"><strong>Retrieval-augmented generation</strong> — Fetching documents at query time instead of stuffing everything into weights.</p>
+      <p class="why">Planning with world models enables test-time adaptation for embodied agents, offering superior generalization over direct policy learning. However, long-horizon tasks remain hindered by cumulative errors and search complexity. Existing hierarchical methods often use rigid macro-actions or latent skills, leading to brittle representations and limited fine-grained control. We introduce ID-WM (Implicit Dynamics World Mo</p>
+      <p class="abstract">Planning with world models enables test-time adaptation for embodied agents, offering superior generalization over direct policy learning. However, long-horizon tasks remain hindered by cumulative errors and search complexity. Existing hierarchical methods often use rigid macro-actions or latent skills, leading to brittle representations and limited fine-grained control. We introduce ID-WM (Implicit Dynamics World Models), a hierarchical world model that decouples state-space reachability from local control. Our framework utilizes a high-level model to sample feasible transitions across the st…</p>
+      <p class="constraint">⚠ Measure retrieval recall on YOUR corpus; the generator cannot fix a dead index.</p>
+      <p class="sowhat">Prototype on Retrieval-augmented generation against your stack — one eval, one constraint, then kill or keep.</p>
+      <div class="links"><a href="https://arxiv.org/abs/2610.42146v1">Paper &rarr;</a></div>
+    </article>
+
+    <article class="card">
+      <div class="card-top"><span class="verdict" style="border-color:#d4a574;color:#d4a574">Prototype</span>
+      <span class="fit">High fit · 87</span></div>
+      <h3>RoboArchitect: Automating the Design of Robotic Agents with Persistent Memory</h3>
+      
+      <p class="concept"><strong>Evaluation / benchmarks</strong> — Measuring what models can actually do, and where they fail.</p>
+      <p class="why">Recent work shows that a frozen robot policy performs far better inside an agent harness, where control code decides when to query the policy, consult vision tools, or command the arm directly. Yet today these harnesses are built by hand and redesigned for each new robot or benchmark. We show that harness design can be automated, offering a strong alternative to finetuning on a novel setup. In RoboArchitect, a coding</p>
+      <p class="abstract">Recent work shows that a frozen robot policy performs far better inside an agent harness, where control code decides when to query the policy, consult vision tools, or command the arm directly. Yet today these harnesses are built by hand and redesigned for each new robot or benchmark. We show that harness design can be automated, offering a strong alternative to finetuning on a novel setup. In RoboArchitect, a coding model observes a robot&#x27;s rollouts, diagnoses failures, and iteratively revises the harness around the frozen policy. The harness evolves on a set of episodes for its optimization …</p>
+      <p class="constraint">⚠ If it does not match your user task, it is a leaderboard, not a ship gate.</p>
+      <p class="sowhat">Prototype on Evaluation / benchmarks against your stack — one eval, one constraint, then kill or keep.</p>
+      <div class="links"><a href="https://arxiv.org/abs/2610.42141v1">Paper &rarr;</a></div>
     </article>
 
     <article class="card">
       <div class="card-top"><span class="verdict" style="border-color:#d4a574;color:#d4a574">Prototype</span>
       <span class="fit">High fit · 89</span></div>
-      <h3>Adaptive Scenario Generation for KL-DRO Around a Learned Density Model</h3>
+      <h3>Counting on Dummies: Privacy Amplification with Observable Counts and Truncated Batches</h3>
       
       <p class="concept"><strong>RL post-training</strong> — Aligning a pretrained model with preference or reward data (RLHF, DPO, GRPO).</p>
-      <p class="why">Distributionally robust optimization (DRO) hedges data-driven two-stage stochastic programs against error in the distribution estimated from a finite record, and standard ambiguity sets differ in how they treat realizations absent from that record. A divergence ball around the empirical distribution contains only reweightings of the record, whereas a transport ball also contains distributions supported off the record</p>
-      <p class="abstract">Distributionally robust optimization (DRO) hedges data-driven two-stage stochastic programs against error in the distribution estimated from a finite record, and standard ambiguity sets differ in how they treat realizations absent from that record. A divergence ball around the empirical distribution contains only reweightings of the record, whereas a transport ball also contains distributions supported off the record, including on realizations the data-generating process cannot produce, against which the decision is then hedged as well. We instead propose a Kullback-Leibler (KL) ball centered …</p>
+      <p class="why">In many practical deployments of Differentially Private Stochastic Gradient Descent (DP-SGD), the server processes data in batches. Randomly sampling these batches allows for better privacy bounds via privacy amplification results. Most sampling schemes with provable privacy amplification, including Poisson sampling and random allocation, result in variable batch sizes. The privacy guarantee of these schemes requires</p>
+      <p class="abstract">In many practical deployments of Differentially Private Stochastic Gradient Descent (DP-SGD), the server processes data in batches. Randomly sampling these batches allows for better privacy bounds via privacy amplification results. Most sampling schemes with provable privacy amplification, including Poisson sampling and random allocation, result in variable batch sizes. The privacy guarantee of these schemes requires that the batch sizes are not revealed. In distributed settings, the server performing the aggregation or any party observing the communication traffic may learn these batch sizes.…</p>
       <p class="constraint">⚠ You need preference data and a held-out harm/quality eval, not a vibes demo.</p>
       <p class="sowhat">Prototype on RL post-training against your stack — one eval, one constraint, then kill or keep.</p>
-      <div class="links"><a href="https://arxiv.org/abs/2610.40644v1">Paper &rarr;</a></div>
+      <div class="links"><a href="https://arxiv.org/abs/2610.42139v1">Paper &rarr;</a></div>
     </article>
 <footer>Generated by <a href="https://github.com/messishivi/mle-professor-app">MLE Professor</a>
 · verdicts are rule-based drafts, not financial/production advice.</footer>
