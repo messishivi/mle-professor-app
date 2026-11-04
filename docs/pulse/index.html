@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>ML Pulse — 2026-11-03</title>
+<title>ML Pulse — 2026-11-04</title>
 <style>
 body{font-family:system-ui,-apple-system,sans-serif;max-width:900px;margin:0 auto;padding:24px;color:#e6edf3;background:#0d1117}
 a{color:#79c0ff} h1{letter-spacing:-0.02em} .muted{color:#8b949e}
@@ -14,9 +14,9 @@ a{color:#79c0ff} h1{letter-spacing:-0.02em} .muted{color:#8b949e}
 footer{margin-top:32px;color:#8b949e;font-size:13px}
 </style></head><body>
 <h1>ML Pulse</h1>
-<p class="muted">What moved in ML/AI on 2026-11-03 — trending papers mapped to concepts,
+<p class="muted">What moved in ML/AI on 2026-11-04 — trending papers mapped to concepts,
 ranked for a generalist MLE stack, with a decision memo each. Updated daily.
-Fetched 2026-11-03T19:59:02+00:00.</p>
+Fetched 2026-11-04T20:18:52+00:00.</p>
 
 
     <article class="card">
@@ -60,15 +60,15 @@ Fetched 2026-11-03T19:59:02+00:00.</p>
 
     <article class="card">
       <div class="card-top"><span class="verdict" style="border-color:#79c0ff;color:#79c0ff">Watch</span>
-      <span class="fit">Watch · 47</span></div>
-      <h3>The Other Half of the Memory Wall: Serving 35B MoEs from SSD with Trained Routing Prediction</h3>
+      <span class="fit">Watch · 46</span></div>
+      <h3>WeVisOne-VL: Unified Visual Perception from Objects to Pixels</h3>
       
-      <p class="concept"><strong>Mixture of Experts</strong> — Sparse routing so only some model experts fire per token.</p>
-      <p class="why">Mixture-of-experts (MoE) inference on consumer hardware is bounded by weight memory: a 35B-class model is 19.5GB at 4-bit, and sparsity shrinks the compute per token, not the bytes that must be held. Naive offloading to SSD does not help on its own, because layer N+1&#x27;s experts must be chosen before layer N&#x27;s output exists, so the reads cannot start early enough to hide behind compute. We present Edge0, a streaming Mo</p>
-      <p class="abstract">Mixture-of-experts (MoE) inference on consumer hardware is bounded by weight memory: a 35B-class model is 19.5GB at 4-bit, and sparsity shrinks the compute per token, not the bytes that must be held. Naive offloading to SSD does not help on its own, because layer N+1&#x27;s experts must be chosen before layer N&#x27;s output exists, so the reads cannot start early enough to hide behind compute. We present Edge0, a streaming MoE inference engine that closes the gap with a prerouter: a per-layer head predicts the next layer&#x27;s routing one token ahead, and the prediction is consumed as the routing itself, s…</p>
-      <p class="constraint">⚠ Serving cost is routing and all-to-all bandwidth, not just train FLOPs.</p>
-      <p class="sowhat">Adjacent to Quantization. Skim the abstract; deep-read only if it names your failure mode.</p>
-      <div class="links"><a href="https://arxiv.org/abs/2609.18063">Paper &rarr;</a></div>
+      <p class="concept"><strong>Multimodal</strong> — One model that takes text plus image, audio, or video.</p>
+      <p class="why">Existing vision-language models (VLMs) remain unreliable for fine-grained visual perception. In this report, we present WeVisOne-VL (WeChat Vision All-in-One), a powerful VLM that unifies object-level and pixel-level perception through structured next-token prediction. It supports multiple visual tasks including object detection, referring localization, counting, OCR, segmentation, and matting, enabling localization </p>
+      <p class="abstract">Existing vision-language models (VLMs) remain unreliable for fine-grained visual perception. In this report, we present WeVisOne-VL (WeChat Vision All-in-One), a powerful VLM that unifies object-level and pixel-level perception through structured next-token prediction. It supports multiple visual tasks including object detection, referring localization, counting, OCR, segmentation, and matting, enabling localization at any user-specific granularity, from points and boxes to masks and alpha mattes. Architecturally, we integrate a lightweight pixel decoder into the VLM via a special &lt;OBJ&gt; token …</p>
+      <p class="constraint">⚠ Modality lag and labeling cost usually beat model choice in the first quarter.</p>
+      <p class="sowhat">Adjacent to RL post-training. Skim the abstract; deep-read only if it names your failure mode.</p>
+      <div class="links"><a href="https://arxiv.org/abs/2610.31329">Paper &rarr;</a></div>
     </article>
 
     <article class="card">
@@ -86,6 +86,32 @@ Fetched 2026-11-03T19:59:02+00:00.</p>
 
     <article class="card">
       <div class="card-top"><span class="verdict" style="border-color:#d4a574;color:#d4a574">Prototype</span>
+      <span class="fit">High fit · 86</span></div>
+      <h3>SpecPilot: Autonomous Algorithm Discovery and Systems Optimization for Speculative Decoding</h3>
+      
+      <p class="concept"><strong>Evaluation / benchmarks</strong> — Measuring what models can actually do, and where they fail.</p>
+      <p class="why">Speculative decoding accelerates memory-bound LLM decoding with a lightweight drafter, and parallel drafters extend this speedup by drafting a whole block in one forward pass. However, it remains unclear whether their released systems (stock) attain the full speedup that parallel drafting permits. We identify three challenges. First, with one request, each step accepts few tokens but reads every target weight. Second</p>
+      <p class="abstract">Speculative decoding accelerates memory-bound LLM decoding with a lightweight drafter, and parallel drafters extend this speedup by drafting a whole block in one forward pass. However, it remains unclear whether their released systems (stock) attain the full speedup that parallel drafting permits. We identify three challenges. First, with one request, each step accepts few tokens but reads every target weight. Second, with batching, per-request verification work roughly halves the speedup over autoregressive (AR) decoding. Third, speculative decoding is deployment-specific, and no universal op…</p>
+      <p class="constraint">⚠ If it does not match your user task, it is a leaderboard, not a ship gate.</p>
+      <p class="sowhat">Prototype on Evaluation / benchmarks against your stack — one eval, one constraint, then kill or keep.</p>
+      <div class="links"><a href="https://arxiv.org/abs/2611.02501">Paper &rarr;</a></div>
+    </article>
+
+    <article class="card">
+      <div class="card-top"><span class="verdict" style="border-color:#79c0ff;color:#79c0ff">Watch</span>
+      <span class="fit">Watch · 47</span></div>
+      <h3>The Other Half of the Memory Wall: Serving 35B MoEs from SSD with Trained Routing Prediction</h3>
+      
+      <p class="concept"><strong>Mixture of Experts</strong> — Sparse routing so only some model experts fire per token.</p>
+      <p class="why">Mixture-of-experts (MoE) inference on consumer hardware is bounded by weight memory: a 35B-class model is 19.5GB at 4-bit, and sparsity shrinks the compute per token, not the bytes that must be held. Naive offloading to SSD does not help on its own, because layer N+1&#x27;s experts must be chosen before layer N&#x27;s output exists, so the reads cannot start early enough to hide behind compute. We present Edge0, a streaming Mo</p>
+      <p class="abstract">Mixture-of-experts (MoE) inference on consumer hardware is bounded by weight memory: a 35B-class model is 19.5GB at 4-bit, and sparsity shrinks the compute per token, not the bytes that must be held. Naive offloading to SSD does not help on its own, because layer N+1&#x27;s experts must be chosen before layer N&#x27;s output exists, so the reads cannot start early enough to hide behind compute. We present Edge0, a streaming MoE inference engine that closes the gap with a prerouter: a per-layer head predicts the next layer&#x27;s routing one token ahead, and the prediction is consumed as the routing itself, s…</p>
+      <p class="constraint">⚠ Serving cost is routing and all-to-all bandwidth, not just train FLOPs.</p>
+      <p class="sowhat">Adjacent to Quantization. Skim the abstract; deep-read only if it names your failure mode.</p>
+      <div class="links"><a href="https://arxiv.org/abs/2609.18063">Paper &rarr;</a></div>
+    </article>
+
+    <article class="card">
+      <div class="card-top"><span class="verdict" style="border-color:#d4a574;color:#d4a574">Prototype</span>
       <span class="fit">High fit · 85</span></div>
       <h3>HairDeck: Animation-Ready Stylized Hair Cards from a Single Image</h3>
       
@@ -99,15 +125,15 @@ Fetched 2026-11-03T19:59:02+00:00.</p>
 
     <article class="card">
       <div class="card-top"><span class="verdict" style="border-color:#d4a574;color:#d4a574">Prototype</span>
-      <span class="fit">High fit · 86</span></div>
-      <h3>CUA-Master: Scaling Computer-use Agents through Open-World Recursive Improvements</h3>
+      <span class="fit">High fit · 85</span></div>
+      <h3>nanoMuse: An Open-Source Personal Agent for Every Device You Own</h3>
       
-      <p class="concept"><strong>Retrieval-augmented generation</strong> — Fetching documents at query time instead of stuffing everything into weights.</p>
-      <p class="why">Despite recent advances in CUAs, their development remains constrained by the limited diversity, controllability, and reliability of interaction data. Moreover, conventional optimization pipelines lack iterative feedback, while existing recursive improvement approaches often rely on self-generated experiences, limiting ability expansion and yielding diminishing returns. To address these challenges, we introduce CUA-M</p>
-      <p class="abstract">Despite recent advances in CUAs, their development remains constrained by the limited diversity, controllability, and reliability of interaction data. Moreover, conventional optimization pipelines lack iterative feedback, while existing recursive improvement approaches often rely on self-generated experiences, limiting ability expansion and yielding diminishing returns. To address these challenges, we introduce CUA-Master, a nested double-loop recursive improvement framework. At the system level, an outer world-data-model flywheel continuously incorporates open-world corpus and leverages evolv…</p>
-      <p class="constraint">⚠ Measure retrieval recall on YOUR corpus; the generator cannot fix a dead index.</p>
-      <p class="sowhat">Prototype on Retrieval-augmented generation against your stack — one eval, one constraint, then kill or keep.</p>
-      <div class="links"><a href="https://arxiv.org/abs/2611.03126">Paper &rarr;</a></div>
+      <p class="concept"><strong>Agents</strong> — Models that use tools, memory, and loops to complete tasks.</p>
+      <p class="why">Assistants from 2011 answered and waited, and agents from 2023 did a task and stopped. In September 2026 Meta&#x27;s Muse showed an agent for one person, with accounts, devices, memory and a conversation that lasts, closed, in a vendor&#x27;s cloud, in one country. Such an agent is expected to act on a person&#x27;s accounts and devices, remember them across weeks, speak first when it is worth it, and answer for what it did. It is </p>
+      <p class="abstract">Assistants from 2011 answered and waited, and agents from 2023 did a task and stopped. In September 2026 Meta&#x27;s Muse showed an agent for one person, with accounts, devices, memory and a conversation that lasts, closed, in a vendor&#x27;s cloud, in one country. Such an agent is expected to act on a person&#x27;s accounts and devices, remember them across weeks, speak first when it is worth it, and answer for what it did. It is a kind of software, not a model, and until now had no open counterpart. This report defines the personal agent in five questions and three horizons. It reads how Muse is built from…</p>
+      <p class="constraint">⚠ Tool permissions, loop caps, and eval of multi-step tasks — not a single chat score.</p>
+      <p class="sowhat">Prototype on Agents against your stack — one eval, one constraint, then kill or keep.</p>
+      <div class="links"><a href="https://arxiv.org/abs/2610.08699">Paper &rarr;</a></div>
     </article>
 
     <article class="card">
@@ -125,15 +151,41 @@ Fetched 2026-11-03T19:59:02+00:00.</p>
 
     <article class="card">
       <div class="card-top"><span class="verdict" style="border-color:#d4a574;color:#d4a574">Prototype</span>
-      <span class="fit">High fit · 85</span></div>
-      <h3>nanoMuse: An Open-Source Personal Agent for Every Device You Own</h3>
+      <span class="fit">High fit · 86</span></div>
+      <h3>CUA-Master: Scaling Computer-use Agents through Open-World Recursive Improvements</h3>
       
-      <p class="concept"><strong>Agents</strong> — Models that use tools, memory, and loops to complete tasks.</p>
-      <p class="why">Assistants from 2011 answered and waited, and agents from 2023 did a task and stopped. In September 2026 Meta&#x27;s Muse showed an agent for one person, with accounts, devices, memory and a conversation that lasts, closed, in a vendor&#x27;s cloud, in one country. Such an agent is expected to act on a person&#x27;s accounts and devices, remember them across weeks, speak first when it is worth it, and answer for what it did. It is </p>
-      <p class="abstract">Assistants from 2011 answered and waited, and agents from 2023 did a task and stopped. In September 2026 Meta&#x27;s Muse showed an agent for one person, with accounts, devices, memory and a conversation that lasts, closed, in a vendor&#x27;s cloud, in one country. Such an agent is expected to act on a person&#x27;s accounts and devices, remember them across weeks, speak first when it is worth it, and answer for what it did. It is a kind of software, not a model, and until now had no open counterpart. This report defines the personal agent in five questions and three horizons. It reads how Muse is built from…</p>
-      <p class="constraint">⚠ Tool permissions, loop caps, and eval of multi-step tasks — not a single chat score.</p>
-      <p class="sowhat">Prototype on Agents against your stack — one eval, one constraint, then kill or keep.</p>
-      <div class="links"><a href="https://arxiv.org/abs/2610.08699">Paper &rarr;</a></div>
+      <p class="concept"><strong>Retrieval-augmented generation</strong> — Fetching documents at query time instead of stuffing everything into weights.</p>
+      <p class="why">Despite recent advances in CUAs, their development remains constrained by the limited diversity, controllability, and reliability of interaction data. Moreover, conventional optimization pipelines lack iterative feedback, while existing recursive improvement approaches often rely on self-generated experiences, limiting ability expansion and yielding diminishing returns. To address these challenges, we introduce CUA-M</p>
+      <p class="abstract">Despite recent advances in CUAs, their development remains constrained by the limited diversity, controllability, and reliability of interaction data. Moreover, conventional optimization pipelines lack iterative feedback, while existing recursive improvement approaches often rely on self-generated experiences, limiting ability expansion and yielding diminishing returns. To address these challenges, we introduce CUA-Master, a nested double-loop recursive improvement framework. At the system level, an outer world-data-model flywheel continuously incorporates open-world corpus and leverages evolv…</p>
+      <p class="constraint">⚠ Measure retrieval recall on YOUR corpus; the generator cannot fix a dead index.</p>
+      <p class="sowhat">Prototype on Retrieval-augmented generation against your stack — one eval, one constraint, then kill or keep.</p>
+      <div class="links"><a href="https://arxiv.org/abs/2611.03126">Paper &rarr;</a></div>
+    </article>
+
+    <article class="card">
+      <div class="card-top"><span class="verdict" style="border-color:#d4a574;color:#d4a574">Prototype</span>
+      <span class="fit">High fit · 87</span></div>
+      <h3>CoworkOS:Scaling Agent Coworkers for Real-world Automation</h3>
+      
+      <p class="concept"><strong>Evaluation / benchmarks</strong> — Measuring what models can actually do, and where they fail.</p>
+      <p class="why">Rapid advances in cowork agents are shifting human-AI collaboration toward real-world automation, delivering software, designs, and other artifacts. However, such productivity work demands both high-quality delivery on complex productivity tasks and continued monitoring and decision-making over long horizons, a combination that remains an open challenge. We introduce CoworkOS, a general-purpose harness for long-horiz</p>
+      <p class="abstract">Rapid advances in cowork agents are shifting human-AI collaboration toward real-world automation, delivering software, designs, and other artifacts. However, such productivity work demands both high-quality delivery on complex productivity tasks and continued monitoring and decision-making over long horizons, a combination that remains an open challenge. We introduce CoworkOS, a general-purpose harness for long-horizon work that separates task strategy from execution management: the model decides actions, delegation, and acceptance, while the runtime maintains state and feedback. Its three-lay…</p>
+      <p class="constraint">⚠ If it does not match your user task, it is a leaderboard, not a ship gate.</p>
+      <p class="sowhat">Prototype on Evaluation / benchmarks against your stack — one eval, one constraint, then kill or keep.</p>
+      <div class="links"><a href="https://arxiv.org/abs/2611.03178">Paper &rarr;</a></div>
+    </article>
+
+    <article class="card">
+      <div class="card-top"><span class="verdict" style="border-color:#d4a574;color:#d4a574">Prototype</span>
+      <span class="fit">High fit · 86</span></div>
+      <h3>Wave Forcing: Towards Speed-of-Light Streaming Video Generation</h3>
+      
+      <p class="concept"><strong>Transformers</strong> — The backbone architecture behind modern language and vision models.</p>
+      <p class="why">Real-time long-video generation requires continuous output with consistent appearance and natural motion. Existing chunk-wise autoregressive methods face challenges in both generation efficiency and long-video quality: serialized denoising and history-cache refresh require two forward passes even with one-step denoising, and longer rollouts can degrade quality and cause camera drift. We propose Wave Forcing (WF), whi</p>
+      <p class="abstract">Real-time long-video generation requires continuous output with consistent appearance and natural motion. Existing chunk-wise autoregressive methods face challenges in both generation efficiency and long-video quality: serialized denoising and history-cache refresh require two forward passes even with one-step denoising, and longer rollouts can degrade quality and cause camera drift. We propose Wave Forcing (WF), which co-designs generation, training, and execution for continuous video output with multi-step denoising. WF uses chunk-wise causal attention to access earlier, cleaner chunks befor…</p>
+      <p class="constraint">⚠ Watch sequence length and attention memory before you copy the architecture.</p>
+      <p class="sowhat">Prototype on Transformers against your stack — one eval, one constraint, then kill or keep.</p>
+      <div class="links"><a href="https://arxiv.org/abs/2611.00859">Paper &rarr;</a></div>
     </article>
 
     <article class="card">
@@ -152,131 +204,79 @@ Fetched 2026-11-03T19:59:02+00:00.</p>
     <article class="card">
       <div class="card-top"><span class="verdict" style="border-color:#d4a574;color:#d4a574">Prototype</span>
       <span class="fit">High fit · 86</span></div>
-      <h3>Wave Forcing: Towards Speed-of-Light Streaming Video Generation</h3>
+      <h3>ToolSpace: Scaling Tool-Centric Environment Synthesis for Long-Horizon Agents</h3>
       
-      <p class="concept"><strong>Transformers</strong> — The backbone architecture behind modern language and vision models.</p>
-      <p class="why">Real-time long-video generation requires continuous output with consistent appearance and natural motion. Existing chunk-wise autoregressive methods face challenges in both generation efficiency and long-video quality: serialized denoising and history-cache refresh require two forward passes even with one-step denoising, and longer rollouts can degrade quality and cause camera drift. We propose Wave Forcing (WF), whi</p>
-      <p class="abstract">Real-time long-video generation requires continuous output with consistent appearance and natural motion. Existing chunk-wise autoregressive methods face challenges in both generation efficiency and long-video quality: serialized denoising and history-cache refresh require two forward passes even with one-step denoising, and longer rollouts can degrade quality and cause camera drift. We propose Wave Forcing (WF), which co-designs generation, training, and execution for continuous video output with multi-step denoising. WF uses chunk-wise causal attention to access earlier, cleaner chunks befor…</p>
-      <p class="constraint">⚠ Watch sequence length and attention memory before you copy the architecture.</p>
-      <p class="sowhat">Prototype on Transformers against your stack — one eval, one constraint, then kill or keep.</p>
-      <div class="links"><a href="https://arxiv.org/abs/2611.00859">Paper &rarr;</a></div>
-    </article>
-
-    <article class="card">
-      <div class="card-top"><span class="verdict" style="border-color:#d4a574;color:#d4a574">Prototype</span>
-      <span class="fit">High fit · 86</span></div>
-      <h3>ReLift: Dense 3D Tracking as Lifted Trajectory Repair</h3>
-      
-      <p class="concept"><strong>Transformers</strong> — The backbone architecture behind modern language and vision models.</p>
-      <p class="why">Dense 3D tracking from monocular video requires establishing point correspondences over time, estimating their depth, and inferring their trajectories during occlusion. Existing methods typically learn these tasks jointly, a demanding objective given the scarcity of 4D supervision. We show that strong pretrained 2D trackers and 3D geometry models provide an effective foundation: lifted trajectories, with occluded seg</p>
-      <p class="abstract">Dense 3D tracking from monocular video requires establishing point correspondences over time, estimating their depth, and inferring their trajectories during occlusion. Existing methods typically learn these tasks jointly, a demanding objective given the scarcity of 4D supervision. We show that strong pretrained 2D trackers and 3D geometry models provide an effective foundation: lifted trajectories, with occluded segments simply interpolated, already rival dedicated 3D trackers using the same geometry. However, lifted trajectories inherit correspondence and depth errors, and under occlusion, t…</p>
-      <p class="constraint">⚠ Watch sequence length and attention memory before you copy the architecture.</p>
-      <p class="sowhat">Prototype on Transformers against your stack — one eval, one constraint, then kill or keep.</p>
-      <div class="links"><a href="https://arxiv.org/abs/2610.42136">Paper &rarr;</a></div>
-    </article>
-
-    <article class="card">
-      <div class="card-top"><span class="verdict" style="border-color:#d4a574;color:#d4a574">Prototype</span>
-      <span class="fit">High fit · 86</span></div>
-      <h3>Investor&#x27;s Last Exam: Can AI Agents Do Equity Investment Without Seeing the Future?</h3>
-      
-      <p class="concept"><strong>Evaluation / benchmarks</strong> — Measuring what models can actually do, and where they fail.</p>
-      <p class="why">Financial agents must form forecasts and investment judgments from decision-time evidence, with predictions evaluated against subsequent outcomes. Existing benchmarks assess financial knowledge, research workflows, or forecasting, but evaluating the full research process requires a strictly frozen information set and professional evaluation criteria. We introduce Investor&#x27;s Last Exam (ILE), an equity-research benchma</p>
-      <p class="abstract">Financial agents must form forecasts and investment judgments from decision-time evidence, with predictions evaluated against subsequent outcomes. Existing benchmarks assess financial knowledge, research workflows, or forecasting, but evaluating the full research process requires a strictly frozen information set and professional evaluation criteria. We introduce Investor&#x27;s Last Exam (ILE), an equity-research benchmark led by experienced buy-side investors and fund managers. Its three components are a versioned financial database spanning 3.43 million document versions and nine source categori…</p>
-      <p class="constraint">⚠ If it does not match your user task, it is a leaderboard, not a ship gate.</p>
-      <p class="sowhat">Prototype on Evaluation / benchmarks against your stack — one eval, one constraint, then kill or keep.</p>
-      <div class="links"><a href="https://arxiv.org/abs/2610.38342">Paper &rarr;</a></div>
-    </article>
-
-    <article class="card">
-      <div class="card-top"><span class="verdict" style="border-color:#d4a574;color:#d4a574">Prototype</span>
-      <span class="fit">High fit · 87</span></div>
-      <h3>NorthCUA Technical Report: Turbocharging Computer-Use Agents through Experience at Scale</h3>
-      
-      <p class="concept"><strong>Evaluation / benchmarks</strong> — Measuring what models can actually do, and where they fail.</p>
-      <p class="why">Scaling computer-use agents from individual actions to complex software work requires experience that connects decisions to complete outcomes. We present NorthCUA, an integrated system for turbocharging computer-use agents through experience at scale. Its Experience Flywheel supplies diverse executable tasks to the NorthCUA Harness, which sustains long interactions, records decisions, and checks task outcomes. The Fl</p>
-      <p class="abstract">Scaling computer-use agents from individual actions to complex software work requires experience that connects decisions to complete outcomes. We present NorthCUA, an integrated system for turbocharging computer-use agents through experience at scale. Its Experience Flywheel supplies diverse executable tasks to the NorthCUA Harness, which sustains long interactions, records decisions, and checks task outcomes. The Flywheel uses these records to curate verified trajectories. For unsolved tasks, recursive self-improvement evolves reusable skills and preserves verified milestones so later attempt…</p>
-      <p class="constraint">⚠ If it does not match your user task, it is a leaderboard, not a ship gate.</p>
-      <p class="sowhat">Prototype on Evaluation / benchmarks against your stack — one eval, one constraint, then kill or keep.</p>
-      <div class="links"><a href="https://arxiv.org/abs/2611.02102">Paper &rarr;</a></div>
-    </article>
-
-    <article class="card">
-      <div class="card-top"><span class="verdict" style="border-color:#d4a574;color:#d4a574">Prototype</span>
-      <span class="fit">High fit · 86</span></div>
-      <h3>Pixel-UMI: Learning Environment-Aware Whole-Body Manipulation from Sensorized Human Demonstrations</h3>
-      
-      <p class="concept"><strong>Retrieval-augmented generation</strong> — Fetching documents at query time instead of stuffing everything into weights.</p>
-      <p class="why">Sensorized human demonstrations offer scalable data for mobile manipulation, but embodiment differences complicate policy learning. We present Pixel-UMI, a pipeline for learning environment-aware whole-body policies from human data. We first introduce Environment-Aware Retargeting (EAR), which combines reconstructed scene geometry with demonstrated head and gripper trajectories to determine robot posture and generate</p>
-      <p class="abstract">Sensorized human demonstrations offer scalable data for mobile manipulation, but embodiment differences complicate policy learning. We present Pixel-UMI, a pipeline for learning environment-aware whole-body policies from human data. We first introduce Environment-Aware Retargeting (EAR), which combines reconstructed scene geometry with demonstrated head and gripper trajectories to determine robot posture and generate collision-aware joint and base targets. Delay-calibrated action assignment converts these trajectories into actions. However, kinematic differences can leave residual pose errors,…</p>
-      <p class="constraint">⚠ Measure retrieval recall on YOUR corpus; the generator cannot fix a dead index.</p>
-      <p class="sowhat">Prototype on Retrieval-augmented generation against your stack — one eval, one constraint, then kill or keep.</p>
-      <div class="links"><a href="https://arxiv.org/abs/2611.03647v1">Paper &rarr;</a></div>
-    </article>
-
-    <article class="card">
-      <div class="card-top"><span class="verdict" style="border-color:#d4a574;color:#d4a574">Prototype</span>
-      <span class="fit">High fit · 86</span></div>
-      <h3>Pixel: A Co-Designed Full-Stack Robot System for Learning General-Purpose Mobile Manipulation</h3>
-      
-      <p class="concept"><strong>Evaluation / benchmarks</strong> — Measuring what models can actually do, and where they fail.</p>
-      <p class="why">General-purpose mobile manipulation requires a combination of capable robot hardware, scalable demonstration collection, expressive whole-body control, and effective policy learning. Yet these components are often developed independently, creating mismatches that limit the capabilities of the complete system. We present Pixel, a co-designed full-stack system for learning general-purpose mobile manipulation. Pixel com</p>
-      <p class="abstract">General-purpose mobile manipulation requires a combination of capable robot hardware, scalable demonstration collection, expressive whole-body control, and effective policy learning. Yet these components are often developed independently, creating mismatches that limit the capabilities of the complete system. We present Pixel, a co-designed full-stack system for learning general-purpose mobile manipulation. Pixel combines a low-cost wheeled humanoid with human-aligned kinematics and compliant grippers, multiple teleoperation and robot-free human data-collection interfaces, a unified whole-body…</p>
-      <p class="constraint">⚠ If it does not match your user task, it is a leaderboard, not a ship gate.</p>
-      <p class="sowhat">Prototype on Evaluation / benchmarks against your stack — one eval, one constraint, then kill or keep.</p>
-      <div class="links"><a href="https://arxiv.org/abs/2611.03648v1">Paper &rarr;</a></div>
-    </article>
-
-    <article class="card">
-      <div class="card-top"><span class="verdict" style="border-color:#d4a574;color:#d4a574">Prototype</span>
-      <span class="fit">High fit · 86</span></div>
-      <h3>From Natural Language to Exact Cover: A Neuro-Symbolic Approach to Zebra Puzzles</h3>
-      
-      <p class="concept"><strong>Long context</strong> — Letting a model read far more tokens without blowing memory or quality.</p>
-      <p class="why">Chain-of-Thought (CoT) generation has substantially improved the performance of Large Language Models (LLMs) on complex reasoning tasks, including code generation, data analysis, and exam-style question answering. Despite these advances, purely neural LLMs continue to struggle with elementary logical reasoning problems and lack the determinism, soundness, and reliability characteristic of symbolic reasoning systems. </p>
-      <p class="abstract">Chain-of-Thought (CoT) generation has substantially improved the performance of Large Language Models (LLMs) on complex reasoning tasks, including code generation, data analysis, and exam-style question answering. Despite these advances, purely neural LLMs continue to struggle with elementary logical reasoning problems and lack the determinism, soundness, and reliability characteristic of symbolic reasoning systems. Conversely, classical symbolic methods such as SAT solving and exact cover guarantee correctness and completeness, but require problems to be expressed in highly specialized formal…</p>
-      <p class="constraint">⚠ Price the KV cache at your real context; quality often dies before the window does.</p>
-      <p class="sowhat">Prototype on Long context against your stack — one eval, one constraint, then kill or keep.</p>
-      <div class="links"><a href="https://arxiv.org/abs/2611.03641v1">Paper &rarr;</a></div>
-    </article>
-
-    <article class="card">
-      <div class="card-top"><span class="verdict" style="border-color:#d4a574;color:#d4a574">Prototype</span>
-      <span class="fit">High fit · 86</span></div>
-      <h3>WebHarbor: Docking Real Websites for Evolving GUI Agent Environments</h3>
-      
-      <p class="concept"><strong>Evaluation / benchmarks</strong> — Measuring what models can actually do, and where they fail.</p>
-      <p class="why">GUI web agents require realistic and interactive environments that remain stable during both evaluation and training. Live website evaluation suffers from changing content, access restrictions, and limited coverage of authenticated workflows, while existing synthetic environments for training often lack functional depth and visual fidelity. We propose WebHarbor, a suite of 153 executable and dockerized website enviro</p>
-      <p class="abstract">GUI web agents require realistic and interactive environments that remain stable during both evaluation and training. Live website evaluation suffers from changing content, access restrictions, and limited coverage of authenticated workflows, while existing synthetic environments for training often lack functional depth and visual fidelity. We propose WebHarbor, a suite of 153 executable and dockerized website environments that faithfully reconstruct the visual interfaces, content, and functional workflows of real-world web services under deterministic control. We build WebHarbor through task-…</p>
-      <p class="constraint">⚠ If it does not match your user task, it is a leaderboard, not a ship gate.</p>
-      <p class="sowhat">Prototype on Evaluation / benchmarks against your stack — one eval, one constraint, then kill or keep.</p>
-      <div class="links"><a href="https://arxiv.org/abs/2611.03634v1">Paper &rarr;</a></div>
-    </article>
-
-    <article class="card">
-      <div class="card-top"><span class="verdict" style="border-color:#8b949e;color:#8b949e">Skip</span>
-      <span class="fit">Skip · 10</span></div>
-      <h3>Pretraining Data Scale Reverses the Muon-AdamW Fine-Tuning Gap</h3>
-      
-      <p class="concept"><strong>Deep learning methods</strong> — A current technique in neural network training or inference.</p>
-      <p class="why">Muon has recently emerged as a promising optimizer for pretraining large language models, offering a speedup over AdamW in minimizing pretraining loss. However, it remains unclear whether Muon&#x27;s advantage persists after fine-tuning. In this paper, we study the downstream behavior of Muon and AdamW and uncover a surprising trend: beyond a sufficiently large pretraining data budget, AdamW outperforms Muon after fine-tu</p>
-      <p class="abstract">Muon has recently emerged as a promising optimizer for pretraining large language models, offering a speedup over AdamW in minimizing pretraining loss. However, it remains unclear whether Muon&#x27;s advantage persists after fine-tuning. In this paper, we study the downstream behavior of Muon and AdamW and uncover a surprising trend: beyond a sufficiently large pretraining data budget, AdamW outperforms Muon after fine-tuning. Moreover, as model size increases, AdamW overtakes Muon at progressively smaller pretraining token-parameter ratios. To explain this reversal, we view fine-tuning as a pertur…</p>
-      <p class="constraint">⚠ Name the eval, the latency budget, and the data you would need before a prototype.</p>
-      <p class="sowhat">Skip unless curious — it does not overlap Transformers, RL post-training, Retrieval-augmented generation.</p>
-      <div class="links"><a href="https://arxiv.org/abs/2611.03633v1">Paper &rarr;</a></div>
+      <p class="concept"><strong>Agents</strong> — Models that use tools, memory, and loops to complete tasks.</p>
+      <p class="why">Large language models are deployed as long-horizon agents that compose diverse tools across MCP services into executable workflows. Existing MCP environment-scaling methods are data-centric: they first synthesize a database and scenario, then derive tools and tasks from them. As a result, tool interfaces may not match real ones, tool compositions are not grounded in execution, and tasks rarely span more than one envi</p>
+      <p class="abstract">Large language models are deployed as long-horizon agents that compose diverse tools across MCP services into executable workflows. Existing MCP environment-scaling methods are data-centric: they first synthesize a database and scenario, then derive tools and tasks from them. As a result, tool interfaces may not match real ones, tool compositions are not grounded in execution, and tasks rarely span more than one environment. We propose ToolSpace, a tool-centric framework that reverses this order. ToolSpace mines data, state, and retry dependencies from adjacent calls in execution traces of rea…</p>
+      <p class="constraint">⚠ Tool permissions, loop caps, and eval of multi-step tasks — not a single chat score.</p>
+      <p class="sowhat">Prototype on Agents against your stack — one eval, one constraint, then kill or keep.</p>
+      <div class="links"><a href="https://arxiv.org/abs/2611.05036">Paper &rarr;</a></div>
     </article>
 
     <article class="card">
       <div class="card-top"><span class="verdict" style="border-color:#d4a574;color:#d4a574">Prototype</span>
       <span class="fit">High fit · 89</span></div>
-      <h3>Not All Reasoning Generalizes: A Case Study on Learning Generalizable Reasoning Strategies in RLVR</h3>
+      <h3>DreamX: Video Diffusion Model is a Universal Latent Action Learner</h3>
       
       <p class="concept"><strong>RL post-training</strong> — Aligning a pretrained model with preference or reward data (RLHF, DPO, GRPO).</p>
-      <p class="why">Reinforcement learning with verifiable rewards (RLVR) can enable generalizable improvement for large language model (LLM) reasoning. This paper studies how to incentivize such generalization via reasoning strategies. We study this question with a controllable equation-solving framework: finding multiple inputs x for equations f(x)=y, where f is a non-bijective string function. This setting makes reasoning strategies </p>
-      <p class="abstract">Reinforcement learning with verifiable rewards (RLVR) can enable generalizable improvement for large language model (LLM) reasoning. This paper studies how to incentivize such generalization via reasoning strategies. We study this question with a controllable equation-solving framework: finding multiple inputs x for equations f(x)=y, where f is a non-bijective string function. This setting makes reasoning strategies observable while supporting a clear definition of easy-to-hard out-of-distribution (OOD) shifts, e.g., more solutions, longer y, etc. We uncover a subtle RLVR failure: it teaches t…</p>
+      <p class="why">Learning a universal action representation from video requires modeling dynamics that are consistent across different executions of the same action yet invariant to changes in embodiment and appearance. Existing latent action models infer actions from visual transitions, but their representations often entangle the underlying action with irrelevant visual variations, limiting transfer across embodiments. We introduce</p>
+      <p class="abstract">Learning a universal action representation from video requires modeling dynamics that are consistent across different executions of the same action yet invariant to changes in embodiment and appearance. Existing latent action models infer actions from visual transitions, but their representations often entangle the underlying action with irrelevant visual variations, limiting transfer across embodiments. We introduce DreamX, which repurposes a pretrained video diffusion model as a universal latent action learner. Our approach extracts compact latent actions from the video model&#x27;s rich spatiote…</p>
       <p class="constraint">⚠ You need preference data and a held-out harm/quality eval, not a vibes demo.</p>
       <p class="sowhat">Prototype on RL post-training against your stack — one eval, one constraint, then kill or keep.</p>
-      <div class="links"><a href="https://arxiv.org/abs/2611.03627v1">Paper &rarr;</a></div>
+      <div class="links"><a href="https://arxiv.org/abs/2611.05377v1">Paper &rarr;</a></div>
+    </article>
+
+    <article class="card">
+      <div class="card-top"><span class="verdict" style="border-color:#d4a574;color:#d4a574">Prototype</span>
+      <span class="fit">High fit · 86</span></div>
+      <h3>From Autonomous Agents to Cognitive Symbionts: Toward AI-Augmented Human Intelligence</h3>
+      
+      <p class="concept"><strong>Transformers</strong> — The backbone architecture behind modern language and vision models.</p>
+      <p class="why">For a decade, progress in artificial intelligence has been measured by how much a machine can do on its own. Large foundation models now write code and run multistep tasks, and personal agents act on a person&#x27;s behalf. Yet people still forget what they once knew, miss what they are not looking at, fail to find the right words, and face hard choices without the benefit of their own history, because the machine that co</p>
+      <p class="abstract">For a decade, progress in artificial intelligence has been measured by how much a machine can do on its own. Large foundation models now write code and run multistep tasks, and personal agents act on a person&#x27;s behalf. Yet people still forget what they once knew, miss what they are not looking at, fail to find the right words, and face hard choices without the benefit of their own history, because the machine that could help stands outside the situation. As AI moves into the physical world, attention has settled on one kind of intelligent individual, the embodied robot; we argue that the era o…</p>
+      <p class="constraint">⚠ Watch sequence length and attention memory before you copy the architecture.</p>
+      <p class="sowhat">Prototype on Transformers against your stack — one eval, one constraint, then kill or keep.</p>
+      <div class="links"><a href="https://arxiv.org/abs/2611.05376v1">Paper &rarr;</a></div>
+    </article>
+
+    <article class="card">
+      <div class="card-top"><span class="verdict" style="border-color:#d4a574;color:#d4a574">Prototype</span>
+      <span class="fit">High fit · 88</span></div>
+      <h3>Aligning Language Models with General Preferences: An Empirical Study of Direct Nash Optimization</h3>
+      
+      <p class="concept"><strong>RL post-training</strong> — Aligning a pretrained model with preference or reward data (RLHF, DPO, GRPO).</p>
+      <p class="why">Direct Nash Optimization (DNO) aligns a language model to a general preference function by approximating the Nash equilibrium of a two-player preference game. Its practical variant, DNO-Prct, iterates on-policy sampling, LLM-based rating of the samples together with a teacher&#x27;s gold response, large-margin preference-pair selection and a DPO-style contrastive update. We re-implement DNO-Prct independently and study it</p>
+      <p class="abstract">Direct Nash Optimization (DNO) aligns a language model to a general preference function by approximating the Nash equilibrium of a two-player preference game. Its practical variant, DNO-Prct, iterates on-policy sampling, LLM-based rating of the samples together with a teacher&#x27;s gold response, large-margin preference-pair selection and a DPO-style contrastive update. We re-implement DNO-Prct independently and study it on two open-weight instruct models, Llama 3.1 8B Instruct and Mistral 7B Instruct v0.1, with GPT-4o or a larger open-weight model of the same family as the annotator. On AlpacaEva…</p>
+      <p class="constraint">⚠ You need preference data and a held-out harm/quality eval, not a vibes demo.</p>
+      <p class="sowhat">Prototype on RL post-training against your stack — one eval, one constraint, then kill or keep.</p>
+      <div class="links"><a href="https://arxiv.org/abs/2611.05373v1">Paper &rarr;</a></div>
+    </article>
+
+    <article class="card">
+      <div class="card-top"><span class="verdict" style="border-color:#d4a574;color:#d4a574">Prototype</span>
+      <span class="fit">High fit · 89</span></div>
+      <h3>PolicyIK: High-Precision Inverse Kinematics for Robot Arms with Reinforcement Learning</h3>
+      
+      <p class="concept"><strong>RL post-training</strong> — Aligning a pretrained model with preference or reward data (RLHF, DPO, GRPO).</p>
+      <p class="why">Inverse kinematics (IK) converts end-effector pose commands into joint motion, and many vision-language-action (VLA) policies rely on it to act on a given arm and to transfer across embodiments. Precise IK remains laborious: redundancy and singularities complicate the inverse mapping, execution depends on hand-tuned controllers, and training data on physical robots are costly to collect. We present PolicyIK, a goal-c</p>
+      <p class="abstract">Inverse kinematics (IK) converts end-effector pose commands into joint motion, and many vision-language-action (VLA) policies rely on it to act on a given arm and to transfer across embodiments. Precise IK remains laborious: redundancy and singularities complicate the inverse mapping, execution depends on hand-tuned controllers, and training data on physical robots are costly to collect. We present PolicyIK, a goal-conditioned reinforcement learning policy for high-precision IK. It updates joint-position references from pose feedback and observes its accumulated reference relative to the measu…</p>
+      <p class="constraint">⚠ You need preference data and a held-out harm/quality eval, not a vibes demo.</p>
+      <p class="sowhat">Prototype on RL post-training against your stack — one eval, one constraint, then kill or keep.</p>
+      <div class="links"><a href="https://arxiv.org/abs/2611.05372v1">Paper &rarr;</a></div>
+    </article>
+
+    <article class="card">
+      <div class="card-top"><span class="verdict" style="border-color:#d4a574;color:#d4a574">Prototype</span>
+      <span class="fit">High fit · 86</span></div>
+      <h3>GUILD: Guided Iterative Data Collection for Imitation Learning</h3>
+      
+      <p class="concept"><strong>Retrieval-augmented generation</strong> — Fetching documents at query time instead of stuffing everything into weights.</p>
+      <p class="why">Imitation learning policies in robotics are trained on datasets collected through costly real-world teleoperation. Often, the data-collection process is unguided, relying on the teleoperator&#x27;s intuition, resulting in data that contributes little to overall policy performance. Recent work has shown that curating such unguided datasets can substantially improve policy performance, but these approaches operate by filter</p>
+      <p class="abstract">Imitation learning policies in robotics are trained on datasets collected through costly real-world teleoperation. Often, the data-collection process is unguided, relying on the teleoperator&#x27;s intuition, resulting in data that contributes little to overall policy performance. Recent work has shown that curating such unguided datasets can substantially improve policy performance, but these approaches operate by filtering existing datasets after collection and therefore do not prevent the acquisition of uninformative data. In this work, we propose GUILD, a novel Guided Data Collection (GDC) meth…</p>
+      <p class="constraint">⚠ Measure retrieval recall on YOUR corpus; the generator cannot fix a dead index.</p>
+      <p class="sowhat">Prototype on Retrieval-augmented generation against your stack — one eval, one constraint, then kill or keep.</p>
+      <div class="links"><a href="https://arxiv.org/abs/2611.05368v1">Paper &rarr;</a></div>
     </article>
 <footer>Generated by <a href="https://github.com/messishivi/mle-professor-app">MLE Professor</a>
 · verdicts are rule-based drafts, not financial/production advice.</footer>
